@@ -1,0 +1,222 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+\usepackage{amsmath,amsfonts,amsthm,amssymb}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{caption} 
+\usepackage{algpseudocode}
+\usepackage{bbm}
+\usepackage{float}
+\usepackage{framed}
+\usepackage{enumerate}
+\usepackage{enumitem}
+\usepackage{color}
+\usepackage[colorlinks=true, linkcolor=red, urlcolor=blue, citecolor=blue]{hyperref}
+
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+\newcommand{\bv}[1]{\mathbf{#1}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\Cost}{Cost}
+\DeclareMathOperator{\cut}{cut}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator*{\lmin}{\lambda_{min}}
+\DeclareMathOperator*{\lmax}{\lambda_{max}}
+\DeclareMathOperator{\Var}{Var}
+
+\topmargin 0pt
+\advance \topmargin by -\headheight
+\advance \topmargin by -\headsep
+\textheight 8.9in
+\oddsidemargin 0pt
+\evensidemargin \oddsidemargin
+\marginparwidth 0.5in
+\textwidth 6.5in
+
+\parindent 0in
+\parskip 1.5ex
+
+\newcommand{\homework}[3]{
+	\noindent
+	\begin{center}
+		\framebox{
+			\vbox{
+				\hbox to 6.50in { {\bf NYU CS-GY 6763: Algorithmic Machine Learning 
+						and Data Science} \hfill Fall 2023 }
+				\vspace{4mm}
+				\hbox to 6.50in { {\Large \hfill Homework #1  \hfill} }
+				\vspace{2mm}
+				\hbox to 6.50in { {Name: #2 \hfill} }
+			}
+		}
+	\end{center}
+	\vspace*{4mm}
+}
+
+\begin{document}
+	
+	\homework{3}{Solution key}
+	
+	\section*{Problem 1}
+	
+	We will solve this problem by bounding $\E[\|\mathbf{s} - \boldsymbol{\mu}\|_2^2]$ and applying Markov's inequality. We have:
+	\begin{align*}
+		\|\mathbf{s} - \boldsymbol{\mu}\|_2^2 = \|\frac{1}{k}\sum_{i=1}^k (\bv{x}_i - \bs{\mu})\|_2^2 = \frac{1}{k^2}\sum_{i=1}^k \|\bv{x}_i - \bs{\mu}\|_2^2 + \sum_{i\neq j}(\bv{x}_i - \bs{\mu})^T(\bv{x}_j - \bs{\mu}).
+	\end{align*}
+	We want to apply linearity of expectation to the expression above to compute $\E[\|\mathbf{s} - \boldsymbol{\mu}\|_2^2]$. In particular, we are given that
+	\begin{align*}
+		\E\left[\sum_{i=1}^k \|\bv{x}_i - \bs{\mu}\|_2^2\right] = k\sigma^2
+	\end{align*}
+	and  claim that for all $i \neq j$,
+	\begin{align*}
+		\E\left[(\bv{x}_i - \bs{\mu})^T(\bv{x}_j - \bs{\mu})\right] = 0.
+	\end{align*}
+	To see why this is the case note that, since $\bv{x}_i$ and $\bv{x}_j$ are independent, 
+	\begin{align*}
+		\E\left[(\bv{x}_i - \bs{\mu})^T\E\left[(\bv{x}_j - \bs{\mu})\right]\right] = 		\E\left[(\bv{x}_i - \bs{\mu})^T0\right] = 0.
+	\end{align*}
+	So, overall we conclude that:
+	\begin{align*}
+		\E\left[\|\mathbf{s} - \boldsymbol{\mu}\|_2^2\right] = \frac{1}{k^2}\E\left[\sum_{i=1}^k \|\bv{x}_i - \bs{\mu}\|_2^2\right] = \frac{1}{k}\sigma^2. 
+	\end{align*}
+	Applying Markov's inequality, we have that :
+\begin{align*}
+	\Pr[\|\mathbf{s} - \boldsymbol{\mu}\|_2^2 \geq \frac{1}{\delta}\frac{1}{k}\sigma^2] \leq \delta.
+\end{align*}
+Plugging in $k = \frac{1}{\delta \epsilon^2}$ and taking square roots on the both sides of the inequality inside the probability yields the bound.
+
+
+	\section*{Problem 2}
+	We first prove a general result on the strong convexity and smoothness of the sum of two functions.
+	Consider functions $f(\bv{x})$ and $h(\bv{x})$ that are $\alpha_1$-strongly convex, $\beta_1$ smooth, and  $\alpha_2$-strongly convex, $\beta_2$ smooth, respectively. We have that:
+	\begin{align*}
+		\frac{\alpha_1}{2}\|\bv{x} - \bv{y}\|_2^2 \leq f(\bv{y}) - f(\bv{x}) - \nabla f(\bv{x})^T(\bv{y} - \bv{x}) \leq \frac{\beta_2}{2}\|\bv{x} - \bv{y}\|_2^2 \\
+		\frac{\alpha_2}{2}\|\bv{x} - \bv{y}\|_2^2 \leq h(\bv{y}) - h(\bv{x}) - \nabla h(\bv{x})^T(\bv{y} - \bv{x}) \leq \frac{\beta_2}{2}\|\bv{x} - \bv{y}\|_2^2.
+	\end{align*}
+	Adding the inequalities, we have:
+	\begin{align*}
+		\frac{\alpha_1 + \alpha_2}{2}\|\bv{x} - \bv{y}\|_2^2 \leq f(\bv{y}) + h(\bv{y}) - (f(\bv{x}) + h(\bv{x})) - (\nabla f(\bv{x}) + \nabla h(\bv{x}) )^T(\bv{y} - \bv{x}) \leq 	\frac{\beta_1 + \beta_2}{2}\|\bv{x} - \bv{y}\|_2^2.
+	\end{align*}
+	So, we conclude that the function $g(\bv{x}) = f(\bv{x}) + h(\bv{x})$ is $(\alpha_1 + \alpha_2)$-strongly convex. 
+
+	Now, consider the function $h(x) = \lambda \|\bv{x}\|_2^2$. The function has gradient $2\lambda \bv{x}$. So we have that:
+	\begin{align*}
+		h(\bv{y}) - h(\bv{x}) - \nabla h(\bv{x})^T(\bv{y} - \bv{x}) &= \lambda\|\bv{y}\|_2^2 - \lambda\|\bv{x}\|_2^2 - 2\lambda \bv{x}^T(\bv{y} - \bv{x})\\
+		 &= \lambda\|\bv{y}\|_2^2 + \lambda\|\bv{x}\|_2^2 - 2\lambda\bv{x}^T(\bv{y}\\
+		&= \lambda \|\bv{x} - \bv{y}\|_2^2. 
+	\end{align*}
+	In other words, the function is $2\lambda$-strongly convex and $2\lambda$-smooth, so has condition number $1$. We conclude that $g(\bv{x}) = f(\bv{x}) + h(\bv{x})$ is $(\alpha_1 + 2\lambda)$-strongly convex, so is convex. Furthermore, $g$'s condition number is:
+	\begin{align*}
+		\frac{\beta_1 + 2\lambda}{\alpha_1 + 2\lambda} \leq \frac{\beta_1 + 2\frac{\beta_1}{\alpha_1}\lambda}{\alpha_1 + 2\lambda} = \frac{\beta_1}{\alpha_1}.
+	\end{align*}
+	In the first inequality, we used that $\beta_1/\alpha_1 \geq 1$. 
+
+	\section*{Problem 3}
+	\begin{enumerate}[label=(\alph*)]
+		\item
+		Call the separation oracles for $A$ and $B$.  If the element is in both sets, it is in $A \cap B$.  Otherwise, at least one of the oracles returned a separating hyperplane; return either of these. That hyperplane separates $\bv{x}$ from either $A$ or $B$, so clearly separates it from $A \cap B$. 
+		
+		\item
+		We can check in $O(n)$ time if the point $\bv{x}$ is in the $\ell_1$ ball by adding up the magnitude of it's entries. If the point is outside the $\ell_1$ ball, return the vector $\bv{s} = \text{sign}(\bv{x})$ which has a $1$ in index $i$ if $x_i$ is positive and otherwise has a negative $1$. We have that $\bv{s}^T\bv{x} = \|\bv{x}\|_1 > 1$ since $\bv{x}$ is not in the $\ell_1$ ball. On the other hand, we always that $\bv{s}^T\bv{y} \leq \|\bv{y}\|_1$. Specifically, $\bv{s}^T\bv{y} = \sum_{i=1} \pm 1 \cdot |y_i| \leq \sum_{i=1} |y_i| = \|\bv{y}\|_1$. So, $\bv{s}^T\bv{y} \leq 1$ for all $u$ in $\mathcal{A}$. So $(\bv{s}, 1)$ determines a valid separating hyperplane. And $\bv{s}$ can be computed in $O(n)$ time.
+		
+		\item Let $\bv{y} = \text{Proj}_A(\bv{x})$. If $\bv{y} = \bv{x}$ then we are in the set and don't need to return anything. Otherwise, return $(\bv{a}, \bv{a}^T \bv{x})$ as our separating hyperplane, where $\bv{a} = \bv{x} - \bv{y}$
+		
+		Our goal is to prove that, for all $\bv{z}\in \mathcal{A}$, 
+		\begin{align*}
+			\bv{z}^T(\bv{x}-\bv{y}) < \bv{x}^T(\bv{x}-\bv{y})
+		\end{align*}
+		
+		To do so, first observe that, for any $\bv{z}\in \mathcal{A}$, the angle between the vectors $\bv{x} - \bv{y}$ and $\bv{z} - \bv{y}$ must be greater than or equal to 90 degrees. I.e. that $(\bv{x} - \bv{y})^T(\bv{z} - \bv{y}) \leq 0$. To see that this is the case, draw a triangle between $\bv{x}, \bv{y}, \bv{z}$. If the angle was acute, we could draw a line from $\bv{x}$ that meets the line between $\bv{y}$ and $\bv{z}$ at a 90 degree angle. This line would both be in the convex set (since by definition every point on the line between $\bv{y}$ and $\bv{z}$ is) and also be closer to $\bv{x}$ than $\bv{y}$, contradicting the fact that $\bv{y}$ is $\bv{x}$'s projection on to the set. 
+
+		If the angle between $\bv{x} - \bv{y}$ and $\bv{z} - \bv{y}$  is greater than 90 degrees, we have that:
+		\begin{align*}
+			(\bv{z}-\bv{y})^T(\bv{x}-\bv{y}) < 0 \leq (\bv{x}-\bv{y})^T(\bv{x}-\bv{y}).
+		\end{align*}
+		Adding $\bv{y}^T(\bv{x}-\bv{y})$ to both sides of the inequality proves our goal. I.e., we have
+	shown that for $\bv{a} = \bv{x} - \bv{y}$, for all $\bv{z}\in \mathcal{A}$, $\bv{a}^T \bv{z}  < \bv{a}^T\bv{x}$ , so we have a valid separating hyperplane.
+		
+		\item
+		We still choose $\bv{a} = \bv{x} - \bv{y}$ as in the previous subproblem. To prove this is a valid separating hyperplane, it suffices to show that for all $\bv{z}'$ in the $\epsilon$-neighborhood of $\mathcal{A}$, that $\bv{a}^T\bv{z}' < \bv{a}^T \bv{x}$ when $\bv{x}$ is not in the $\epsilon$-neighborhood of $\mathcal{A}$. To prove this, first note that $\bv{z}'$ can always be written as the sum $\bv{z}' = \bv{z} + \bv{w}$ where $\bv{z}$ is a point in $\mathcal{A}$ and $\|\bv{w}\|_2 \leq \epsilon$.  
+		
+By the same analysis as above, we have that $(\bv{x}-\bv{y})^T \bv{z} < \bv{x}^T (\bv{x}-\bv{y}) -\|\bv{x}-\bv{y}\|_2^2$. We then bound:
+\begin{align}
+	(\bv{x}-\bv{y})^T \bv{z}' &= (\bv{x}-\bv{y})^T \bv{z} + (\bv{x}-\bv{y})^T \bv{w}\\
+	&\leq  \bv{x}^T (\bv{x}-\bv{y}) - \|\bv{x} - \bv{y}\|_2^2 + (\bv{x}-\bv{y})^T \bv{w}\\
+		&\leq  \bv{x}^T (\bv{x}-\bv{y}) - \|\bv{x} - \bv{y}\|_2^2 + \epsilon \|\bv{x}-\bv{y}\|_2.
+\end{align}
+The last inequality follows from Cauchy-Schwarz. Finally, since $\bv{x}$ is not in the $\epsilon$ neighborhood, $\|\bv{x}-\bv{y}\|_2 > \epsilon$, so  $\|\bv{x} - \bv{y}\|_2^2 > \epsilon \|\bv{x}-\bv{y}\|_2$ and thus we conclude that :
+\begin{align*}
+	(\bv{x}-\bv{y})^T \bv{z}'  <  \bv{x}^T (\bv{x}-\bv{y})  - 0,
+\end{align*}
+which completes the argument.
+	\end{enumerate}
+	
+\section*{Problem 4}
+We start with basically the same analysis from class, where we showed using convexity that:
+\begin{align*}
+	f(\bv{x}^{(i)}) - f(\bv{x}^*) \leq \frac{\|\bv{x}^{(i)} - \bv{x}^*\|_2^2 - \|\bv{x}^{(i+1)} - \bv{x}^*\|_2^2}{2\eta} + \frac{\eta \|\nabla f(\bv{x}^{(i)})\|_2^2}{2}. 
+\end{align*}
+See e.g. Slide 50 on Lecture 6. They don't need to reprove this from scratch.
+
+Now, plug in $\eta = \frac{f(\bv{x}^{(i)}) - f(\bv{x}^{*})}{\|f(\bv{x}^{(i)})\|_2}$. We get: 
+\begin{align*}
+	f(\bv{x}^{(i)}) - f(\bv{x}^*) \leq \frac{\|\bv{x}^{(i)} - \bv{x}^*\|_2^2 - \|\bv{x}^{(i+1)} - \bv{x}^*\|_2^2}{2(f(\bv{x}^{(i)}) - f(\bv{x}^*))}\cdot\|\nabla f(\bv{x}^{(i)})\|_2^2 + \frac{f(\bv{x}^{(i)}) - f(\bv{x}^*)}{2}. 
+\end{align*}
+Using that $\|\nabla f(\bv{x}^{(i)})\|_2^2 \leq G^2$, we have:
+\begin{align*}
+\frac{f(\bv{x}^{(i)}) - f(\bv{x}^*)}{2}\leq \frac{\|\bv{x}^{(i)} - \bv{x}^*\|_2^2 - \|\bv{x}^{(i+1)} - \bv{x}^*\|_2^2}{2(f(\bv{x}^{(i)}) - f(\bv{x}^*))}\cdot G^2. 
+\end{align*}
+And multiplying through by $2(f(\bv{x}^{(i)}) - f(\bv{x}^*)$, we have:
+\begin{align*}
+	(f(\bv{x}^{(i)}) - f(\bv{x}^*))^2 \leq \left(\|\bv{x}^{(i)} - \bv{x}^*\|_2^2 - \|\bv{x}^{(i+1)} - \bv{x}^*\|_2^2\right)\cdot G^2
+\end{align*}
+Now we use a telescoping sum argument as before to get that:
+\begin{align*}
+	\sum_{i=0}^{T-1} (f(\bv{x}^{(i)}) - f(\bv{x}^*))^2 \leq \left(\|\bv{x}^{(0)} - \bv{x}^*\|_2^2 - \|\bv{x}^{(T)} - \bv{x}^*\|_2^2\right)\cdot G^2 \leq \|\bv{x}^{(0)} - \bv{x}^*\|_2^2\cdot G^2 \leq R^2\cdot G^2. 
+\end{align*}
+I.e. 
+\begin{align*}
+	\frac{1}{T}\sum_{i=0}^{T} (f(\bv{x}^{(i)}) - f(\bv{x}^*))^2 \leq \frac{R^2 G^2}{T}.
+\end{align*}
+This implies that the average squared error is less than or equal to $R^2G^2/T$, so there must be some $i$ such that $(f(\bv{x}^{(i)}) - f(\bv{x}^*))^2 \leq R^2G^2/T$. We conclude that:
+\begin{align*}
+	f(\hat{\bv{x}}) - f(\bv{x}^*) \leq RG/\sqrt{T}. 
+\end{align*}
+Setting $T = R^2G^2/\epsilon^2$ yields the desired result. 
+
+
+\section*{Problem 5}
+
+			1. To solve this problem, we show that $\sum_{i=1}^n \|\bv{x}_i\|_2^2 = \frac{1}{2n}\sum_{i,j} \bv{D}_{i,j}$.
+			\begin{align*}
+				\sum_{i,j} \bv{D}_{i,j} = \sum_{i} \sum_{j} \|\bv{x}_i\|_2^2 + \|\bv{x}_j\|_2^2 - 2\bv{x}_i^T\bv{x}_j = \sum_{i} \sum_{j} \|\bv{x}_i\|_2^2 + \|\bv{x}_j\|_2^2 - 2\bv{x}_i^T\sum_{j} \bv{x}_j.
+			\end{align*}
+			By our assumption that our points are centered around the origin, $\sum_{j} \bv{x}_j = \bv{0}$, so we conclude 
+			\begin{align*}
+			\sum_{i,j} \bv{D}_{i,j} = \sum_{i,j} \|\bv{x}_i\|_2^2 + \|\bv{x}_j\|_2^2 = 2n \sum_{i} \|\bv{x}_i\|_2^2.
+			\end{align*}
+			2. Similarly, using the same assumption, we can have that for any $i$, 
+			\begin{align*}
+			\sum_{j} \bv{D}_{i,j} =\sum_{j} \|\bv{x}_i\|_2^2 + \|\bv{x}_j\|_2^2 - 2\bv{x}_i^T\bv{x}_j = n \|\bv{x}_i\|_2^2 + \sum_j \|\bv{x}_j\|_2^2.
+			\end{align*}
+			So we can compute $\|\bv{x}_i\|_2^2$ via the formula $\|\bv{x}_i\|_2^2 = \frac{1}{n}\left(\sum_{j} \bv{D}_{i,j} - \sum_{j} \|\bv{x}_j\|_2^2\right)$. The second term in parenthesis we can compute using Part 1. 
+			
+			3. Using the norms calculated from part (b), we can form the a matrix $\bv{N}$ where;
+			\begin{align*}
+			\bv{N}_{i,j} = \|\bv{x}_i\|_2^2 + \|\bv{x}_j\|_2^2.
+			\end{align*}
+			Let $\bv{M} = (\bv{N} - \bv{D})/2$. Notice that $\bv{M}$'s entries satisfy $\bv{M}_{i,j} = \bv{x}_i^T\bv{x}_j$. $\bv{M}$'s $i^\text{th}$ diagonal entry equals $\|\bv{x}_i\|_2^2$. So, it suffices to return any $\bv{W} \in \R^{n\times d}$ such that $\bv{W}\bv{W}^T = \bv{M}$. $\bv{W}$'s rows will have the same pairwise distances as the points in $\bv{X}$, and thus solve the problem. 
+			
+			To find such a $\bv{W}$, we can factor $\bv{M}$ using the SVD. Since it is symmetric, we will get a factorization of the form $\bv{V}\bs{\Sigma}\bv{V}^T$. Only $d$ of $\bs{\Sigma}$'s diagonal entries will be nonzero since $\bv{M}$ is rank $d$ (since $\bv{M} = \bv{X}\bv{X}^T$). So we can we can truncate this factorization to get $\bv{V}_d\bs{\Sigma}_d\bv{V}_d^T = \bv{M}$ where $\bv{V}_d \in \R^{n\times d}$ $\bs{\Sigma}_d\in \R^{d\times d}$. Then we return $\bv{W} =\bv{V}_d \sqrt{\bs{\Sigma}_d}$. 
+
+		% 4. Don't need to check implmentation, but just check that they got a reasonable answer. 
+
+
+
+
+	
+
+\end{document}

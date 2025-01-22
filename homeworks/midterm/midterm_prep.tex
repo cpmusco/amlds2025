@@ -1,0 +1,185 @@
+\documentclass[10pt]{article}
+\usepackage{titlesec}
+\usepackage{geometry}
+\geometry{verbose,tmargin=.9in,bmargin=.9in,lmargin=1.0in,rmargin=1.0in}
+\usepackage{amsmath,amsfonts,amsthm,amssymb}
+\usepackage{url}
+\usepackage{color}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage[colorlinks=true, linkcolor=red, urlcolor=blue, citecolor=gray]{hyperref}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+\newcommand{\bv}[1]{\mathbf{#1}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\DeclareMathOperator*{\Var}{var}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\definecolor{nyuDarkPurple}{HTML}{330662}
+\definecolor{nyuOfficialPurple}{HTML}{57068c}
+
+\newcommand{\spara}[1]{\vspace{.5em}\noindent {\large\sffamily\textcolor{nyuOfficialPurple}{#1}}}
+\titleformat{\section}[hang]{\Large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsection}[hang]{\large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsubsection}[hang]{\normalsize\sffamily\color{gray}}{\thesection}{1em}{}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{\includegraphics[width=4cm]{tandon_long_color.eps}}
+\rhead{\thepage}
+\pagenumbering{gobble}
+
+\setcounter{secnumdepth}{0}
+
+\begin{document}
+	
+\begin{center}
+	\normalsize
+	New York University Tandon School of Engineering
+	
+	Computer Science and Engineering
+	\medskip
+	
+	\large
+	CS-GY 6763: Midterm Practice. 
+	\medskip
+\end{center} 
+
+\section{Logistics}
+\begin{itemize}
+	\item Exam will be held in class on \textbf{Friday, 10/20} starting at 2:00pm sharp. Please arrive on time!
+	\item Feyza will give a lecture for the second half of class after a short break. 
+	\item You will have \textbf{1 hour} to answer a variety of short answer and longer form questions.
+	\item You can bring a one page sheet of paper (two-sided if you want) with notes, theorems, etc. written down for reference. 
+	\item I will be in the room to answer any questions.
+\end{itemize}
+
+\section{Concepts to Know}
+
+\subsection{Random variables and concentration.}
+\begin{itemize}
+	\item Linearity of expectation and variance.
+	\item Indicator random variables and how to use them.
+	\item Markov's inequality, Chebyshev's inequality (ideally should know from memory so you can apply quickly).
+	\item Union bound  (should know from memory).
+	\item Chernoff and Bernstein bounds (don't need to memorize the exact bounds, but can apply if given).
+	\item General idea of law of large numbers and central limit theorem. 
+	\item The probability that a normal random variables $\mathcal{N}(0,\sigma^2)$ falls further than $k\sigma$ away from its expectation is $\leq O(e^{-k^2/2})$. 
+\end{itemize}
+
+\subsection{Hashing, Dimensionality Reduction, High Dimensional Vectors}
+\begin{itemize}
+	\item Random hash functions.
+	\item Random hashing for frequency estimation. 
+	\item Random hashing for distinct elements estimation.
+	\item MinHash for Jaccard similarity estimation. 
+	\item Locality sensitive hash functions. 
+	\item MinHash and SimHash for Jaccard Similarity and Cosine Similarity.
+	\item Adjusting false positive rate and false negative rate in an LSH scheme. 
+	\item Statement of Johnson-Lindenstrauss lemma (know from memory).
+	\item Statement of \emph{distributional} JL lemma and how it can be used to prove JL.
+\end{itemize}
+
+\subsection{High dimensional geometry}
+\begin{itemize}
+	\item How to draw a random unit vector from the sphere in $d$ dimensions (draw $\bv{x}$ with all entries i.i.d. $\mathcal{N}(0,1)$ and normalize it). 
+	\item How does $\|x - y\|_2^2$ relate to $\langle x, y\rangle$ if $x$ and $y$ are unit vectors?
+%	\item Why is the inner product $\langle x,  y\rangle$ of two uniformly random unit vectors on the sphere identically distributed to to $\langle e_i,  y\rangle$ for any standard basis vector $e_i$? Or for that matter to $\langle z,  y\rangle$ for any fixed vector $z$?
+	\item How many mutually orthogonal unit vectors are there in $d$ dimensions?
+	\item There are $2^{\theta(\epsilon^2d)}$ nearly orthogonal unit vectors in $d$ dimensions (with $\langle x,  y\rangle \leq \epsilon$). Know roughly how prove this fact using the \emph{probabilistic method}, which required a an exponential \emph{concentration inequality} + \emph{union bound}.
+	\item Know how to prove that all but an $2^{\theta(-\epsilon d)}$ fraction of a balls volume in $d$ dimensions lies in a spherical shell of width $\epsilon$ near its surface.
+	\item The surface area/volume ratio \emph{increases} in high dimensions. 
+	\item The cube volume/ball volume ratio \emph{increases} in high dimensions.
+	
+\end{itemize}
+
+% \subsection{Convex optimization}
+% \begin{itemize}
+% 	\item Definition(s) of convex function.
+% 	\item Definition of convex set.
+% 	\item Gradient descent basic update rule. 
+% 	\item Definitions of $G$-Lipschitz, $\beta$-smooth, $\alpha$-strongly convex. Know the first order definition for high-dimensional functions. The second order definition you only need to know for low-dimensional functions. I.e. a twice differentiable function $f:\R\rightarrow \R$ is $\beta$-smooth, $\alpha$-strongly convex if for all $x$, $\alpha \leq f''(x) \leq \beta$. I won't test on Hessians.
+% 	\item Definition of condition number.
+% 	\item How much time does it take to multiply an $n\times d$ matrix by a $d \times m$ matrix?
+% 	\item Be able to compute gradients of basic functions from $\R^d \rightarrow \R$. 
+% 	\item Definition(s) of convex function.
+% \end{itemize}
+
+	
+	\section{Practice Problems}
+	
+	\subsection{Random variables and concentration.}
+	
+	\begin{enumerate}
+		\item Show that for any  random variable ${X}$, $\E[{X}^2] \ge \E[{X}]^2$.
+		\item Show that for independent ${X}$ and ${Y}$ with $\E[{X}] = \E[{Y}] = 0$, $\Var[{X} \cdot {Y}] = \Var[X] \cdot \Var[Y]$. 
+		\item Given a random variable $X$, can we conclude that $\E[1/X] = 1/E[X]$? If so, prove this. If not, give an example where the equality does not hold.
+		\item Indicate whether each of the following statements is \textbf{always} true, \textbf{sometimes} true, or \textbf{never} true. Provide a short justification for your choice. 
+		\begin{enumerate}[label=(\alph*)]
+			\item $\Pr[{X} = s \text{ and } {Y} = t] > \Pr[{X} = s]$. \hspace{1em}ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER
+			\item $\Pr[{X} = s \text{ or }  {Y} = t] \le \Pr[{X} = s] + \Pr[{Y} = t]$. \hspace{1em}ALWAYS \hspace{1em} SOMETIMES\hspace{1em} NEVER
+			\item $\Pr[{X} = s \text{ and } {Y} = t] = \Pr[{X} = s] \cdot \Pr[{Y} = t]$. \hspace{1em}ALWAYS\hspace{1em} SOMETIMES \hspace{1em} NEVER
+		\end{enumerate}
+		\item Assume there are $1000$ registered users on your site $u_1, \ldots, u_{1000}$, and in a given day, each user
+		visits the site with some probability $p_i$. The event that any user visits the site is independent of what the other users do. Assume that $\sum_{i=1}^{1000} p_i = 500$. 
+		\begin{enumerate}
+			\item  Let $X$ be the number of users that visit the site on the given day. What is $E[X]$?
+			\item Apply a Chernoff bound to show that $Pr[X \geq 600] \leq .01$.
+			\item Apply Markov’s inequality and Chebyshev’s inequality to bound the same probability.
+			How do they compare?
+		\end{enumerate}
+		\item Give an example of a random variable and a deviation t where Markov’s inequality gives a	tighter upper bound than Chebyshev’s inequality.
+	\end{enumerate}
+	
+	\subsection{Hashing, Dimensionality Reduction, High Dimensional Vectors}
+	\begin{enumerate}
+%		\item SimHash can be applied to binary vectors ${y}, {q}\in \{0,1\}^d$. How does doing so compare to MinHash? How is the Jaccard similarity $J(y,q)$ related to the cosine similarity $\cos(\theta(y,q))$?
+		\item Suppose there is some unknown vector $\bs{\mu} \in \R^d$. We receive noise perturbed random samples of the form $\bv{Y}_1 = \bs{\mu} + \bv{X}_1, \ldots, \bv{Y}_k = \bs{\mu} + \bv{X}_k$ where each $\bv{X}_i$ is a random vector with each of its entries distributed as an independent random normal $\mathcal{N}(0,1)$. From our samples $\bv{Y}_1, \ldots, \bv{Y}_k$ we hope to estimate $\bs{\mu}$ by $\bs{\tilde{\mu}} = \frac{1}{k}\sum_{i=1}^k \bv{Y}_i$. 
+		\begin{enumerate}
+			\item How many samples $k$ do we require so that $\max_{i=1,\ldots, d}|\bs{\mu}_i -\bs{\tilde{\mu}_i} | \leq \epsilon$ with probability $9/10$?
+			\item How many samples $k$ do we require so that $\|\bs{\mu} -\bs{\tilde{\mu}}\|_2 \leq \epsilon$ with probability $9/10$?
+		\end{enumerate}
+		\item Let $\bs{\Pi}$ be a random Johnson-Lindenstrauss matrix (e.g. scaled random Gaussians) with $O(\log(1/\delta)/\epsilon^2)$ rows. Prove that with probability $(1-\delta)$,
+		\begin{align*}
+			\min_{\bv{x}} \|\bs{\Pi}\bv{A}\bv{x} - \bs{\Pi}\bv{b}\|_2^2 \leq (1+\epsilon) \min_{\bv{x}} \|\bv{A}\bv{x} - \bv{b}\|_2^2 
+		\end{align*}
+%			Is the following also true with high probability?
+%	\begin{align*}
+%		(1-\epsilon) \min_{\bv{x}} \|\bv{A}\bv{x} - \bv{b}\|_2^2\leq \min_{\bv{x}} \|\bs{\Pi}\bv{A}\bv{x} - \bs{\Pi}\bv{b}\|_2^2
+%	\end{align*}
+	\end{enumerate}
+	
+	
+	
+	% \subsection{Convex optimization}
+	% From \emph{Convex Optimization} book (\url{https://web.stanford.edu/\~boyd/cvxbook/bv_cvxbook.pdf}):
+	% \begin{itemize}
+	% 	\item \textbf{Exercises:} 3.7, 3.10, 3.11 (first part), 3.21 (lots of other problems if you want more practice, but many are on the harder side)
+	% \end{itemize}
+	
+	% \begin{enumerate}
+	% 	\item Let $f_1(x), \ldots, f_n(x)$ be $\beta$-smooth convex functions and let $g(x) = \frac{1}{n}\sum_{i=1}^n f_i(x)$ be their average. Show that $g$ is $\beta$-smooth.
+	% 	\item Let $f: \R\rightarrow \R$ be a $\beta$-smooth, $\alpha$-strongly  convex function. Let $g(x) = f(c\cdot x)$ for some constant $0< c < 1$.  How does $g$'s smoothness and strong convexity compare to that of $f$? How about $g$'s condition number?
+	% 	%	\item We stated in class that a $\beta$-smooth convex function can be optimized to error $\epsilon$ in $O(\beta R^2/\epsilon)$ iterations of gradient descent. Suppose $f$ is not $\beta$-smooth -- we only know it is $G$-Lipschitz. 
+	% 	\item Let $f(x) = x^4$. Is $f$ $G$-Lipschitz for finite $G$?  Is $f$ $\beta$-smooth for finite $B$? 
+	% 	%	\item In stochastic gradient descent, we have a function $f(\bv{x}) = \sum_{i=1}^n f_i(\bv{x})$. At each step we pick an $f_i$ uniformly at random and update $\bv{x}^{(t+1)} = \bv{x}^{(t)} - \eta \nabla f_i(\bv{x}^{(t)} )$. In practice a different strategy is often used due to cache considerations: instead of picking $f_i$ at random, we cycle through functions $f_1, \ldots, f_n$, using each of their gradients in order. Specifically, we update $\bv{x}^{(t+1)} = \bv{x}^{(t)} - \eta \nabla f_j(\bv{x}^{(t)})$ where $j = t\mod (n+1)$.
+	% 	%	
+	% 	%	Show that this strategy can fail terribly in the worst case. In particular, describe a function $f(\bv{x}) = \sum_{i=1}^n f_i(\bv{x})$ where cyclic updates 
+	% \end{enumerate}
+	
+	%	\item 
+	%	
+	%	ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER\vspace{4em}
+	
+\end{document}

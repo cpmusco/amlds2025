@@ -1,0 +1,230 @@
+\documentclass[10pt]{article}
+\usepackage{titlesec}
+\usepackage{geometry}
+\geometry{verbose,tmargin=.9in,bmargin=.9in,lmargin=1.0in,rmargin=1.0in}
+\usepackage{amsmath,amsfonts,amsthm,amssymb}
+\usepackage{url}
+\usepackage{color}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage[colorlinks=true, linkcolor=red, urlcolor=blue, citecolor=gray]{hyperref}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{etoolbox}
+
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+\newcommand{\bv}[1]{\mathbf{#1}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cost}{Cost}
+\DeclareMathOperator{\cut}{cut}
+\DeclareMathOperator{\tr}{tr}
+
+\definecolor{nyuDarkPurple}{HTML}{330662}
+\definecolor{nyuOfficialPurple}{HTML}{57068c}
+
+\newcommand{\spara}[1]{\vspace{.5em}\noindent {\large\sffamily\textcolor{nyuOfficialPurple}{#1}}}
+\titleformat{\section}[hang]{\Large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsection}[hang]{\large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsubsection}[hang]{\normalsize\sffamily\color{gray}}{\thesection}{1em}{}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{\includegraphics[width=4cm]{tandon_long_color.eps}}
+\rhead{\thepage}
+\pagenumbering{gobble}
+
+\setcounter{secnumdepth}{0}
+
+\begin{document}
+	
+\begin{center}
+	\normalsize
+	New York University Tandon School of Engineering
+	
+	Computer Science and Engineering
+	\medskip
+	
+	\large
+	CS-GY 6763: Homework 4. 
+	
+	Due Thursday, December 14th, 2023, 11:59pm.
+	\medskip
+	
+	\normalsize 
+	\noindent \emph{Collaboration is allowed on this problem set, but solutions must be written-up individually. Please list collaborators for each problem separately, or write ``No Collaborators" if you worked alone.}
+	\medskip
+\end{center} 
+
+%\subsection{Problem 1: Sketches for Cut Estimation}
+%\textbf{(5 pts)}
+%Let $G(V,E)$ be a graph with vertex set $V$ and edge set $E$. Suppose $|V| = n$ and $G$ has edge vertex incidence matrix $\bv{B} \in \R^{m\times n}$. Let $\bs{\Pi} \in \R^{k \times m}$ be a random Johnson-Lindenstrauss matrix with $k$ rows. Suppose we sketch $G$ by forming the $O(kn)$ matrix $\bs{\Pi}\bv{B}$.
+%
+%Given any vertex set $S \subseteq V$, prove that it is possible to estimate $\cut(S,V\setminus S)$ up to $(1\pm \epsilon)$ error with probability $1-\delta$ using only the information in $\bs{\Pi}\bv{B}$, as long as $k = O(\log(1/\delta)/\epsilon^2)$. 
+%
+%\subsection{Problem 1: Optimal Low-Rank Approximation}
+%\textbf{(10 pts)}  In class we claimed that the best low-rank approximation to any matrix $X\in\R^{n\times d}$ is given by $XV_kV_k^T$, where $V_k \in \R^{d\times k}$ contains the top $k$ right singular vectors of $X = U\Sigma V^T$ -- i.e., the top $k$ eigenvectors of the positive semidefinite matrix $X^TX$. Here you will prove this from scratch, using just basic properties of projection matrices and eigenvectors.
+%\begin{enumerate}
+%	\item Let $X \in\R^{n\times d}$ be as above, and let $M \in\R^{n\times d}$ be a candidate $k$ rank approximation that has singular value decomposition $M = QDZ^T$ for orthonormal  $Q\in \R^{n\times k}, Z\in \R^{d\times k}$, and diagonal $D \in \R^{k\times k}$. Prove that $\|X - M\|_F^2 = \|XZZ^T - M\|_F^2 + \|X  - XZZ^T\|_F^2$ and conclude that, if $M =  \argmin_{\text{rank } k B} \|X - B\|_F^2$, then $M = XZZ^T$. 
+%\item Using a similar argument as above, one can show that, if $M = \argmin_{\text{rank } k B} \|X - B\|_F^2$, then $M = QQ^T X$. Use this and part (1) to prove that $X^TXZ = ZD^2$ for any optimal rank $k$ approximation $M = QDZ^T$. Conclude that each column of $Z$ is an eigenvector of $X^T X$. \textbf{Hint: It may
+%be helpful to prove as an intermediate step that $XZ = QD$ and $Q^T X = DZ^T$.}
+%\item Complete the proof, showing that the best low-rank approximation of $X$ is given
+%by $XV_kV_k^T$ where $V_k$ contains the top $k$ eigenvectors of $X^T X$.
+%\end{enumerate}
+
+\subsection{Problem 1: Approximating Eigenvalues Moments} 
+\textbf{(15 pts)}
+Let $\bv{A}\in \R^{n\times n}$ be a square symmetric matrix, which means it it guaranteed to have a symmetric eigendecomposition with real eigenvalues, $\lambda_1 \geq \ldots \geq \lambda_n$, and orthogonal eigenvectors. While computing these eigenvalues naively takes $O(n^3)$ time, we can compute their \emph{sum} much more quickly: with $n$ operations. This is because $\sum_{i=1}^n\lambda_i$ is exactly equal to the trace of $\bv{A}$, i.e. the sum of its diagonal entries $\tr(\bv{A}) = \sum_{i=1}^n \bv{A}_{ii}$. We can also compute the sum of squared eigenvalues in $O(n^2)$ time by taking advantage of the fact that $\sum_{i=1}^n\lambda_i^2 = \|\bv{A}\|_F^2$ where $\|\bv{A}\|_F^2$ is the Frobenius norm. What about $\sum_{i=1}^n\lambda_i^3$? Or $\sum_{i=1}^n\lambda_i^4$? It turns out that no exact algorithms faster than a full eigendecomposition are known. 
+
+In this problem, however, we show how to \emph{approximate} $\sum_{i=1}^n\lambda_i^k$ for any positive integer $k$ in $O(n^2k)$ time. By the way, this is not a contrived problem -- it has a ton of applications in machine learning and data science that you can ask me about in office hours!
+
+\begin{enumerate}[label=(\alph*)]
+	\item Show that $\sum_{i=1}^n\lambda_i^k = \tr(\bv{A}^k)$ where $\bv{A}^k$ denotes the chain of matrix products $\bv{A}\cdot \bv{A}\cdot\ldots\cdot \bv{A}$, repeated $k$ times.
+	For the remainder of the problem we use the notation $\bv{B} = \bv{A}^k$. 
+	
+	\item Let $\bv{x}^{(1)}, \ldots, \bv{x}^{(m)} \in \R^n$ be $m$ independent random vectors, all with i.i.d. $\{+1,-1\}$ uniform random entries. Let $Z = \frac{1}{m}\sum_{i=1}^m (\bv{x}^{(i)})^T \bv{B}\bv{x}^{(i)}$. We will show that $Z$ is a good estimator for $\tr(\bv{B})$ and thus for $\sum_{i=1}^n\lambda_i^k$. Give a short argument that $Z$ can be computed in $O(n^2km)$ time (recall that $\bv{B} = \bv{A}^k$).  
+	
+	\item Prove that:
+	\begin{align*}
+		\E[Z] &= \tr(\bv{B}) & &\text{and} & \Var[Z] &\leq \frac{2}{m}\|\bv{B}\|_F^2
+	\end{align*}
+
+	\textbf{Hint:} Use linearity of variance but be careful about what things are independent!
+	
+
+	\item 	Show that if $m = O(\frac{1}{\epsilon^2})$ then, with probability $9/10$, 
+	\begin{align*}
+		|\tr(\bv{B}) -Z| \leq \epsilon \|\bv{B}\|_F.
+	\end{align*}
+
+	\item Argue that, when $\bv{A}$ is positive semidefinite, $\epsilon \|\bv{B}\|_F \leq \epsilon \tr(\bv{B})$, so the above guarantee actually gives the relative error bound, 
+\begin{align*}
+	(1-\epsilon)\tr(\bv{B}) \leq Z \leq (1+\epsilon)\tr(\bv{B}),
+\end{align*}
+all with just $O(n^2k/\epsilon^2)$ computation time. 
+
+\end{enumerate}
+
+\subsection{Problem 2: Accelerated Gradient Descent Through the Polynomial Lens}
+\textbf{(10 pts)}
+In Lecture 7, we saw how to analyze gradient descent for $f(\bv{x}) = \|\bv{A}\bv{x} - \bv{b}\|_2^2$, which has gradient $\nabla f(\bv{x}) = 2\bv{A}^T\bv{A}\bv{x} - 2\bv{A}^T\bv{b}$. The dominant cost for each gradient descent iteration is multiplying $\bv{x}$ by $\bv{A}^T\bv{A}$ to compute the gradient, which takes $O(nd)$ time when $A$ is $n\times d$. 
+
+We obtained a convergence bound depending on the largest and smallest eigenvalues of $\bv{A}^T\bv{A}$, which we denote $\lambda_1$ and $\lambda_d$ respectively. We did so by rearranging the gradient descent update rule:
+\begin{align*}
+	\bv{x}^{(i)} &= \bv{x}^{(i-1)} - \eta\left(2\bv{A}^T\bv{A}\bv{x}^{(i-1)} - 2\bv{A}^T\bv{b}\right) \\
+	\bv{x}^{(i)} - \bv{x}^* &= \bv{x}^{(i-1)} - \eta\left(2\bv{A}^T\bv{A}\bv{x}^{(i-1)} - 2\bv{A}^T\bv{A}\bv{x}^*\right) -\bv{x}^*&& \text{since $\nabla f(\bv{x}^*)=\bv{0}$, so $\bv{A}^T\bv{A}\bv{x}^* = \bv{A}^T\bv{b}$}\\
+	\bv{x}^{(i)} - \bv{x}^* &= (\bv{I} - 2\eta\bv{A}^T\bv{A})(\bv{x}^{(i-1)} - \bv{x}^*).
+\end{align*}
+By induction, it follows that the error $\bv{x}^{(i)} - \bv{x}^*$ equals $\bv{x}^{(i)} - \bv{x}^* = (\bv{I} - 2\eta\bv{A}^T\bv{A})^i(\bv{x}^{(0)} - \bv{x}^*)$. This allowed us to obtain a convergence bound by arguing that, if we set $\eta = 1/2\lambda_1$ where $\lambda_1$ is the largest eigenvalue of $\bv{A}^T\bv{A}$, then $(\bv{I} - \frac{1}{\lambda_1}\bv{A}^T\bv{A})^i$ has top eigenvalue $< \epsilon$ after $i = O(\frac{\lambda_1}{\lambda_d}\log(1/\epsilon))$ iterations. In this problem you will prove an ``accelerated'' version of this bound with a significantly improve condition number dependence of $O(\sqrt{\frac{\lambda_1}{\lambda_d}} \log(1/\epsilon))$ iterations.  
+
+\begin{enumerate}
+	\item Let $p$ be any degree $q$ polynomial. I.e. $p = c_0 + c_1 x + \ldots + c_q x^q$. Show that, for any $p$ with $p(1) = c_0 + c_1 + \ldots + c_q = 1$ and any starting vector $\bv{x}^{(0)}$, we can compute in $q$ iterations (i.e., using $q$ gradient computations and up to $O(ndq)$ additional runtime) a vector $\bv{x}^{(q)}$ such that:
+	\begin{align*}
+			\bv{x}^{(q)} - \bv{x}^* = p\left(\bv{I} - \frac{1}{\lambda_1}\bv{A}^T\bv{A}\right)(\bv{x}^{(0)} - \bv{x}^*).
+		\end{align*}
+	Note that this result strictly generalizes what we know from gradient descent, which computes $\bv{x}^{(q)}$ satisfying the equation for the polynomial $p(x) = x^q$, which satisfies our restriction that $p(1) = 1$. 
+	\item Prove that for $q = O(\sqrt{\frac{\lambda_1}{\lambda_d}} \log(1/\epsilon))$, there exists a polynomial $p$ with coefficients $c_0 + c_1 + \ldots + c_q = 1$ such that the top eigenvalue of $p\left(\bv{I} - \frac{1}{\lambda_1}\bv{A}^T\bv{A}\right) \leq \epsilon$. \textbf{Hint:} You might want to use Claim 4 in the supplemental notes on the Lanczos method posted for Lecture 11.
+\end{enumerate}
+
+By Part 2, above, it follows that $\|\bv{x}^{(q)} - \bv{x}^*\|_2 = \|p\left(\bv{I} - \frac{1}{\lambda_1}\bv{A}^T\bv{A}\right)(\bv{x}^{(0)} - \bv{x}^*)\|_2 \leq \epsilon \|\bv{x}^{(0)} - \bv{x}^*\|_2^2$ as long as we use degree $q = O(\sqrt{\frac{\lambda_1}{\lambda_d}} \log(1/\epsilon))$ -- i.e. run for $O(\sqrt{\frac{\lambda_1}{\lambda_d}} \log(1/\epsilon))$ iterations.
+
+\subsection{Problem 3: Spectral Methods for Cliques} 
+\textbf{(15 pts)} 
+A common tasks in data mining is to identify large \emph{cliques} in a graph. For example, in social networks, large cliques can be indicators of fraudulent accounts or networks of accounts designed to promote certain content. In this problem, we consider a spectral heuristic for finding a large clique based on the top eigenvector of the graph adjacency matrix $A$: 
+\begin{itemize}
+	\item Compute the leading eigenvector $v_1$ of $A$. 
+	\item Let $i_1, \ldots, i_k \in \{1, \ldots, n\}$ be the indices of the $k$ entries in $v_1$ with largest absolute value. 
+	\item Check if nodes $i_1, \ldots, i_k$ form a $k$-clique.
+\end{itemize}
+
+We will analyze this heuristic on a natural random graph model. Specifically, let $G$ be an Erdos-Renyi random graph: we start with $n$ nodes, and for every pair of nodes $(i,j)$, we add an edge between the pair with probability $p < 1$. To simplify the math, also assume that we add a self-loop at every vertex $i$ with probability $p$. Then, choose a fixed subset $S$ of $k$ nodes to form a clique. Connect all nodes in $S$ with edges and add self-loops. We will argue that, for sufficiently large $k$, we can expect the heuristic above to identify the nodes in the clique. 
+
+\begin{enumerate}
+	\item Let $A$ be the adjacency matrix of a random graph generated as above. What is $\E[A]$? Prove that the rank of $\E[A]$ is 2. In other words, the matrix only has two non-zero eigenvalues.
+	\item Derive expressions for the two non-zero eigenvalues of $\E[A]$, and their corresponding eigenvectors. \textbf{Hint:} First argue that, up to multiplying by a constant, any eigenvector $v$ must have $v[i] = 1$ for all $i \notin S$ and $v[i] = \alpha$ for all $i\in S$, where $\alpha$ is a constant. Then use some high school algebra 2!
+	\item Using your results from (2) above, argue that, up to a positive scaling, the top eigenvector $v_1$ has $v[i] = 1$ for all $i \notin S$ and $v[i] = \alpha$ for all $i\in S$, where $\alpha > 1$. In other words, the largest entries of $v_1$ exactly correspond to the nodes in the clique!
+	\item To prove the algorithm works, it is possible to use a matrix concentration inequality to argue that the top eigenvector of $A$ is close to that of $E[A]$. Instead of doing that, let's verify things experimentally. Generate a graph $G$ according to the prescribed model with $n = 900$, $k = 
+	|S|= 30$, and $p = .1$. Compute the top eigenvector of $A$ and look at its 30 largest
+	entries in magnitude. What fraction of nodes in the clique $S$ are among these 30 entries? Repeat the experiment and report the average fraction recovered. 
+\end{enumerate}
+
+
+\subsection{Problem 4 (Bonus): Matrix Concentration from Scalar Concentration}
+\textbf{(10 pts)}   This problem asks you to prove a simplified (and slightly weaker) version of the matrix concentration result used in Lecture 12. 
+Construct a random \emph{symmetric} matrix $R \in \R^{n\times n}$ by setting $R_{ij} = R_{ji}$ to $+1$ or $-1$, uniformly at random. Prove that, with high probability,
+\begin{align*}
+	\|R\|_2 \leq c\sqrt{n\log n},
+\end{align*}
+for some constant $c$. This is much better than the naive bound of $\|R\|_2 \leq \|R\|_F = n$ and it's nearly tight: we always have that $\|R\|_2^2 \geq \|R\|_F^2/n$ (do you see why?) so $\|R\|_2 \geq \sqrt{n}$ no matter what. 
+
+Here are a few hints that might help you along:
+\begin{itemize}
+	\item Recall that for a matrix $R$,  $\|R\|_2 = \max_{x \in \R^n} \frac{\|R x\|_2}{\|x\|_2}$. When $R$ is symmetric, it also holds that $\|R\|_2 = \max_{x \in \R^n} \frac{|x^T R x|}{x^Tx}$.
+	\item Try to first bound $\frac{|x^T R x|}{x^Tx}$ for one particular $x$. You might want to use a {Hoeffding bound}.
+%	, or the Rademacher concentration bound from Lecture 12.
+	\item Then try to extend the result to hold for all $x$ simultaneously, using an $\epsilon$-net argument.
+\end{itemize}
+
+%\subsection{Problem 1: Restricted Isometry Property for  JL Matrices}
+%\textbf{(15 pts)}
+%A $k$-sparse vector is any vector with $k$ nonzero entries. Let $\mathcal{S}_k$ be the set of all $k$-sparse vectors in $\R^d$. Show that, if $\Pi \in \R^{s\times d}$ is chosen to be a Johnson-Lindenstrauss embedding matrix (e.g. a scaled random Gaussian matrix, random sign matrix, etc.) with $s = O(\frac{k\log d}{\epsilon^2})$ rows then, with high probability, 
+%\begin{align*}
+%(1-\epsilon)\|\Pi x\|_2 \leq \|x\|_2 \leq (1+\epsilon)\|\Pi x\|_2 
+%\end{align*}
+%for all $x\in \mathcal{S}_k$, simultaneously. You may use any of the results stated in class for JL matrices (except for the RIP property itself of course).
+
+
+%
+%\subsection{Problem 4: 18th Century Style Compressed Sensing}
+% \textbf{(10 pts)} In Lecture 12 it was mentioned that there exist simpler compressed sensing schemes that work when noise/numerical precision is not an issue. Let $q_1, \ldots, q_n \in \R$ be any set of \emph{distinct} numbers. E.g. we could choose $[q_1, \ldots, q_n] = [1,\ldots, n]$. Consider the sensing matrix $A\in\R^{2k\times n}$:
+%\begin{align*}
+%A = \begin{bmatrix}
+%1 & 1 & 1 & \ldots & 1\\
+%q_1 & q_2 & q_3&\ldots & q_n \\
+%(q_1)^2 & (q_2)^2 & (q_3)^2 & \ldots & (q_n)^2 \\
+%\vdots & \vdots &\vdots & & \vdots \\ 
+%(q_1)^{2k-1} &(q_2)^{2k-1} & (q_3)^{2k-1} & \ldots & (q_n)^{2k-1}
+%\end{bmatrix}
+%\end{align*}
+%This $A$ does not obey any sort of RIP property. Nevertheless, show that, if $x \in\R^n$ is a $k$ sparse vector -- i.e. $\|x\|_0 \leq k$ -- then we can recover $x$ from $Ax$. You don't need to give an efficient algorithm. Just argue that for any given $y \in \R^{2k}$, there is at most one $k$-sparse $x$ such that $y = Ax$. (Hint: Use that a non-zero degree $p$ polynomial cannot have more than $p$ roots. You may also want to use that the column and row rank of a matrix are always equal.)
+%
+%%\medskip \noindent \textbf{(5 pts bonus)} Describe an algorithm to recover $x$ from $Ax$ when $x$ is $k$-sparse. It is okay if the algorithm is slow (e.g. depends exponentially on some parameters).
+%
+%\subsection{Bonus 1: Sparse Recovery for Dense Vectors}
+% \textbf{(5 pts extra credit)}
+% A compressed sensing scheme typically recovers $x$ from a linear sketch $Ax$ whenever $x$ is $k$-sparse. When $x$ is not $k$-sparse, there is no guarantee about what is returned. E.g., for the measurement matrix $A$ described above, for any specified $k$, there exists an algorithm $Decode(y)$ which returns $x$ if $y = Ax$ for a $k$-sparse $x$. If $y \neq Ax$ for some $k$-sparse $x$, $Decode(y)$ can return anything. In this problem we consider a method that will still return \emph{something useful} when $x$ is not $k$-sparse.
+% 
+% \medskip
+%  In particular, your goal is to design a measurement matrix $B \in \R^{c\log n \times n}$, where $c$ is a constant, such that \emph{for any $x$} (i.e. not necessarily sparse) it is possible to recover a single index/value pair $(i, x_i)$ with $x_i \neq 0$ from $Bx$ with constant probability (e.g. with success probability 9/10). Your algorithm can return \emph{any} $(i,x_i)$ as long as $x_i \neq 0$. 
+%\textbf{Hint: One possible $B$ takes the form:} 
+% \begin{align*}
+% B = \begin{bmatrix}
+% AD_0 \\ AD_1 \\ AD_2 \\\ldots \\ A{D_s}
+% \end{bmatrix}
+% \end{align*}
+% \textbf{where $D_1, \ldots, D_s$ are carefully (and randomly) constructed diagonal matrices and $A$ is the matrix from Problem 3 with $k = O(1)$}. 
+%
+%
+%\subsection{Bonus 2: Communicating in the Dark is Easier with Shared Random Coins}
+% \textbf{(5 pts extra credit)}
+%Suppose Jesse holds a subset of elements $J \subseteq \{1,\ldots, n\}$. Leslie holds another subset $L \subseteq \{1,\ldots, n\}$. Jesse and Leslie do not know what elements the other holds. Using as little communication as possible, Jesse wants to figure out if she or Leslie hold any unique elements -- i.e. if there is any $j \in J\cup L - J\cap L$.
+%
+%Show that, for some constant $c$, Leslie can send Jesse a single message of $O(\log^c n)$ bits that allows her to find such a $j$ if one exists, with constant success probability.
+%
+%You can assume that Jesse and Leslie decide on a strategy in advance, and that they have access to an unlimited source of shared random bits (e.g. that are published by some third party). You might want to use the result from Problem 4.
+%
+%\medskip\medskip
+%\textbf{
+%	This result should surprise you! Even if Leslie \emph{knew} all of Jesse's elements, $O(\log n)$ bits would be needed to communicate if they hold any unique elements. Here we are saying that nearly the same communication complexity can be achieved with \emph{no prior knowledge} of $J$.}
+
+\end{document}

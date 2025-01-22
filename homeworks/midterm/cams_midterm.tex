@@ -1,0 +1,210 @@
+\documentclass[11pt]{article}
+\usepackage{amssymb,amsthm,amsmath}
+\usepackage{color}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage{bbm}
+
+\usepackage[colorlinks=true, linkcolor=red, urlcolor=blue, citecolor=gray]{hyperref}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[margin=1in]{geometry}
+\usepackage[bottom]{footmisc}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{algorithm}
+%\usepackage{algorithmic}
+\usepackage{algpseudocode}
+\newcommand{\algoname}[1]{\textnormal{\textsc{#1}}}
+\newcommand{\comment}[1]{\text{\phantom{(#1)}} \tag{#1}}
+\newcommand{\spara}[1]{\smallskip\noindent{\bf #1}}
+\newif\ifdraft
+\draftfalse
+%\drafttrue
+
+
+\newcommand{\todo}[1]{\textcolor{blue}{TODO: #1}}
+\newcommand{\Chris}[1]{\textcolor{blue}{Chris: #1}}
+\newcommand{\Cam}[1]{\textcolor{blue}{Cam: #1}}
+
+\newcommand{\eqdef}{\mathbin{\stackrel{\rm def}{=}}}
+\makeatletter
+\def\hlinewd#1{%
+	\noalign{\ifnum0=`}\fi\hrule \@height #1 \futurelet
+	\reserved@a\@xhline}
+\makeatother
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{definition}{Definition}
+\newtheorem{problem}[definition]{Problem}
+\newtheorem{example}[theorem]{Example}
+
+\newtheorem*{rep@theorem}{\rep@title}
+\newcommand{\newreptheorem}[2]{%
+	\newenvironment{rep#1}[1]{%
+		\def\rep@title{#2 \ref{##1}}%
+		\begin{rep@theorem}}%
+		{\end{rep@theorem}}}
+\makeatother
+\newreptheorem{theorem}{Theorem}
+\newreptheorem{claim}{Claim}
+
+\newcommand{\R}{\mathbb{R}}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\HH}{\mathcal{H}}
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+\newcommand{\bv}[1]{\mathbf{#1}}
+\newcommand{\wh}{\widehat}
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\opnorm}[1]{\|#1\|_\mathrm{op}}
+\DeclareMathOperator{\supp}{\mathrm{supp}}
+\DeclareMathOperator{\poly}{poly}
+\DeclareMathOperator{\var}{Var}
+\DeclareMathOperator{\argmax}{argmax}
+\DeclareMathOperator{\sinc}{sinc}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\Kmu}{\mathcal{K}_{\mu}}
+\newcommand{\Gmu}{\mathcal{G}_\mu}
+\newcommand{\Fmu}{\mathcal{F}_\mu}
+\newcommand{\Pmu}{\mathcal{P}_{\mu}}
+\newcommand{\Imu}{\mathcal{I}_\mu}
+
+\newcommand{\smu}{s_{\mu,\epsilon}}
+\newcommand{\tmu}{\tau_{\mu,\epsilon}}
+\newcommand{\ttmu}{\tilde{\tau}_{\mu,\epsilon}}
+\newcommand{\btmu}{\bar{\tau}_{\mu,\epsilon}}
+\newcommand{\tsmu}{\tilde{s}_{\mu,\epsilon}}
+
+
+\newcommand{\E}{\mathbb{E}}
+
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\err}{err}
+\DeclareMathOperator{\erf}{erf}
+\DeclareMathOperator{\range}{range}
+\DeclareMathOperator{\Null}{null}
+
+
+\title{COMPSCI 514: Midterm}
+\date{}
+
+
+\begin{document}
+\maketitle
+
+\vspace{-3em}
+\textbf{Date:} 10/17/2019, 10:00am-11:15am 
+
+\medskip 
+
+\textbf{Instructions:}
+\begin{itemize}
+\item Please show your work/derive any answers as part of the solutions to receive full credit (and partial credit if you make a mistake).
+\item If you need extra space to show your work you can include additional pages. Please mark clearly with your name and problem number.
+\item If you have a question, raise your hand and we will come to you.
+\end{itemize}
+
+\smallskip
+
+\subsection*{Probability, Expectation, and Variance \normalfont (10 points)} 
+
+\begin{enumerate}
+\item (3 points) For two random variables $\bv X$ and $\bv{Y}$, indicate whether each statement is \textbf{always true}, \textbf{sometimes true}, or \textbf{never true}. Give a short sentence/phrase explaining why.
+\begin{enumerate}
+\item $\E[\bv{X} - \bv{Y} ] = \E[\bv{X}] - \E[\bv{Y}] $. \hspace{1em}ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER
+\vspace{7em}
+\item $Var[\bv{X} + \bv{Y} ] = Var[\bv{X}] + Var[\bv{Y}] $. \hspace{1em}ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER
+\vspace{7em}
+\item If $\bv{X}, \bv{Y}$ have the same variance, the average $\bv{Z} = \frac{1}{2} \left ( \bv{X} + \bv{Y} \right )$ has $Var[\bv{Z}] \le \frac{1}{2} Var[\bv{X}].$ 
+
+\smallskip \hspace{.75em}ALWAYS\hspace{.75em} SOMETIMES\hspace{.75em} NEVER
+\vspace{7em}
+\end{enumerate}
+\clearpage
+\item (3 points) Prove that for any random variable $\bv X$, $Var[\bv X] = \E[\bv X^2] - \E[\bv X]^2$.
+\vspace{16em}
+\item (2 points) Given a random variable $\bv X$, can we conclude that $\E[1/\bv X] = 1/\E[\bv X]$? If so, prove this. If not, give an example where  the equality  does not hold.
+\vspace{16em}
+\item (2 points) An airplane has 1000 critical parts -- including engine components, navigation equipment, etc. Each part has been throughly tested, and during a given flight, each part is guaranteed to fail with probability at most $.0001$. Give as tight an upper bound as you can on the probability  that \emph{at least one part fails} during a flight. %Would you feel safe flying on this airplane? 
+\vspace{16em}
+\end{enumerate}
+
+%\clearpage
+\subsection*{Hash Functions \normalfont (10 points)} 
+Consider a pairwise independent hash function $\bv{h}: [n] \rightarrow [m]$. 
+\begin{enumerate}
+\item (2 points) For any $x,y \in [n]$ with $x \neq y$ and $z \in [m]$, what is $\Pr(\bv{h}(x) = \bv{h}(y) = z)$.
+\vspace{7em}
+\item (2 points) Is $\bv{h}$ a 2-universal hash function? Circle one and give a sentence explaining your answer: YES\hspace{1em} NO\hspace{1em} MAYBE. 
+\vspace{7em} 
+\item (2 points) Is $\bv{h}$ a locality sensitive hash function? Circle one and give a sentence explaining your answer: YES\hspace{1em} NO\hspace{1em} MAYBE.  
+\vspace{7em}
+\item (2 points) Why are pairwise independent hash functions used instead of fully independent hash functions in practice? 
+\vspace{7em}
+\item (2 points) You use a pairwise independent hash function to insert items into hash table. You would like to show that the maximum number of items in any bucket is small with good probability. Circle any of the following bounds that you can apply to this problem.  Explain in a couple of sentences.
+\begin{center}Markov's\hspace{1em} Chebyshev's\hspace{1em} Chernoff. \end{center}
+\vspace{7em}
+%\item (2 points) Consider a hash function mapping 8-bit strings to a single bit -- $\bv{h}: \{0,1\}^8 \rightarrow \{0,1\}$. We generate $\bv{h}$ by selecting a random position $i$ from $1,\ldots, 8$. Then let $\bv{h}(x) = x(i)$, the value of $x$ at  position $i$. Note that after $i$ is chosen, it remains fixed, when we apply $\bv{h}$ to different inputs.
+%\begin{enumerate}
+%\item Given $x,y \in \{0,1\}^8$ with hamming distance $\norm{x-y}_0$ (i.e., $x$ and $y$ have different bit values in $\norm{x-y}_0$ positions), what is $\Pr[\bv{h}(x) = \bv{h}(y)]$.
+%\vspace{5em}
+%\item Is $\bv{h}$ a locality sensitive hash function?
+%\end{enumerate}
+\end{enumerate}
+
+\subsection*{Finding Duplicates in Limited Space \normalfont (10 points)} 
+You have a list of $n$ usernames that are registered on your website. When a new user signs up, you want to check whether the username they pick is already assigned.
+\begin{enumerate}
+\item (3 points) What data structure might you use to rapidly  check if a username has been previously assigned?
+ You must be sure to never let a user pick an already  assigned name, but are willing to allow a small false positive rate: with small probability, a user may not be allowed to pick a name even though it is not actually assigned. (No explanation of answer needed.)
+ \vspace{3em}
+\item (3 points) What data structure/technique might you use if you also want to prevent a new user from choosing a username that is \emph{close to any registered username}, and therefore a potential point of confusion? (No explanation  of answer needed.)
+\vspace{3em}
+\item (4 points) Generally, how do the space complexities of these two methods compare to if you just stored the registered user names in a hash table with $O(n)$ buckets? Are they higher or lower? Why?
+\vspace{10em}
+\end{enumerate}
+
+\subsection*{Estimating Similarity with Min Hash \normalfont (10 points)} 
+In class we used MinHash as a locality sensitive hashing function for Jaccard similarity. We will now see how it can be used directly  as an estimator of Jaccard similarity.
+Consider two sets $A$ and $B$ with Jaccard similarity $J(A,B) = s$. Let $\bv{MH}_1(\cdot), \bv{MH}_2(\cdot),\ldots, \bv{MH}_t(\cdot)$ be $t$ independent instantiations of MinHash. Let $\bv{X}$ be the number of times that the MinHash values for $A$ and $B$ collide in these $t$ instantiations. That is, $\bv{X} = | \{i \in [t]\text{ such that }\bv{MH}_i(A) = \bv{MH}_i(B)\}|$. Let $\bv{\tilde s} = \bv{X}/t$ be an estimate of $s$ derived from $\bv{X}$.
+\begin{enumerate}
+\item (2 points) Show that $\E[\bv{\tilde s}] = s$.
+\vspace{12em}
+\item (3 points) Show that $Var[\bv{\tilde s}] \le \frac{1}{t}$. \textbf{Hint}: Break $\bv{X}$ into indicator random variables, and show that each has variance $\le 1$.
+\vspace{18em}
+\item (3 points) Use the results from (1) and (2) to show that if we set $t \ge \frac{1}{\delta \epsilon^2}$, then
+$$\Pr[|\bv{\tilde s} - \bv{s}| \ge \epsilon] \le \delta.$$  %epsilon^2/t
+That is, with good probability $\bv{\tilde s} $ is within $\epsilon$ of the true Jaccard similarity.
+\vspace{18em}
+\item (2 points) In part  (3), to give failure probability $\delta$, $t$ depends on $1/\delta$. What technique could you use  to improve this dependence, so that  the failure probability  is lower? 
+\vspace{6em}
+\end{enumerate}
+
+\clearpage
+
+\subsection*{Randomized Dimensionality Reduction \normalfont (EXTRA CREDIT: 8 points)} 
+In class  we studied randomized dimensionality reduction (the Johnson-Lindenstrauss lemma) using a matrix whose entries are random Gaussian variables. In this problem we will see how one might analyze a random projection whose entries are just random signs.
+
+\smallskip
+
+\noindent Consider a vector $\vec x \in \R^d$ and let $\bv{\Pi} \in \R^{m \times d}$ be a random matrix, with each entry set independently to $1/\sqrt{m}$ with probability $1/2$ and $-1/\sqrt{m}$ with probability $1/2$. 
+\begin{enumerate}
+\item (2 points) Letting $\bv{\Pi}(j)$ denote the $j^{th}$ row of $\bv{\Pi}$, what is $\E[\langle \vec x, \bv{\Pi}(j) \rangle]$?
+\vspace{11em}
+\item (2 points) What is $\E[ \langle \vec x, \bv{\Pi}(j) \rangle^2]$?
+\vspace{14em}
+\item (2 points) What is $\E[ \norm{\bv{\Pi} \vec x}_2^2]$? Does this value make sense if we want to use $\bv{\Pi}$ to give a low-distortion embedding?
+\vspace{10em}
+\item (2 points) In practice, why might one prefer a random projection matrix whose entries are random signs rather than random Gaussian variables?
+\end{enumerate}
+
+\end{document} 

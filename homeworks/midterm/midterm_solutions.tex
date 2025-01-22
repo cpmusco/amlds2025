@@ -1,0 +1,246 @@
+\documentclass[10pt]{article}
+\usepackage{titlesec}
+\usepackage{geometry}
+\geometry{verbose,tmargin=.9in,bmargin=.9in,lmargin=1.0in,rmargin=1.0in}
+\usepackage{amsmath,amsfonts,amsthm,amssymb}
+\usepackage{url}
+\usepackage{color}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage[colorlinks=true, linkcolor=red, urlcolor=blue, citecolor=gray]{hyperref}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{etoolbox}
+\usepackage{bbm}
+
+\definecolor{nyuDarkPurple}{HTML}{330662}
+\definecolor{nyuOfficialPurple}{HTML}{57068c}
+
+\newcommand{\spara}[1]{\vspace{.5em}\noindent {\large\sffamily\textcolor{nyuOfficialPurple}{#1}}}
+\titleformat{\section}[hang]{\Large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsection}[hang]{\large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsubsection}[hang]{\normalsize\sffamily\color{gray}}{\thesection}{1em}{}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{\includegraphics[width=4cm]{tandon_long_color.eps}}
+\rhead{\thepage}
+\pagenumbering{gobble}
+
+\setcounter{secnumdepth}{0}
+
+% math commands
+\DeclareMathOperator{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+\newcommand{\bv}[1]{\mathbf{#1}}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\Var}{Var}
+
+\begin{document}
+	
+\begin{center}
+	\normalsize
+	New York University Tandon School of Engineering
+	
+	Computer Science and Engineering
+	\medskip
+	
+	\large
+	Midterm Exam, Solutions
+	\medskip
+\end{center}
+
+
+\subsection{1. Always, sometimes, never. (\textbf{\small 12pts -- 3pts each})} 
+Indicate whether each of the following statements is \textbf{always} true, \textbf{sometimes} true, or \textbf{never} true. Provide a short justification or example to explain your choice. 
+\begin{enumerate}[label=(\alph*)]
+	
+	\item For random variables $X$ and $Y$, $\E[10X - 3Y] = 10\E[X] - 3\E[Y]$.
+	
+	\textbf{ALWAYS}\hspace{1em} SOMETIMES\hspace{1em} NEVER
+	
+	Follows from linearity of expectation, which holds for any r.v.'s.
+	
+	\item If random variables $X,Y$ have the same variance $\sigma^2$, the average $Z=\frac{1}{2}(X+Y)$ has $\Var[Z]\geq\frac{1}{2}\sigma^2$. 
+	
+	ALWAYS\hspace{1em} \textbf{SOMETIMES}\hspace{1em} NEVER
+	
+	True when $X = Y$ for example, in which case $\Var[Z] = \sigma^2$. Not true when $X = -Y$, in which case $\Var[Z] = 0$.
+	
+	\item For a value $z > 0$ and random variable $Y$ that always takes positive integer values $1, 2, 3, \ldots$, we have  $\Pr[Y \geq z] \leq \frac{\E[Y]}{z}$. 
+	
+	\textbf{ALWAYS}\hspace{1em} SOMETIMES\hspace{1em} NEVER
+	
+	This is the statement of Markov's inequality. On the exam I forgot to specify $z > 0$, so points were also awarded to SOMETIMES answers.
+	
+	\item Increasing the number of tables in a locality sensitive hashing scheme increases the expected number of false negatives.
+	
+	ALWAYS\hspace{1em} SOMETIMES\hspace{1em} \textbf{NEVER}
+	
+	Increasing number of tables strictly decreases false negatives because it strictly increases the chance of checking every point in the database.
+	
+	
+	\item Let $X_1, \ldots, X_n$ be random variables (not necessarily independent). $\Pr\left[\min_j X_j \leq z\right] \leq \sum_{j=1}^n \Pr\left[X_j \leq z\right]$.
+	
+	\textbf{ALWAYS}\hspace{1em} SOMETIMES\hspace{1em} NEVER
+	
+	This is true by union bound. $\Pr\left[\min_j X_j \leq z\right] = \Pr\left[X_1 \leq z\right] \text{ and } \ldots \text{ and } \Pr\left[X_n \leq z\right]$.
+\end{enumerate}
+
+\subsection{2. Mark-and-Recapture, The Missing Analysis (\textbf{\small 15pts})}
+Recall the mark-and-recapture estimator introduced in Lecture 1. We collect $m$ items $d_1, \ldots, d_m$, where each $d_i$ is selected uniformly at random from the set $\{1, \ldots, n\}$, where $n$ is unknown. To estimate $n$ we return
+\begin{align*}
+	\tilde{n} &= \frac{m(m-1)}{2D} & &\text{where} & D &=\sum_{i=1}^m \sum_{j < i} \mathbbm{1}[d_i == d_j].
+\end{align*}
+In class I claimed that if $m = O(\sqrt{n}/\epsilon)$, the with high probability,
+\begin{align*}
+	(1-\epsilon)n \leq \tilde{n} \leq (1+\epsilon)n.
+\end{align*}
+However, I never proved that fact. You will fill in the analysis here.
+\begin{enumerate}[label=(\alph*)]
+	\item (3pts) Show that $\E[D] = \frac{m(m-1)}{2n}$. We already proved this in class, so I'm asking you to reprove it. 
+	
+By linearity of expectation,	
+\begin{align*}
+	\E[D] = \sum_{i=1}^m \sum_{j < i}\E[\mathbbm{1}[d_i == d_j]] = \sum_{i=1}^m \sum_{j < i} \frac{1}{n}.
+\end{align*}
+There are $m(m-1)/2$ terms in the sum, which proves the bound.
+
+	\item (4pts) Show that $\Var[D] \leq \frac{m(m-1)}{2n}$. 
+	
+	In the sum above, the random variables $\mathbbm{1}[d_i == d_j]$ are \emph{pairwise} independent. So we can apply linearity of variance:
+	\begin{align*}
+		\Var[D] = \sum_{i=1}^m \sum_{j < i}\Var[\mathbbm{1}[d_i == d_j]] = \sum_{i=1}^m \sum_{j < i} \left(\frac{1}{n} - \frac{1}{n^2}\right) \leq  \sum_{i=1}^m \sum_{j < i} \frac{1}{n} =  \frac{m(m-1)}{2n}.
+	\end{align*}
+	
+	\item (5pts) Prove that if $m = c\sqrt{n}/\epsilon$ for a large enough constant $c$, then
+	\begin{align*}
+		\Pr[|D - \E[D]| \geq \epsilon\E[D]] \leq 1/100.
+	\end{align*}
+	Will will apply Chebyshev's inequality. From (b) we have that the standard deviation of $D$ is upper bounded by $\sigma = \sqrt{ \frac{m(m-1)}{2n}} \leq \frac{m}{\sqrt{2n}}$, which is $\leq \frac{c/\sqrt{2}}{\epsilon}$ when $m = c\sqrt{n}/\epsilon$. So by Chebyshev's Inequality we have that:
+	\begin{align*}
+		\Pr[|D - \E[D]| \geq \frac{10c/\sqrt{2}}{\epsilon}] \leq 1/100.
+	\end{align*}
+	At the same time, we have that $\E[D] = \frac{m(m-1)}{2n} \geq \frac{m^2}{4n} = \frac{c^2}{4\epsilon^2}$.  Combing with the bound above, we have
+	\begin{align*}
+		\Pr[|D - \E[D]| \geq \epsilon \frac{40}{c\sqrt{2}}\E[D]] \leq 1/100.
+	\end{align*}
+Setting $c \geq 40/\sqrt{2}$ gives the bound.
+	
+	\item (3pts) Conclude that if $m = O(\sqrt{n}/\epsilon)$, then with probability $99/100$, 
+	\begin{align*}
+		(1-\epsilon)n \leq \tilde{n} \leq (1+\epsilon)n.
+	\end{align*}
+	\textbf{Hint:} You may assume that $\epsilon \leq 1/2$, and use the fact that in that case $\frac{1}{1-\epsilon} \leq 1 + 2\epsilon$ and $\frac{1}{1+\epsilon} \geq 1-\epsilon$.
+	
+	We have from above that that if $m = O(\sqrt{n}/\epsilon)$ then:
+	\begin{align*}
+		(1-\epsilon/2)\E[D] \leq D \leq (1+\epsilon/2)\E[D].
+	\end{align*}
+Inverting all sides we have:
+	\begin{align*}
+	\frac{1}{1+\epsilon/2}\frac{1}{\E[D]} \leq  \frac{1}{D} \leq \frac{1}{1-\epsilon/2}\frac{1}{\E[D]} \\
+	(1-\epsilon) \frac{1}{\E[D]} \leq  \frac{1}{D} \leq (1+\epsilon)  \frac{1}{\E[D]}\\
+		(1-\epsilon) \frac{m(m-1)}{2\E[D]} \leq  \frac{m(m-1)}{2D} \leq (1+\epsilon)  \frac{m(m-1)}{2\E[D]}\\ 
+		(1-\epsilon)n \leq \tilde{n} \leq (1+\epsilon)n.
+\end{align*}
+\end{enumerate}
+
+
+\subsection{3. Locality sensitive hash for hamming similarity. (\textbf{\small 10pts})}
+The giant internet company Popflix operates a movie streaming service that offers a total of $d$ movies. They keep track of the movies viewed by each subscriber to the service by storing a length $d$ binary vector with a $1$ in all entries corresponding to movies that subscriber has watched. All other entries are set to $0$. Popflix would like to efficiently find other subscribers with similar viewing habits using an LSH scheme. For two length $d$ binary vectors $\bv{q},\bv{y} \in \{0,1\}^d$, they model viewing similarity by the hamming similarity: 
+\begin{align*}
+	s(\bv{x},\bv{y}) = 1 - \frac{\|\bv{q} - \bv{y}\|_0}{d}.
+\end{align*}
+Above $\|\bv{q} - \bv{y}\|_0$ is the hamming distance, $\|\bv{q} - \bv{y}\|_0 = \sum_{i=1}^d |q_i - y_i|$.  $q_i$ and $y_i$ denote the $i^\text{th}$ entries of $\bv{q}$ and $\bv{y}$, respectively. For example, the hamming similarity between the follow two vectors is $2/3$.
+\begin{align*}
+	\bv{q} &= \begin{bmatrix}1,0,0,1,1,0\end{bmatrix} \\
+	\bv{y} &= \begin{bmatrix}1,0,1,1,0,0\end{bmatrix} 
+\end{align*}
+
+\begin{enumerate}[label=(\alph*)]
+	\item (6pts) 
+	To implement their LSH scheme, Popflix first needs a locality sensitive hash function $h: \{0,1\}^d \rightarrow \{1, \dots, n\}$ that maps user vectors into a table of size $n$. We construct $h$ as follows:
+	Let $j$ be a uniform random integer in $\{1, \ldots, d\}$ and define the function $c: \{0,1\}^d \rightarrow \{0,1\}$ as $c(\bv{x}) = x_j$. Additionally, let $g$ be a uniform random hash function from $\{0,1\} \rightarrow \{1, \ldots, n\}$. Finally, let:
+	\begin{align*}
+		h(\bv{x}) = g(c(\bv{x})).
+	\end{align*}
+	
+	Prove that $h$ is a locality sensitive hash function for {hamming similarity}. \textbf{Hint:} Write down an expression for $\Pr[h(\bv{q}) == h(\bv{y})]$. 
+	
+		Note that for binary vectors $\bv{q},\bv{y}$, $\|\bv{q} - \bv{y}\|_0$ is exactly the number of entries where the vectors \emph{differ}. $d -\|\bv{q} - \bv{y}\|_0$ is the number of entries where the vectors are the same. So we have, for any binary $\bv{q},\bv{y}$
+	\begin{align*}
+		\\Pr[h(\bv{q}) == h(\bv{y})] = \Pr[q_g = y_g] =  \frac{d - \|\bv{q} - \bv{y}\|_1}{d} = 1 - \frac{\|\bv{q} - \bv{y}\|_1}{d}.
+	\end{align*}
+	So our collision probability is \emph{exactly proportional} to the hamming similarity. It increases when similarity increases, and decreases when it decreases. So $h$ is a locality sensitive hash function.
+	
+	
+	\item (4pts) What are \textbf{two reasons} Popflix might \textbf{not want to use} locality sensitive hashing for similarity search, and might instead perform a linear scan. 
+	\begin{itemize}
+		\item LSH requires preprocessing time to hash all database elements into multiple tables. This is slower than a linear scan. So you only save time with LSH if you have many queries. 
+		\item LSH requires more space. 
+		\item LSH always fails with some probability -- it can never be $100 \% $ reliable. 
+	\end{itemize}
+\end{enumerate}
+
+
+\subsection{4. Regularization (\textbf{\small 15pts})}
+Regularization is a popular technique in machine learning. It is often used to improve final test error, but can also help speed-up optimization methods like gradient descent by improving the condition number of the function being regularized.
+
+\begin{enumerate}[label=(\alph*)]
+	\item (5pts) Let $f(\bv{x})$ be a differentiable function mapping a length $d$ vector $\bv{x}$ to a scalar value. Let $g$ be the function with added Euclidean regularization:
+	\begin{align*}
+		g(\bv{x}) = f(\bv{x}) + \lambda \|\bv{x}\|_2^2
+	\end{align*}  Above $\lambda > 0$ is a non-negative constant that controls the amount of regularization. Write down an expression for the gradient of $g$, $\nabla g(\bv{x})$, in terms of $\nabla f(\bv{x})$, $\lambda$, and $\bv{x}$.
+
+	We applying linearity of the gradient. $\nabla g(\bv{x}) =\nabla  f(\bv{x}) + \lambda \nabla\left[\|\bv{x}\|_2^2\right]$. We have that $\|\bv{x}\|_2^2 = \sum_{i=1}^n x_i^2$, so the partial derivative with respect to $i$ is $2x_i$. So $\nabla\left[\|\bv{x}\|_2^2\right]  = 2\bv{x}$ and overall we have:
+	\begin{align*}
+		\nabla g(\bv{x}) = \nabla  f(\bv{x}) + 2\lambda \bv{x}.
+	\end{align*}
+	
+	\item (5pts) Prove that $h(\bv{x}) =  \lambda \|\bv{x}\|_2^2$ is an $\alpha_1$-strongly convex, $\beta_1$-smooth function with $\alpha_1 = \beta_1 = 2\lambda$. 
+We use the first order definition of smoothness and strong convexity:
+\begin{align*}
+	\frac{\alpha}{2}\|\bv{x}-\bv{y}\|_2^2 \leq h(\bv{y})-h(\bv{x}) - \nabla h(\bv{x})^T(\bv{y} - \bv{x}) \leq \frac{\beta}{2}\|\bv{x}-\bv{y}\|_2^2.
+\end{align*}
+Consider the middle term.  
+\begin{align*}
+	h(\bv{y})-h(\bv{x}) - \nabla h(\bv{x})^T(\bv{y} - \bv{x}) &= \lambda \cdot \left(\|\bv{y}\|_2^2 - \|\bv{x}\|_2^2 - 2\bv{x}^T\bv{y} + 2\|\bv{x}\|_2^2\right)\\
+	&=\lambda \cdot \left(\|\bv{y}\|_2^2 + \|\bv{x}\|_2^2 - 2\bv{x}^T\bv{y}\right) = \lambda \|\bv{x} - \bv{y}\|_2^2.
+\end{align*}
+So we can talk $\alpha = \beta = 2\lambda$ to make the above inequality true.
+	
+	\item (5pts) Assume that $f$ is $\alpha_2$-strongly convex and $\beta_2$-smooth where $\beta_2 > \alpha_2$.  Using part (b), prove that the regularized function $g(\bv{x})$ has strictly better condition number than  $f(\bv{x})$. 
+	
+	\textbf{Hint:} As a first step, show that when you add an $\alpha_1$-strongly convex, $\beta_1$-smooth function to an  $\alpha_2$-strongly convex, $\beta_2$-smooth function, then the resulting function is $(\alpha_1 + \alpha_2)$-strongly-convex and $(\beta_1 + \beta_2)$-smooth.
+\end{enumerate}
+
+The first step from the hint follows directly from the first order definition above. If we have both
+\begin{align*}
+	\frac{\alpha_g}{2}\|\bv{x}-\bv{y}\|_2^2 \leq g(\bv{y})-g(\bv{x}) - \nabla g(\bv{x})^T(\bv{y} - \bv{x}) \leq \frac{\beta_g}{2}\|\bv{x}-\bv{y}\|_2^2\\
+	\frac{\alpha_h}{2}\|\bv{x}-\bv{y}\|_2^2 \leq h(\bv{y})-h(\bv{x}) - \nabla h(\bv{x})^T(\bv{y} - \bv{x}) \leq \frac{\beta_h}{2}\|\bv{x}-\bv{y}\|_2^2,
+\end{align*}
+then summing the inequalities gives 
+\begin{align*}
+	\frac{\alpha_g + \alpha_h}{2}\|\bv{x}-\bv{y}\|_2^2 \leq f(\bv{y})-f(\bv{x}) - \nabla f(\bv{x})^T(\bv{y} - \bv{x}) \leq \frac{\beta_g + \beta_h}{2}\|\bv{x}-\bv{y}\|_2^2,
+\end{align*}
+where $f = g + h$. 
+
+So we have that the regularized function has condition number:
+\begin{align*}
+	\frac{\beta_2 + 2\lambda}{\alpha_2 + 2\lambda}.
+\end{align*}
+We claim that this is always \emph{smaller} than $\frac{\beta_2}{\alpha_2}$, which means that the regularized function is \emph{better} conditioned than $f$. To see why this is the case observe:
+\begin{align*}
+	\frac{\beta_2 + 2\lambda}{\alpha_2 + 2\lambda} \leq \frac{\beta_2 + 2\frac{\beta_2}{\alpha_2}\lambda}{\alpha_2 + 2\lambda} = \frac{\beta_2}{\alpha_2}.
+\end{align*}
+The inqeuality follows from the fact that $\lambda \geq 0$ and $\beta_2 \geq \alpha_2$.
+
+\end{document}

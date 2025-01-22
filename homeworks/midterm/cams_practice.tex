@@ -1,0 +1,197 @@
+\documentclass[11pt]{article}
+\usepackage{amssymb,amsthm,amsmath}
+\usepackage{color}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage{bbm}
+
+\usepackage[colorlinks=true, linkcolor=red, urlcolor=blue, citecolor=gray]{hyperref}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[margin=1in]{geometry}
+\usepackage[bottom]{footmisc}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{algorithm}
+%\usepackage{algorithmic}
+\usepackage{algpseudocode}
+\newcommand{\algoname}[1]{\textnormal{\textsc{#1}}}
+\newcommand{\comment}[1]{\text{\phantom{(#1)}} \tag{#1}}
+\newcommand{\spara}[1]{\smallskip\noindent{\bf #1}}
+\newif\ifdraft
+\draftfalse
+%\drafttrue
+
+
+\newcommand{\todo}[1]{\textcolor{blue}{TODO: #1}}
+\newcommand{\Chris}[1]{\textcolor{blue}{Chris: #1}}
+\newcommand{\Cam}[1]{\textcolor{blue}{Cam: #1}}
+
+\newcommand{\eqdef}{\mathbin{\stackrel{\rm def}{=}}}
+\makeatletter
+\def\hlinewd#1{%
+	\noalign{\ifnum0=`}\fi\hrule \@height #1 \futurelet
+	\reserved@a\@xhline}
+\makeatother
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{definition}{Definition}
+\newtheorem{problem}[definition]{Problem}
+\newtheorem{example}[theorem]{Example}
+
+\newtheorem*{rep@theorem}{\rep@title}
+\newcommand{\newreptheorem}[2]{%
+	\newenvironment{rep#1}[1]{%
+		\def\rep@title{#2 \ref{##1}}%
+		\begin{rep@theorem}}%
+		{\end{rep@theorem}}}
+\makeatother
+\newreptheorem{theorem}{Theorem}
+\newreptheorem{claim}{Claim}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\HH}{\mathcal{H}}
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+\newcommand{\bv}[1]{\mathbf{#1}}
+\newcommand{\wh}{\widehat}
+\newcommand{\norm}[1]{\|#1\|}
+\newcommand{\opnorm}[1]{\|#1\|_\mathrm{op}}
+\DeclareMathOperator{\supp}{\mathrm{supp}}
+\DeclareMathOperator{\poly}{poly}
+\DeclareMathOperator{\var}{Var}
+\DeclareMathOperator{\argmax}{argmax}
+\DeclareMathOperator{\sinc}{sinc}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\Kmu}{\mathcal{K}_{\mu}}
+\newcommand{\Gmu}{\mathcal{G}_\mu}
+\newcommand{\Fmu}{\mathcal{F}_\mu}
+\newcommand{\Pmu}{\mathcal{P}_{\mu}}
+\newcommand{\Imu}{\mathcal{I}_\mu}
+
+\newcommand{\smu}{s_{\mu,\epsilon}}
+\newcommand{\tmu}{\tau_{\mu,\epsilon}}
+\newcommand{\ttmu}{\tilde{\tau}_{\mu,\epsilon}}
+\newcommand{\btmu}{\bar{\tau}_{\mu,\epsilon}}
+\newcommand{\tsmu}{\tilde{s}_{\mu,\epsilon}}
+
+
+\newcommand{\E}{\mathbb{E}}
+
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\err}{err}
+\DeclareMathOperator{\erf}{erf}
+\DeclareMathOperator{\range}{range}
+\DeclareMathOperator{\Null}{null}
+
+
+\title{COMPSCI 514: Midterm Review}
+\date{}
+
+
+\begin{document}
+\maketitle
+
+\vspace{-3em}
+\section{Concepts to Study}
+
+\textbf{Foundational Probability Concepts + Concentration Bounds}
+\begin{itemize}
+\item Linearity of expectation and variance.
+\item Markov's inequality, Chebyshev's inequality (should know from memory).
+\item Union bound  (should know from memory).
+\item General idea of higher moment inequalities.
+\item Chernoff and Bernstein bounds (don't need to memorize the exact bounds, but should be able to apply if given).
+\item General idea of law of large numbers and central limit theorem.
+\item Technique of breaking random variables into sums of indicator random variables.
+\item Averaging to reduce error.
+\item Median trick. 
+\end{itemize}
+
+\noindent \textbf{Random Hashing and Related Algorithms}
+\begin{itemize}
+\item Random hash functions.
+\item Definitions of 2-universal and pairwise independent hash functions (should have memorized).
+\item Application of random hashing to load balancing.
+\item Hashing for Distinct Elements. Understand the `idealized' algorithm where we hash to real numbers. Don't need to understand details of HyperLogLog
+\item Bloom Filters. Don't need to have formulas memorized.
+\item MinHash for Jaccard similarity.
+\item Idea of locality sensitive hashing. How it is used for similarity  search (with hash signatures and repeated tables). Idea of $s$-curve tuning (don't need to memorize formula).
+\end{itemize}
+
+\noindent \textbf{Other}
+\begin{itemize}
+\item Frequent elements problem definition and setup.
+\item High level idea of Boyer-Moore and Misra-Gries, but don't need to know in detail.
+\item Count-min sketch and analysis.
+\item The Johnson-Lindenstrauss Lemma. Don't need to memorize, but should understand and be able to apply if given.
+\item Do not need to be able to recreate the JL proof, but should understand the ideas behind it.
+\end{itemize}
+
+\section{Practice Questions} 
+
+Work in progress. Check back to see if more questions have been added.
+
+\medskip
+
+\noindent\textbf{Probability, Expectation, Variance:}
+
+\begin{enumerate}
+\item Exercises 2.1, 2.3, 2.4, 2.28, 2.41 of \emph{Foundations of Data Science} (\url{https://www.cs.cornell.edu/jeh/book.pdf}) 
+\item Show that for any $\bv{X}$, $\E[\bv{X}^2] \ge \E[\bv{X}]^2$.
+\item Show that for independent $\bv{X}$ and $\bv{Y}$, $\E[\bv{X} \cdot \bv{Y}] = \E[\bv X] \cdot \E[\bv Y]$.
+\item Show that for independent $\bv{X}$ and $\bv{Y}$ with $\E[\bv{X}] = \E[\bv{Y}] = 0$, $Var[\bv{X} \cdot \bv{Y}] = Var[\bv X] \cdot Var[\bv Y]$. \textbf{Hint:} use part (3).
+\item For the statements below, indicate if they are \textbf{always true}, \textbf{sometimes true}, or \textbf{never true}. Give a sentence explaining why.
+\begin{enumerate}
+\item $\Pr[\bv{X} = s \cap \bv{Y} = t] > \Pr[\bv{X} = s]$.\hspace{.75em}ALWAYS\hspace{.75em} SOMETIMES\hspace{.75em} NEVER
+\item $\Pr[\bv{X} = s \cup \bv{Y} = t] \le \Pr[\bv{X} = s] + \Pr[\bv{Y} = t]$.\hspace{.75em}ALWAYS\hspace{.75em} SOMETIMES\hspace{.75em} NEVER
+\item $\Pr[\bv{X} = s \cap \bv{Y} = t] = \Pr[\bv{X} = s] \cdot \Pr[\bv{Y} = t]$.\hspace{.75em}ALWAYS\hspace{.75em} SOMETIMES\hspace{.75em4} NEVER
+\end{enumerate}
+\end{enumerate}
+
+\noindent\textbf{Concentration Inequalities:}
+\begin{enumerate}
+\item Let $\bv{X}_1,\ldots, \bv{X}_n$ be the number of visitors to a website on $n$ consecutive days. These are independent and identically  distributed random variables. We have $\E[\bv{X}_i] = 20,000$ and $Var[ \bv{X}_i] = 100,000,000$.
+\begin{enumerate}
+\item Give an upper bound on the probability that on day $i$, more than $40,000$ visitors hit the website.
+\item Let $\bv{\bar X} = \frac{1}{n} \sum_{i=1}^n \bv{X}_i$ be the average number of visitors over $n$ days. What are $\E[\bv{\bar X}]$ and $Var[\bv{\bar X}]$?
+\item Give an upper bound on the probability that $\bv{\bar X} \ge 25,000$, for $n = 100$.
+\end{enumerate}
+\item Assume there are 1000 registered users on your site $u_1,\ldots,u_{1000}$, and in a given day, each user visits the site with some probability  $p_i$. The event that any user visits the site is independent of what the other users do. Assume that $\sum_{i=1}^{1000} p_i = 500$.
+\begin{enumerate}
+\item Let  $\bv{X}$ be the number of users that visit the site on the given day. What is $\E[\bv{X}]$.
+\item Apply a Chernoff bound to show that $\Pr[\bv{X} \ge 600] \le .01$. 
+\end{enumerate}
+\end{enumerate}
+
+\noindent\textbf{Random Hashing  Algorithms:}
+\begin{enumerate}
+\item Exercises 6.1, 6.2, 6.6,  6.7, 6.10, 6.19, 6.22, 6.23 of \emph{Foundations of Data Science}
+\item Consider a hash function mapping m-bit strings to a single bit -- $\bv{h}: \{0,1\}^m\rightarrow \{0,1\}$. We generate $\bv{h}$ by selecting a random position $i$ from $1,\ldots, m$. Then let $\bv{h}(x) = x(i)$, the value of $x$ at  position $i$. Note that after $i$ is chosen, it remains fixed, when we apply $\bv{h}$ to different inputs.
+\begin{enumerate}
+\item Given $x,y \in \{0,1\}^m$ with hamming distance $\norm{x-y}_0$ (i.e., $x$ and $y$ have different bit values in $\norm{x-y}_0$ positions), what is $\Pr[\bv{h}(x) = \bv{h}(y)]$.
+\item Is $\bv{h}$ a locality sensitive hash function?
+\item Let $m$ be the number of all possible $5$-singles in a document (i.e., all possible strings of $5$ English words). If $x$ and $y$ are indicator vectors of the $5$-shingles in two different documents, why do we expect them to be very sparse (i.e., each only have a few bits set to $1$)?
+\item Why might might MinHash and Jaccard similarity be more useful in the situation of (c) than the hash function $\bv{h}$ and Hamming distance.
+\end{enumerate}
+\item Use a Chernoff bound to show that if we hash $n$ items into a table with $n$ buckets, with probability $\ge 1-\delta$, the maximum number of items in a single bucket is upper bounded by $O(\log n/\delta)$.
+\end{enumerate}
+
+%\noindent\textbf{Randomized Dimensionality Reduction:}
+%\begin{enumerate}
+%\item Let $\vec{\bv{ y}}$ be a random $d$-dimensional vector with each entry  set independently  to $1$ with probability  $1/2$ and $-1$ with probability $1/2$.
+%\begin{enumerate}
+%\item What is $\norm{\vec{\bv{ y}}}_2$?
+%\end{enumerate}
+%\end{enumerate}
+
+\end{document} 

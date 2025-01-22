@@ -1,0 +1,228 @@
+\documentclass[10pt]{article}
+\usepackage{titlesec}
+\usepackage{geometry}
+\geometry{verbose,tmargin=.9in,bmargin=.9in,lmargin=1.0in,rmargin=1.0in}
+\usepackage{amsmath,amsfonts,amsthm,amssymb}
+\usepackage{url}
+\usepackage{color}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage[colorlinks=true, linkcolor=red, urlcolor=blue, citecolor=gray]{hyperref}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{etoolbox}
+
+\definecolor{nyuDarkPurple}{HTML}{330662}
+\definecolor{nyuOfficialPurple}{HTML}{57068c}
+
+\newcommand{\spara}[1]{\vspace{.5em}\noindent {\large\sffamily\textcolor{nyuOfficialPurple}{#1}}}
+\titleformat{\section}[hang]{\Large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsection}[hang]{\large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsubsection}[hang]{\normalsize\sffamily\color{gray}}{\thesection}{1em}{}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{\includegraphics[width=4cm]{tandon_long_color.eps}}
+\rhead{\thepage}
+\pagenumbering{gobble}
+
+\setcounter{secnumdepth}{0}
+
+% math commands
+\DeclareMathOperator{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\DeclareMathOperator{\Var}{Var}
+
+\begin{document}
+	
+\begin{center}
+	\normalsize
+	New York University Tandon School of Engineering
+	
+	Computer Science and Engineering
+	\medskip
+	
+	\large
+	CS-GY 9223I: Midterm Exam, Solutions
+	\medskip
+\end{center}
+
+
+\subsection{1. Always, sometimes, never. (\textbf{\small 12pts -- 3pts each})} 
+Indicate whether each of the following statements is \textbf{always} true, \textbf{sometimes} true, or \textbf{never} true. Provide a short justification or example to explain your choice. 
+\begin{enumerate}[label=(\alph*)]
+	\item For random variables $X$ and $Y$, $\E[X - Y]  =  \E[X] - \E[Y]$. 
+	
+	\textbf{ALWAYS}\hspace{1em} SOMETIMES\hspace{1em} NEVER
+	
+	Follows from linearity of expectation, which holds for any r.v.'s.
+	
+	\item For random variables $X$ and $Y$, $\E[X Y]  \geq  \E[X]\E[Y]$. 
+	
+	ALWAYS\hspace{1em} \textbf{SOMETIMES}\hspace{1em} NEVER
+	
+	Let $X$ be uniform random $\pm 1$. If $Y = X$ we have $1 =  \E[X]\E[Y] \geq \E[X]\E[Y] = 0$. If $Y = -X$ we have $-1 =  \E[X]\E[Y] < \E[X]\E[Y] = 0$.
+	
+	\item For convex functions $f(x)$ and $g(x)$, $f(x) + g(x)$ is convex.
+	
+	\textbf{ALWAYS}\hspace{1em} SOMETIMES\hspace{1em} NEVER
+	
+	Follows from first definition of convexity. Let $h(x) = f(x) + g(x)$. For any $\lambda \in [0,1]$, $h(\lambda x + (1-\lambda) y) = f(\lambda x + (1-\lambda) y) + g(\lambda x + (1-\lambda) y) \geq \lambda f( x) + (1-\lambda)f(y)  + \lambda g( x) + (1-\lambda)g(y)  = \lambda h( x) + (1-\lambda)h(y). $
+	
+
+	
+%	\item For convex functions $f(x)$ and $g(x)$, $f(x)\cdot g(x)$ is convex.
+%	
+%	ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER\vspace{4em}
+	
+	\item For convex functions $f(x)$ and $g(x)$, $f(g(x))$ is convex.
+	
+	ALWAYS\hspace{1em} \textbf{SOMETIMES}\hspace{1em} NEVER
+	
+	Both $g(x) = x$ and $g(x) = -x$ are convex. $f(g(x))$ is convex for the former, but not for the later (in fact, it's concave).
+	
+%	\item Let $f_1(x), \ldots, f_n(x)$ be $\beta$-smooth convex functions and let $g(x) = \frac{1}{n}\sum_{i=1}^n f_i(x)$ be their average. $g$ is $\beta$-smooth.
+%	
+%	ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER\vspace{4em}
+\end{enumerate}
+
+
+\subsection{2. Safety First (\textbf{\small 5pts})}
+An airplane has 1000 critical parts, including engine components, navigation equipment, etc. Each part has been thoroughly tested, and during a given flight, each part is guaranteed not to fail with probability 9999/10000. 
+What is the probability that no part fails during a given flight? Give the highest bound you can based on the problem information. 
+\vspace{1em}
+
+We cannot assume that failures are \emph{independent}. The best bound we can give is via a union bound:
+\begin{align*}
+\Pr[\text{no failures}] = 1- \Pr[\text{at least on failure}] \geq 1 - \sum_{i=1}^{1000} \Pr[\text{part $i$ fails}] \geq 1 - 1000\cdot (1-9999/10000) = 9/10.
+\end{align*}
+So the best upper bound we can give is $\mathbf{9/10}$.
+
+\subsection{3. Johnson-Lindenstrauss with Sign Matrices (\textbf{\small 15pts})}
+In class we saw that a matrix ${\Pi} \in\R^{m \times d}$ with \textbf{random Gaussian entries} satisfies the Johnson-Lindenstrauss Lemma with high probability when $m = {O(\log n /\epsilon^2)}$. Here we will consider the setting where $\Pi$'s entries are \textbf{scaled random $\pm 1$ random variables}. In particular, for all $i \in 1,\ldots, m$ and $j \in 1,\ldots d$, let 
+\begin{align*}
+\Pi_{i,j} = \begin{cases}
++\frac{1}{\sqrt{m}} & \text{ with probability $1/2$.} \\
+-\frac{1}{\sqrt{m}} & \text{ with probability $1/2$.} 
+\end{cases}
+\end{align*}
+
+\begin{enumerate}[label=(\alph*)]
+	\item (6pts) Let $\pi_i \in \R^d$ be the first row of $\Pi$. Show that for any $z \in \R^d$, $\E[ \langle\pi_i, z\rangle^2] = \frac{1}{m}\|z\|_2^2$.
+	\vspace{1em}
+	
+	Let $W = \langle\pi_i, z\rangle$. $W$ is a random variable and we want to given an expression for $\E[W^2]$. 
+	Let $X_1, \ldots, X_d$ be independent random variables that take values $\pm 1$, each with probability $1/2$. Then observe that:
+	\begin{align*}
+	W = \frac{1}{\sqrt{m}} \sum_{i=1}^d X_i z_i.
+	\end{align*}
+	By linearity of expectation $\E[W] = 0$ since $\E[X_i z_i] = 0$ for all $i$. 
+	$\Var[W]  = \frac{1}{m} \Var[\sum_{i=1}^d X_i z_i]$ and, since all $X_iz_i, X_iz_j$ are independent, we can apply linearity of variance.
+	\begin{align*}
+	\Var[\sum_{i=1}^d X_i z_i] = \sum_{i=1}^d \Var[X_i z_i] = \sum_{i=1}^d z_i^2 = \|z\|_2^2. 
+	\end{align*}
+	We conclude by noting that,
+	\begin{align*}
+	\E[W^2] = \E[W^2] - 0  =  \E[W^2] - \E[W]^2 = \Var[W] = \frac{1}{m}\|z\|_2^2.
+	\end{align*}
+	
+	\item (6pts) Use (a) to conclude that for any two vectors $x,y \in \R^d$, 
+	\begin{align*}
+		\E[\|\Pi x - \Pi y\|_2^2] = \|x - y\|_2^2
+	\end{align*}
+	First note that:
+	\begin{align*}
+	\|\Pi z\|_2^2 = \sum_{i=1}^m \langle\pi_i, z\rangle^2
+	\end{align*} 
+	and so by linearity of expectation, $\E \|\Pi z\|_2^2  = \sum_{i=1}^m \E\langle\pi_i, z\rangle^2 = \|z\|_2$. 
+	
+	Plugging in $z = x-y$ and noting that $\Pi (x - y) = \Pi x - \Pi y$ gives the result.
+
+	
+	\item (3pts) What's one reason you might you want to use a matrix with each entry equal to $\pm\frac{1}{\sqrt{m}}$ instead of being a random Gaussian?
+	\begin{itemize}
+		\item Less storage space for $\Pi$ (1 bit per entry instead of a floating point number).
+		\item Faster time to compute $\Pi x$: only additions/subtractions, no floating point multiplications. 
+		\item Faster to generate $\Pi$ (how to generate a random Gaussian isn't obvious). 
+	\end{itemize}
+\end{enumerate}
+
+
+\subsection{4. Smoothness, strong convexity, and condition number. (\textbf{\small 10pts})}
+
+\begin{enumerate}[label=(\alph*)]
+	\item (5pts) Draw below:
+	\begin{itemize}
+		\item A convex function which is smooth but not $\alpha$-strongly convex for any $\alpha > 0$.
+		\item A convex function which is strongly convex but not $\beta$-smooth for any finite $\beta$. 
+		\item A convex function which is not $\beta$-smooth for any finite $\beta$ and not $\alpha$-strongly convex for any $\alpha > 0$.
+	\end{itemize} 
+\textbf{Extra credit (3pts):} Given explicit expressions for your functions.
+	
+	\begin{itemize}
+		\item $f(x) = x$
+		\item $f(x) = x^6$ (see below). There are simpler examples to draw too.
+		\item $f(x) = |x|$.
+	\end{itemize}
+	
+	\item (3pts) What is the condition number  $\kappa$ of the convex function $f(x) = x^2$. Recall that $\kappa = \frac{\beta}{\alpha}$ where $\beta$ and $\alpha$ are the smoothness and strong convexity parameters of $f(x)$. 
+	\vspace{1em} 
+	
+	$\nabla f(x) = 2x.$ For all $x,y$ we have,
+	\begin{align*}
+	|\nabla f(x)  - \nabla f(y)| = 2|x - y|
+	\end{align*}
+	so from the definition of $\beta$ smooth, $f(x)$ is $2$-smooth.
+	
+	We also have:
+	\begin{align*}
+	\nabla f(x) (x - y) - [f(x) - f(y) = 2x^2 - 2xy - x^2 + y^2 = (x - y)^2
+	\end{align*}
+	So, by the definition of $\alpha$ smoothness, $f(x)$ is $2$-smooth. 
+	We conclude that $\mathbf{\boldsymbol{\kappa} = 1}$ for $f(x) = x^2$. 
+	
+	\item (2pts) Does $f(x) = x^6$ have a finite condition number? 
+	Justify your answer. 
+	\vspace{1em} 
+	
+	It does not because $f(x)$ is not $\beta$-smooth for any finite $\beta$. In particular, $|\nabla f(x)  - \nabla f(y)|$ = $6 |x^5 - y^5|$. Setting $y = 0$, this can be arbitrarily larger than $|x - y|$ as $x \rightarrow \infty$
+\end{enumerate}
+
+
+\subsection{5. Simple locality sensitive hash. (\textbf{\small 8pts})}
+Define the \emph{hamming similarity} between two length $d$ binary vectors $q,y \in \{0,1\}^d$ as:
+\begin{align*}
+1 - \frac{\|q - y\|_1}{d}.
+\end{align*}
+Here $\|q - y\|_1$ is the $\ell_1$ distance, which is defined as $\|z\|_1 = \sum_{i=1}^d |z_i|$.
+
+
+\begin{enumerate}[label=(\alph*)]
+	\item (4pts) 
+%	For an integer $m$, let $f: \{0,1\} \rightarrow \{1, \ldots, m\}$ be a uniformly random hash function from $\{0,1\}$ to $\{1,\ldots, m\}$. 
+	Let $g$ be a uniform random integer in $\{1, \ldots, d\}$. Define the function $h: \{0,1\}^d \rightarrow \{0,1\}$ as $h(x) = x_g$, where $x_g$ is the $g^\text{th}$ entry in the vector $x$. Show that $h$ is a locality sensitive hash function for {hamming similarity}.
+	\vspace{1em}
+	
+	Note that for binary vectors $x,y$, $\|x - y\|_1$ is exactly the number of entries where the vectors \emph{differ}. $d - \|x - y\|_1$ is the number of entries where the vectors are the same. So we have, for any binary $x,y$,
+	\begin{align*}
+	\Pr[h(x) = h(y)] = \Pr[x_g = y_g] =  \frac{d - \|x - y\|_1}{d} = 1 - \frac{\|q - y\|_1}{d}.
+	\end{align*}
+	So our collision probability is \emph{exactly proportional} to the hamming similarity. It increases when similarity increases, and decreases when it decreases. So $h$ is a locality sensitive hash function.
+	
+	\item (4pts) What are \textbf{two reasons} to \emph{not use} locality sensitive hashing for similarity search, but instead to perform a linear scan. 
+	\begin{itemize}
+		\item LSH requires preprocessing time to hash all database elements into multiple tables. This is slower than a linear scan. So you only save time with LSH if you have many queries. 
+		\item LSH requires more space. 
+		\item LSH always fails with some probability -- it can never be $100 \% $ reliable. 
+	\end{itemize}
+\end{enumerate}
+
+
+
+\end{document}

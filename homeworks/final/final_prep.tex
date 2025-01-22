@@ -1,0 +1,205 @@
+\documentclass[10pt]{article}
+\usepackage{titlesec}
+\usepackage{geometry}
+\geometry{verbose,tmargin=.9in,bmargin=.9in,lmargin=1.0in,rmargin=1.0in}
+\usepackage{amsmath,amsfonts,amsthm,amssymb}
+\usepackage{url}
+\usepackage{color}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage[colorlinks=true, linkcolor=red, urlcolor=blue, citecolor=gray]{hyperref}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+\newcommand{\bv}[1]{\mathbf{#1}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\DeclareMathOperator*{\Var}{var}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\definecolor{nyuDarkPurple}{HTML}{330662}
+\definecolor{nyuOfficialPurple}{HTML}{57068c}
+
+\newcommand{\spara}[1]{\vspace{.5em}\noindent {\large\sffamily\textcolor{nyuOfficialPurple}{#1}}}
+\titleformat{\section}[hang]{\Large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsection}[hang]{\large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsubsection}[hang]{\normalsize\sffamily\color{gray}}{\thesection}{1em}{}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{\includegraphics[width=4cm]{tandon_long_color.eps}}
+\rhead{\thepage}
+\pagenumbering{gobble}
+
+\setcounter{secnumdepth}{0}
+
+\begin{document}
+	
+\begin{center}
+	\normalsize
+	New York University Tandon School of Engineering
+	
+	Computer Science and Engineering
+	\medskip
+	
+	\large
+	CS-GY 6763: Final Exam Review. 
+	\medskip
+\end{center} 
+
+\section{Logistics}
+\begin{itemize}
+	\item \textbf{Time/place:} 2:00pm - 3:30pm on Friday 12/22 in our usual classroom. It will be a 1.5 hour exam. 
+	\item \textbf{Material allowed:}  One double sided sheet of paper with whatever you want on it is allowed. 
+\end{itemize}
+
+\section{Concepts to Know}
+
+\subsection{Random variables and concentration.}
+\begin{itemize}
+	\item This was the first section of the course, but the tools we learned never stopped being important. You will not be tested on them in isolation, but don't be surprised if problems require applying techniques like computing expectations/variances or random variables, applying the basic concentration bounds, applying union bounds, etc.  
+\end{itemize}
+
+\subsection{Optimization.}
+\begin{itemize}
+	\item Definition(s) of convex function.
+	\item Definition of convex set.
+	\item Gradient descent basic update rule. 
+	\item Definitions of $G$-Lipschitz, $\beta$-smooth, $\alpha$-strongly convex. Know the first order definition for high-dimensional functions. The second order definition you only need to know for low-dimensional functions. I.e. a twice differentiable function $f:\R\rightarrow \R$ is $\beta$-smooth, $\alpha$-strongly convex if for all $x$, $\alpha \leq f''(x) \leq \beta$. I won't test on Hessians.
+	\item How much time does it take to multiply an $n\times d$ matrix by a $d \times m$ matrix?
+	\item Be able to compute gradients of basic functions from $\R^d \rightarrow \R$. 
+	\item Definition of condition number.
+	\item Meaning of condition number for convex optimization problem. Meaning in the special case of $f(x) = \|Ax - b\|_2$. 
+	\item What does it mean for a matrix to be positive semidefinite.
+	\item Stationary point definition. 
+	\item What is the center of gravity method? How many iterations does it take to minimize a convex function over a convex set? Why isn't it used in practice?
+	\item Grunbaum's Theorem, and why it is relevant to analyzing the center of gravity method.
+	\item Be able to recognize a linear program (linear constraints, linear objective).
+	\item Definition of a projection oracle.
+	\item Definition of a separation oracle. Be able to describe a separation oracle for simple convex sets (e.g. for the unit ball or the $\ell_1$ ball). 
+	\item  Relax and round approach to solving combinatorial optimization problems.
+\end{itemize}
+
+\subsection{Singular Value Decomposition}
+\begin{itemize}
+	\item Basic properties of matrices with orthonormal columns and orthonormal rows. When does multiplying by such a matrix $V$ preserve the norm of a vector?
+	\item Singular value decomposition (SVD).
+	\item Connection between SVD and eigendecomposition. Differences between SVD and eigendecomposition. For what matrices are they the same?
+	\item Relation to norms: $\|A\|_F^2 = \sum_{i=1}^d \sigma_i^2$. $\|A\|_2^2 = \max_{x: \|x\|_2 = 1} \|Ax\|_2^2 = \sigma_1^2$.
+	\item Optimal low-rank approximation. 
+	\item Power method and its analysis. What properties of the target matrix $A$ control the convergence rate?
+	\item Main idea behind Krylov methods. 
+	\item Polynomials of matrices and their eigenvalues.
+\end{itemize}
+
+\subsection{Spectral Graph Theory}
+\begin{itemize}
+	\item Matrix representations of graphs (adjacency matrix  ${A}$, Laplacian matrix  ${L}$, edge-vertex incidence matrix ${B}$).
+	\item Relationship between edge-vertex incidence matrix and Laplacian matrix.
+	\item How to compute the value of cuts in a ``linear algebraic way" using $L$ or $B$. 
+	\item Intuitively what is the meaning of the smallest Laplacian eigenvector.
+	\item Stochastic block model. Planted clique model. Random graphs in general.
+	\item Basic strategy for recovering the partition in a stochastic block model using a spectral method.
+	\item Matrix concentration inequalities (you don't need to know the one stated in class, but know what it means to write down the expectation of a random matrix and bound its distance from that expectation).
+\end{itemize}
+
+\subsection{Randomized Numerical Linear Algebra}
+\begin{itemize}
+	\item What is a matrix sketch.
+	\item Subspace embedding theorem.
+	\item How subspace embeddings can be used to approximately solve least squares regression.
+	\item $\epsilon$-net arguments. Why was one needed for subspace embedding proof? Even if you can't reproduce the proof yourself, know the main components.
+	\item Size of $\epsilon$-net for the unit ball in $\R^d$. 
+	\item Definition of Randomized Hadamard matrices and how they are used to compute JL sketches faster.
+\end{itemize}
+
+\subsection{Compressed Sensing}
+\begin{itemize}
+	\item What is the compressed sensing problem.
+	\item Restricted Isometry Property, why it allows for sparse recovery. Know the $\ell_0$ minimization proof.
+	% \item What matrices satisfy RIP? With what parameters? How many rows? 
+	\item Know how to prove that a random JL matrix satisfies RIP using the subspace embedding theorem.
+	% \item Basis pursuit optimization problem for efficient recovery (you don't need to be able to reproduce the analysis).
+\end{itemize}
+
+
+\section{Practice Problems}
+
+From \emph{Convex Optimization} book (\url{https://web.stanford.edu/\~boyd/cvxbook/bv_cvxbook.pdf}):
+\begin{itemize}
+	\item \textbf{Exercises:} 3.7, 3.10, 3.11 (first part), 3.21 (lots of other problems if you want more practice, but many are on the harder side)
+\end{itemize}
+
+\begin{enumerate}
+	\item Let $f_1(x), \ldots, f_n(x)$ be $\beta$-smooth convex functions and let $g(x) = \frac{1}{n}\sum_{i=1}^n f_i(x)$ be their average. Show that $g$ is $\beta$-smooth.
+	\item Let $f: \R\rightarrow \R$ be a $\beta$-smooth, $\alpha$-strongly  convex function. Let $g(x) = f(c\cdot x)$ for some constant $0< c < 1$.  How does $g$'s smoothness and strong convexity compare to that of $f$? How about $g$'s condition number?
+	%	\item We stated in class that a $\beta$-smooth convex function can be optimized to error $\epsilon$ in $O(\beta R^2/\epsilon)$ iterations of gradient descent. Suppose $f$ is not $\beta$-smooth -- we only know it is $G$-Lipschitz. 
+	\item Let $f(x) = x^4$. Is $f$ $G$-Lipschitz for finite $G$?  Is $f$ $\beta$-smooth for finite $B$? 
+	%	\item In stochastic gradient descent, we have a function $f(\bv{x}) = \sum_{i=1}^n f_i(\bv{x})$. At each step we pick an $f_i$ uniformly at random and update $\bv{x}^{(t+1)} = \bv{x}^{(t)} - \eta \nabla f_i(\bv{x}^{(t)} )$. In practice a different strategy is often used due to cache considerations: instead of picking $f_i$ at random, we cycle through functions $f_1, \ldots, f_n$, using each of their gradients in order. Specifically, we update $\bv{x}^{(t+1)} = \bv{x}^{(t)} - \eta \nabla f_j(\bv{x}^{(t)})$ where $j = t\mod (n+1)$.
+	%	
+	%	Show that this strategy can fail terribly in the worst case. In particular, describe a function $f(\bv{x}) = \sum_{i=1}^n f_i(\bv{x})$ where cyclic updates 
+\end{enumerate}
+
+%\subsection{Linear Algebra and SVD.}
+From \emph{Foundations of Data Science} book (\url{https://www.cs.cornell.edu/jeh/book.pdf}). Note that this book uses $\|x\|$ to denote $\|x\|_2$ for a vector $x$.
+\begin{itemize}
+	\item \textbf{Exercises:} 3.6, 3.7, 3.8, 3.10, 3.11, 3.12, 3.13, 3.18 (we showed this in class, make sure you can prove), 3.20, 3.21, 3.22, 3.26, 7.27, 12.31, 12.36
+	\item \textbf{Exercises:} 12.33, 12.38 (try to figure out what the eigenvectors and eigenvalues of $A$ are by hand)
+	\item \textbf{Exercises:} 6.16. Understand the second equation on page 194: $\E[X] = AB$.
+	\item \textbf{Exercises:} 2.2
+	\begin{enumerate}
+		\item For $V \in \R^{n\times d}$ with orthonormal columns and vector $x \in \R^n$, when is $\|V^Tx\|_2 = \|x\|_2$? Always, sometimes, or never?
+		\item Let ${A}_k$ be the optimal $k$-rank approximation for ${A}$ obtained via an SVD. prove that $\|A - A_k\|_2 = \sigma_{k+1}(A)$. 
+		\item For any $V \in \R^{n\times d}$ with orthonormal columns, $VV^T$ is the projection matrix onto the subspace spanned by the columns of $V$ ($V$’s column span). We used this fact many times when discussing low-rank approximation. Show that $VV^T = (VV^T)(VV^T)$. Why does this property make intuitive sense if $VV^T$ is a projection?
+		\item Let ${A}_k$ be the optimal $k$-rank approximation for ${A}$ obtained via an SVD.  Prove that $\|A - A_k\|_F^2 = \|A\|_F^2 - \|A_k\|_F^2$. Is the same statement true if we switch these to spectral norms $\|\cdot\|_2$? 
+		\item Let $X \in R^{n\times 900}$ have random entries drawn independently as $\{0,1\}$, each with probability $1/2$. Let $Y \in R^{n\times 900}$ have
+		rows corresponding to $30 \times 30$ pixel black and white images of handwritten digits. All entries
+		of Y are in $\{0,1\}$. How do you expect $\sum_{i=11}^{900} \sigma_i(X)^2$ and $\sum_{i=11}^{900} \sigma_i(Y)^2$ to compare?
+%		\item You have a data matrix $X \in \R^{n\times d}$ where each row corresponds to a student and each column corresponds to their grade on an assignment. The final column is their cumulative grade. What do you expect the rank of this matrix to be? Do you think it is well approximated by an even lower rank matrix?
+		\item  Let $X \in \R^{n\times d}$ have SVD $U\Sigma V^T$ with singular values $\sigma_1(X), . . . \sigma_d(X)$. What are the eigenvalues of $(X^TX)^q$ What are its eigenvectors. How about $(XX^T)^q$. What is the runtime required to apply either of these two matrices to a vector?
+		\item In the stochastic block model, why is clustering with the second largest eigenvector of the expected adjacency matrix equivalent to clustering with the second smallest eigenvector of the expected Laplacian? Are these two approaches identical when clustering using the actual rather than the expected matrices?
+	\end{enumerate}
+%	\begin{enumerate}
+%		\item Let $A \in \R^{n\times d}$ be a rank $r$ matrix and let $\tilde{A}$ be formed by adding independent random Gaussian noise $\mathcal{N}(0,\nu^2)$ to every entry of $A$.
+%		\begin{enumerate}
+%			\item Let $\tilde{A}_r$ be the best rank $r$ approximation to $\tilde{A}$. Prove that $\tilde{A}_r = \argmin_{B \text{ with rank } r} \E\|\tilde{A} - B\|_F^2$. 
+%			\item Prove that with probability $9/10$, $\sigma_{r+1}(\tilde{A}) \leq \sqrt{nd}\cdot \nu$
+%		\end{enumerate}
+%	\end{enumerate}
+\end{itemize}
+
+%\subsection{Spectral Graph Theory}
+%From \emph{Foundations of Data Science} book (\url{https://www.cs.cornell.edu/jeh/book.pdf}). 
+%\begin{itemize}
+%	\item \textbf{Exercises:} 12.33, 12.38 (try to figure out what the eigenvectors and eigenvalues of $A$ are by hand)
+%\end{itemize}
+%
+%\subsection{Randomized Linear Algebra}
+%From \emph{Foundations of Data Science} book (\url{https://www.cs.cornell.edu/jeh/book.pdf}). 
+%\begin{itemize}
+%	\item \textbf{Exercises:} 6.16. Understand the second equation on page 194: $\E[X] = AB$.
+%\end{itemize}
+%
+%\subsection{Compressed Sensing}
+%From \emph{Foundations of Data Science} book (\url{https://www.cs.cornell.edu/jeh/book.pdf}). 
+%\begin{itemize}
+%	\item \textbf{Exercises:} 
+%\end{itemize}
+%
+%\subsection{High Dimensional Geometry}
+%From \emph{Foundations of Data Science} book (\url{https://www.cs.cornell.edu/jeh/book.pdf}). 
+%\begin{itemize}
+%	\item \textbf{Exercises:} 2.2
+%\end{itemize}
+
+
+\end{document}

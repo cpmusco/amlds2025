@@ -1,0 +1,210 @@
+---
+title: "**Distinct Elements**"
+header-includes:
+  - \usepackage{amsbsy}
+output:
+  html_document:
+    mathjax: https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+---
+
+We've seen how to apply linearity of variance and Chebyshev's inequality to the distinct elements problem.
+In this class, we will see how to apply these tools to the load balancing problem.
+
+This class, we will learn and use linearity of variance and Chebyshev's inequality.
+
+Suppose Google answers map search queries using $n$ servers
+$A_1, \ldots, A_n$.
+Given a query like "New York to Rhode Island",
+a common practice is to choose a random hash function
+$h: \mathcal{U} \rightarrow \{1, \ldots, q\}$ and
+to route this query to the server corresponding
+to its hashed value.
+
+Our goal is to ensure that requests are distributed evenly, so no one
+server gets loaded with too many requests.
+We want to avoid downtime and slow responses to clients.
+
+Why should we use a hash function instead of just distributing requests randomly?
+Well, if a query has already been answered on a server, we want to direct
+the same query to it again so we don't have to recompute the same answer
+on different servers.
+
+Suppose we have $n$ servers and $m$ requests
+$x_1, \ldots, x_m$.
+Let $s_i$ be the number of requests sent to 
+server $i \in \{1, \ldots, n\}$.
+Formally,
+$$
+s_i = \sum_{j=1}^m \mathbb{1}[h(x_j)=1].
+$$
+Our goal is to understand the value of the maximum load on any server,
+which can be written as the random variable
+$$
+S = \max_{i \in \{1, \ldots, n\}} s_i.
+$$
+
+A good first step in any analysis of random variables is to 
+think about expectations.
+If we have $n$ servers and $m$ requests,
+for any $i \in \{1, \ldots, n\}$,
+$$
+\mathbb{E}[s_i] = \sum_{j=1}^m \mathbb{E}\left[\mathbb{1}[h(x_j)=1]\right]
+= \frac{m}{n}.
+$$
+But it's very unclear what the expectation of $S$ is.
+In particular, $\mathbb{E}[S] \neq \max_{i \in \{1, \ldots, n\}} \mathbb{E}[s_i]$.
+
+Can you convince yourself that for two random variables $A$
+and $B$, $\mathbb{E}[\max(A,B)] \neq \max(\mathbb{E}[A], \mathbb{E}[B])$?
+One example to think about is when $A$ and $B$ are independent variables that are each equally likely to be $1$ and $0$.
+
+In order to reduce notation and keep the math simple,
+let's assume that $m=n$. That is, we assume that we have
+exactly the same number of servers and requests.
+As we did in the last problem, we'll continue to assume we have
+access to a uniformly random hash function $h$ so that
+$\Pr(h(x) = h(y))=\frac{1}{m}$.
+
+We can visualize the load balancing problem in the following figure:
+Each request is placed in a server uniformly and at random.
+
+<center><img src="images/balls.png" width="800"></center>
+
+We know that the expected number of requests per server
+is $\mathbb{E}[s_i] = \frac{m}{n} = 1$ under our assumption
+that we have the same number of requests and servers.
+We would like to prove
+$$
+\Pr\left(
+\max_{i} s_i \geq C
+\right) \leq \frac{1}{10}
+$$
+where $C$ is a small value (much smaller than $n$).
+Putting it another way,
+we would like to prove
+$$
+\Pr\left( (s_1 \geq C) \cup (s_2 \geq C) \cup \ldots \cup (s_n \geq C)\right)
+\leq \frac{1}{10}.
+$$
+Notice these statements are equivalent since the max is greater than $C$ if
+at least one of the values is greater than $C$.
+
+Whenever we look at the union of different events,
+we should immediately think of the union bound!
+Recall that the union bound allows us to nicely upper bound
+the union of events even when the events have complicated
+and dependent dynamics.
+
+### Union Bound
+
+**Union Bound:** For any events $A_1, \ldots, A_n$,
+$$
+\Pr(A_1 \cup \ldots \cup A_n) \leq \Pr(A_1) + \ldots + \Pr(A_n).
+$$
+
+<center><img src="images/union.png" width="600"></center>
+
+We saw the proof by picture last class.
+This time, we'll prove the union bound using Markov's inequality.
+Ironically, three of the tools that we've used so far (Markov's inequality, Chebyshev's inequality, and the union bound) are all Markov's inequality.
+
+**Proof**:
+Let $X_i = \mathbb{1}[A_i]$ be the indicator random variable
+that event $A_i$ occurs.
+Define $S= \sum_{i=1}^n X_i$ as the number of events that occur.
+Markov's inequality tells us that
+$$
+\Pr \left( A_1 \cup \ldots \cup A_n \right)
+= \Pr \left( \sum_{i=1}^n X_i \geq 1 \right)
+\leq \mathbb{E}[S]
+$$
+$$
+= \sum_{i=1}^n \mathbb{E}[X_i]
+= \Pr(A_1) + \ldots + \Pr(A_n).
+$$
+
+If we can prove that $\Pr(s_i \geq C) \leq \frac{1}{10n}$,
+then the union bound immediately gives the last two bounds that
+we wanted.
+Why? Well,
+$$
+\Pr(\max_i s_i \geq C) \leq \sum_{i=1}^n \Pr(s_i \geq C)
+\leq \sum_{i=1}^n \frac{1}{10n} = \frac{1}{10}
+$$
+where the second inequality follows by the union bound.
+
+It should look hard to prove $\Pr(s_i \geq C) \leq \frac{1}{10n}$.
+This implies that $s_i < C$ for a particular server $i$ with
+*very high* probabiity $1- \frac{1}{10n}$.
+Unfortunately, Markov's inequality is too weak for this.
+We'll instead use Chebyshev's inequality but we'll first have to understand the variance
+$\textrm{Var}(s_i) = \sigma^2$.
+Let $s_{i,j}$ be the indicator random variable that
+the $j$th request goes to the $i$th server.
+We have
+$$
+s_i = \sum_{j=1}^n s_{i,j}.
+$$
+Since each $s_{i,j}$ and $s_{i,j'}$ are independent, we can apply
+linearity of variance and get
+$$
+\textrm{Var}(s_i)
+=\sum_{j=1}^n \textrm{Var}(s_i,j).
+$$
+We know that server $i$ gets request $j$ with probability $\frac{1}{n}$
+so $s_i = 1$ with probability $\frac{1}{n}$ and $s_i=0$ otherwise.
+This tells us that $\mathbb{E}[s_{i,j}] = \frac{1}{n}$
+and $\mathbb{E}[s_{i,j}^2] = \frac{1}{n}$.
+Then
+$$
+\textrm{Var}(s_{i,j}) = \frac{1}{n} - \frac{1}{n^2} \leq \frac{1}{n}
+$$
+and
+$$
+\textrm{Var}(s_i) \leq n \frac{1}{n} = 1.
+$$
+Similarly, we know $\mathbb{E}[s_i] = 1$.
+
+Applying Chebyshev's inequality gives
+$$
+\Pr\left(
+|s_i - 1| \geq k
+\right)
+\leq \frac{1}{k^2}.
+$$
+
+Setting $k=\sqrt{10n}$ gives
+$$
+\Pr(|s_i - 1| \geq \sqrt{10n}) \leq \frac{1}{10n}
+\implies 
+\Pr(s_i \geq \sqrt{10n}+1) \leq \frac{1}{10n}
+$$
+By the union bound argument from before,
+we have
+$$
+\Pr \left(
+\max_{i \in \{1, \ldots, n\}} s_i \geq \sqrt{10n} + 1
+\right)
+\leq \frac{1}{10}.
+$$
+
+In words, we proved that when hashing $n$ requests into
+$n$ servers, the server with the maximum number of requests
+contains no more than $\sqrt{10n} + 1$ requests with probability
+$\frac{9}{10}$.
+
+## Conclusion
+
+In this class, we analyzed and solved the distinct elements problem and the load balancing problem.
+Both are important and widely applicable.
+But the real value of what we did today is not the specific problems we solved but the techniques we used to solve them:
+
+* We used the union bound to control the maximum of many random variables.
+
+* We used Chebyshev's inequality to bound a variable whose variance we could can compute.
+
+* In order to compute the variance, we took a random variable and decomposed it into a sum of independent random variables so that we could apply linearity of variance.

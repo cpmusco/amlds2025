@@ -1,0 +1,205 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+\usepackage{amsmath,amsfonts,amsthm,amssymb}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{caption} 
+\usepackage{algpseudocode}
+\usepackage{bbm}
+\usepackage{float}
+\usepackage{framed}
+\usepackage{enumerate}
+\usepackage{enumitem}
+\usepackage{color}
+\usepackage[colorlinks=true, linkcolor=red, urlcolor=blue, citecolor=blue]{hyperref}
+
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+\newcommand{\bv}[1]{\mathbf{#1}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\Cost}{Cost}
+\DeclareMathOperator{\cut}{cut}
+\DeclareMathOperator{\tr}{tr}
+
+\topmargin 0pt
+\advance \topmargin by -\headheight
+\advance \topmargin by -\headsep
+\textheight 8.9in
+\oddsidemargin 0pt
+\evensidemargin \oddsidemargin
+\marginparwidth 0.5in
+\textwidth 6.5in
+
+\parindent 0in
+\parskip 1.5ex
+
+\newcommand{\homework}[3]{
+	\noindent
+	\begin{center}
+		\framebox{
+			\vbox{
+				\hbox to 6.50in { {\bf NYU CS-GY 6763: Algorithmic Machine Learning 
+						and Data Science} \hfill }
+				\vspace{4mm}
+				\hbox to 6.50in { {\Large \hfill Homework #1  \hfill} }
+				\vspace{2mm}
+				\hbox to 6.50in { {Name: #2 \hfill} }
+			}
+		}
+	\end{center}
+	\vspace*{4mm}
+}
+
+\begin{document}
+	
+	\homework{4}{Solution key}
+
+	\section*{Problem 1}
+	(a). Let $V\Sigma V^T$ be the eigendecomposition of $A$. We have that $A^k = V\Sigma V^TV\Sigma V^T, \ldots, V\Sigma V^T$. All of the $V^TV$ terms cancel to be identities, so in the end we have that $A^k = V\Sigma^k V^T$. At this point you can use cyclic property of the trace, or more directly, observe that $V\Sigma^k V^T$ is an eigendecomposition of $A^k$. So $\tr(A^k) = \sum_{i=1}^n \Sigma_{ii}^k =  \sum_{i=1}^n \lambda_{i}^k$.
+
+(b) Since there are $m$ terms in the sum, the claim follows if you can compute $x^TBx$ for any vector $x$ in $O(n^2k)$ time. This can be done by multiplying from right to left. I.e. to compute $A\cdot A\cdot\ldots \cdot A\cdot x$ first compute $A\cdot x$, then multiply this on the left by $A$, then repeat $k$ times. Each matrix-vector multiplication takes $O(n^2)$ time for a total of $O(n^2k)$ time .
+
+(c) By linearity, we only need to compute the expectation and variance of $x^TBx$ for one $x$ to compute the claim. For let's do expectation:
+\begin{align*}
+	x^TBx = \sum_{i=1}^n\sum_{j=1}^n x_ix_j B_{ij}
+\end{align*}
+so by linearly
+\begin{align*}
+	\E[x^TBx] = \sum_{i=1}^n\sum_{j=1}^n B_{ij} \E[x_ix_j].
+\end{align*}
+Since $X_i$ and $X_j$ are random $\pm 1$'s, $x_ix_j = 1$ if $i = j$ and otherwise itself is a random $\pm 1$, and thus has expectation zero. So we have: 
+\begin{align*}
+	\E[x^TBx] = \sum_{i=1}^n\sum_{j=1}^n B_{ij} \E[x_ix_j] = \sum_{i=1}^n B_{ii}\cdot 1 = \tr(B)
+\end{align*}
+
+Next let's do variance. First note that, as above, we can write $x^TBx = \sum_{i=1}^n\sum_{j\neq i} x_ix_j B_{ij} + \sum_{i=1}^n B_{ii}$. The second part is a constant, so the variance of $x^TBx$ is just equal to the variance of $\sum_{i=1}^n\sum_{j\neq i} x_ix_j B_{ij} $. We can *almost* evaluate this using linearity of variance because $x_ix_j$ and $x_\ell x_k$ are independent as long as one of $\ell,k$ differ from $i,j$. However, the variables will not be indepdent if $\ell = j$ and $k=i$ -- in fact in that case, $x_ix_j$ and $x_\ell x_k$ are the same random variable. To deal with this issue, we regroup:
+\begin{align*}
+	\Var[x^TBx] = \Var\left[\sum_{i=1}^n\sum_{j\neq i} x_ix_j B_{ij} \right] = \Var\left[\sum_{i=1}^n\sum_{j> i} x_ix_j (B_{ij} + B_{ji}) \right].
+\end{align*}
+Now we can check that every term in the sum truly is independent, and so by linearity of variance we have:
+\begin{align*}
+	\Var[x^TBx] = \sum_{i=1}^n\sum_{j> i}(B_{ij} + B_{ji})^2 \Var[ x_ix_j ] \leq  \sum_{i=1}^n\sum_{j> i}2B_{ij}^2 + 2B_{ji}^2 = 2\|B\|_F^2
+\end{align*}
+In the last inequality we used that $\Var[ x_ix_j ]  = 1$ and also the AM-GM inequality -- ie that $(a+b)^2 = a^2 + 2ab + b^2 \leq a^2 + a^2 + b^2 + b^2$.  
+
+It follows that if we average $m$ repeated trials of $x^TBx$ we get variance $2\|B\|_F^2/m$.
+
+(d) Can can apply Chebyshev's inequality. 
+
+(e) First we note that, when $A$ is PSD, so is $B$. In particular, $B$'s eigenvalues are equal to those of $A$ raised to the $k^\text{th}$ power, so are all positive.
+
+So, we prove the claim for a generic PSD matrix $B$. Let $\lambda_1, \ldots, \lambda_n$ denote the matrix's eigenvalues.
+ As discussed in class, $\|B\|_F^2 = \sum_{i=1}^n \lambda_i^2$ and $\tr(B)^2 = (\sum_{i=1}^n \lambda_i)^2 = \sum_{i=1}^n \lambda_i^2 + \sum_{i\neq j} \lambda_i \lambda_j$. Since $B$ is PSD, all $\lambda_i, \lambda_j$ are positive, so  $\sum_{i\neq j} \lambda_i \lambda_j \geq 0$ and thus we have that  $\|B\|_F^2 \leq \tr(B)^2$ as required. 
+	
+	\section*{Problem 2}
+	1. Run gradient descent for $q$ steps and collect all intermediate results $\bv{x}^{(0)}, \bv{x}^{(1)}, \ldots, \bv{x}^{(q)}$. Note that this takes $O(ndq)$ time -- $O(nd)$ time for each gradient step to multiply a vector by $\bv{A}^T\bv{A}$, and we run $q$ steps. Now, given a $q$ degree polynomial $p$ with coefficients $c_0, c_1, \ldots, c_q$, form the vector:
+	\begin{align*}
+		\bv{y} = c_0\bv{x}^{(0)} + c_1\bv{x}^{(1)} + \ldots + c_q\bv{x}^{(q)}. 
+	\end{align*}
+	By the fact the $\bv{x}^{(i)} = (\bv{I} - 2\eta\bv{A}^T\bv{A})(\bv{x}^{(i-1)} - \bv{x}^*) + \bv{x}^*$, we can check that $\bv{y}$ satisfies:
+	\begin{align*}
+		\bv{y} = p\left(\bv{I} - \frac{1}{\lambda_1}\bv{A}^T\bv{A}\right)(\bv{x}^{(0)} - \bv{x}^*) + (c_0 + c_1 + \ldots + c_q)\bv{x}^*.
+	\end{align*}
+	And since we assume the coefficients summed to $1$, we have that, as desired,
+	\begin{align*}
+		\bv{y} - \bv{x}^* = p\left(\bv{I} - \frac{1}{\lambda_1}\bv{A}^T\bv{A}\right)(\bv{x}^{(0)} - \bv{x}^*).
+	\end{align*}
+
+	2. We use the polynomial $p$ from Claim 4 of the Lanczos notes. $p(1) = 1$ for that polynomial, and since $1^q = 1$ for all $q$, $p(1) = c_0 + \ldots + c_q$, so this polynomial satisfies the coefficient requirement. Let $\lambda_1 \geq \ldots, \geq \lambda_d \geq 0$ be the eigenvalues of the PSD matrix $\bv{A}^T\bv{A}$. I.e. the diagonal entries of $\bs{\Lambda}$ in the eigendecomposition $\bv{A}^T\bv{A} = \bv{V}\bs{\Lambda}\bv{V}^T$. Since $\bv{I} = \bv{V}\bv{I}\bv{V}^T$, we have that:
+\begin{align*}
+	\bv{I} - \frac{1}{\lambda_1}\bv{A}^T\bv{A} = \bv{V}(\bv{I} - \frac{1}{\lambda_1}\bs{\Lambda})\bv{V}^T
+\end{align*} 
+and
+\begin{align*}
+	p(\bv{I} - \frac{1}{\lambda_1}\bv{A}^T\bv{A}) = \bv{V}p(\bv{I} - \frac{1}{\lambda_1}\bs{\Lambda})\bv{V}^T
+\end{align*} 
+The entries of the diagonal matrix $\bv{I} - \frac{1}{\lambda_1}\bs{\Lambda}$ lie between $0$ at the smallest and and $1 -\lambda_d/\lambda_1$ at the largest. So, by Claim 4, as long as $p$ is chosen to have degree $O(\sqrt{\lambda_1/\lambda_d})$, the values in $p(\bv{I} - \frac{1}{\lambda_1}\bs{\Lambda})$ are all less than $\epsilon$. $p(\bv{I} - \frac{1}{\lambda_1}\bv{A}^T\bv{A})  = \bv{V}p(\bv{I} - \frac{1}{\lambda_1}\bs{\Lambda})\bv{V}^T$ is thus a matrix with eigenvalues bounded by $\epsilon$ in absolute value. 
+
+3. By part 2, we have $\|\bv{y} - \bv{x}^*\|_2 = \|p\left(\bv{I} - \frac{1}{\lambda_1}\bv{A}^T\bv{A}\right)(\bv{x}^{(0)} - \bv{x}^*)\|_2 \leq \epsilon \|\bv{x}^{(0)} - \bv{x}^*\|_2^2$ as long as we use degree $q = O(\sqrt{\lambda_1/\lambda_d})$ (i.e. run for $q$ iterations).
+
+\section*{Problem 3}
+1. Assume without loss of generality that $S = \{1, \ldots, k\}$. $E[A]$ has its top left $k\times k$ block equal to all ones, and all other entries equal to $p$. 
+
+2. Let $\bar{A}$ denote $\E[A]$. The hint must hold because the first $k$ rows of $\bar{A}$ are identical. So for any eigenvector $v$, it must be that the first $k$ entries of $\bar{A}v$ are  all identical. But we have $\bar{A}v = \lambda v$, so this implies that the first $k$ entries of $v$ itself are identical. The same goes for the remaining $n-k$ entries since the bottom $n-k$ rows of $A$ are all identical. Since scaling won't impact whether or not $v$ is an eigenvector, we can always rescale so that the last  $n-k$ entries are equal to $1$. 
+
+Given the form of the eigenvector above, we note that $\bar{A}v$ can be written as
+\begin{align}
+	\label{bmatrix}
+	\begin{bmatrix}
+		1 & \ldots & 1  & p & \ldots & p   \\
+		\vdots & \ddots & \vdots & \vdots & \ddots & \vdots   \\
+		1 & \ldots & 1 & p & \ldots & p\\
+				p & \ldots & p  & p & \ldots & p   \\
+		\vdots & \ddots & \vdots & \vdots & \ddots & \vdots   \\
+		p & \ldots & p & p & \ldots & p
+	\end{bmatrix}
+	\begin{bmatrix}
+		\alpha \\ \vdots \\ \alpha \\  1 \\ \vdots \\ 1 
+		\end{bmatrix} =
+	\begin{bmatrix}
+		k\alpha + (n-k)p \\ \vdots \\ k\alpha + (n-k)p \\  	kp\alpha + (n-k)p  \\ \vdots \\ kp\alpha + (n-k)p
+		 \end{bmatrix}
+\end{align}
+
+For $v$ to be an eigenvector, we need that $Av = \lambda v$ for some constant $\lambda$, and thus that:
+\begin{align*}
+	k\alpha + (n-k)p = \lambda \alpha\\
+	kp\alpha + (n-k)p = \lambda 
+	\end{align*}
+
+Now we solve for $\alpha$. Multiplying the bottom equation by $\alpha$ and subtracting off the first we get:
+\begin{align*}
+	\left[kp\right]\alpha^2 + \left[(n-k)p - k\right] \alpha - \left[(n-k)p\right] = 0.
+\end{align*}
+This is a quadratic equation, so use the quadratic formula to find that:
+\begin{align*}
+	\alpha = \frac{- \left[(n-k)p - k\right] \pm \sqrt{\left[(n-k)p - k\right]^2 + 4\left[(n-k)p^2k\right]}}{2kp}
+\end{align*}
+These two solutions for $\alpha$ immediately give our two eigenvectors, and make it clear there are only 2!
+
+3. First we observe that $\E[A]$ is positive semidefinite since it can be written as $p\cdot \vec{1}\vec{1}^T + (1-p)\cdot \vec{1}_k\vec{1}_k$, where $\vec{1}$ denotes the all ones vector and $\vec{1}_k$ denotes a vector that is $1$ in it's first $k$ entries and zeros elsewhere. So, both of its non-zero eigenvalues are positive. Accordingly, to find the largest magnitude eigenvalue, we just need to find the most positive eigenvalue of $A$. To do so, note that $\lambda = kp\alpha + (n-k)p$ is always more positive for large values of $\alpha$. So, the more positive eigenvalue corresponds to taking the ``+'' in the quadratic equation. Once we do, it's clear that $\alpha > 0$ because the term inside the square root is greater than $\left[(n-k)p - k\right]^2 $, and thus the top of the fraction evaluates to a positive number. 
+
+Once we know that $\alpha > 0$,  we have that $\lambda \alpha = k\alpha + (n-k)p > kp\alpha + (n-k)p  = \lambda \cdot 1$ since $p < 1$ and $k \alpha$ is positive. Since $\lambda > 0$ if $\lambda \alpha \geq \lambda$ then $\alpha > 1$.
+
+
+
+\section*{Problem 4 (\textbf{15 pts})}
+We follow the steps laid out in the hint. 
+
+Without loss of generality, assume $\|x\|_2 = 1$. Then $x^T R x/x^Tx$ equals:
+\begin{align*}
+	x^T R x = \sum_{i = 1}^n \sum_{j = i+1}^n  2R_{ij} x_ix_j + \sum_{i = 1}^n R_{ii} x_i^2. 
+\end{align*}
+Note that $\E[x^TRx] = 0$, so by a Hoeffding bound, we have that:
+\begin{align*}
+	\Pr[|x^TRx| \geq t] \leq 2e^{\frac{-2t^2}{\sum_{i = 1}^n \sum_{j = i+1}^n  16x_i^2x_j^2 + \sum_{i = 1}^n  4 x_i^4}}
+\end{align*}
+Note that $\sum_{i = 1}^n \sum_{j = i+1}^n  16x_i^2x_j^2 + \sum_{i = 1}^n  4 x_i^4 \leq 8 (x_1^2 + \ldots + x_n^2)^2 = 8\|x\|_2^4$. So if we set $t = c \sqrt{q\log n}$ for sufficiently large $c$, we have that 
+\begin{align*}
+	\Pr[|x^TRx| \geq t] \leq 1/n^{q}
+\end{align*}
+for any constant $c_1$ we desire. 
+
+Next we do the $\epsilon$-net argument. A sticking point for students is they often try to follow the argument from class a bit too closely, but the argument here can be simpler. 
+
+Construct an $\epsilon$-net $\mathcal{N}_\epsilon$ over the unit ball so that, for any unit vector $x\in \R^n$, there is a vector $w \in \mathcal{N}_\epsilon$ such that $\|x - w\|_2 \leq \epsilon$. We will choose $\epsilon$ to be \emph{really small} -- on the order of $1/n^c$, noting that this doesn't hurt out net-size by much. Let $x - w = e$. Consider $|x^T R x|$: 
+\begin{align*}
+	|x^T R x| = |w^TRw + e^TRe + 2 w^T Re| &\leq |w^TRw| + (2w + e)^TRe
+	\\&\leq  |w^TRw|  + \|2w + e\|_2\|Re\|_2
+	\\&\leq  |w^TRw|  + 3\|Re\|_2.
+\end{align*}
+The second to last step follows from Cauchy-Schwarz, and the last from triangle inequality assuming $\epsilon \leq 1$. 
+We have that $\|Re\|_2 \leq \epsilon\|R\|_2$ based on the first definition of the spectral norm given in the problem, and trivially that $\|R\|_2 \leq n$. So, if we set $\epsilon \leq 1/n$, we have that:
+\begin{align*}
+	|x^T R x|  \leq |w^TRw| + O(1). 
+\end{align*}
+
+Note that $\mathcal{N}_\epsilon$ has size $(cn)^n$, so if we set $q = O(n)$ above, then we have that, with high probability, $|w^TRw| \leq c\sqrt{q\log n}$ for all $w\in \mathcal{N}_\epsilon$. Combine with the above reduction for all $x$, this gives the result. 
+
+	
+
+
+\end{document}

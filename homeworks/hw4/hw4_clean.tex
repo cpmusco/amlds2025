@@ -1,0 +1,122 @@
+\documentclass[10pt]{article}
+\usepackage{titlesec}
+\usepackage{geometry}
+\geometry{verbose,tmargin=.9in,bmargin=.9in,lmargin=1.0in,rmargin=1.0in}
+\usepackage{amsmath,amsfonts,amsthm,amssymb}
+\usepackage{url}
+\usepackage{color}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage[colorlinks=true, linkcolor=red, urlcolor=blue, citecolor=gray]{hyperref}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{etoolbox}
+
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+\newcommand{\bv}[1]{\mathbf{#1}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\Cost}{Cost}
+\DeclareMathOperator{\cut}{cut}
+
+\definecolor{nyuDarkPurple}{HTML}{330662}
+\definecolor{nyuOfficialPurple}{HTML}{57068c}
+
+\newcommand{\spara}[1]{\vspace{.5em}\noindent {\large\sffamily\textcolor{nyuOfficialPurple}{#1}}}
+\titleformat{\section}[hang]{\Large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsection}[hang]{\large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsubsection}[hang]{\normalsize\sffamily\color{gray}}{\thesection}{1em}{}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{\includegraphics[width=4cm]{tandon_long_color.eps}}
+\rhead{\thepage}
+\pagenumbering{gobble}
+
+\setcounter{secnumdepth}{0}
+
+\begin{document}
+	
+\begin{center}
+	\normalsize
+	New York University Tandon School of Engineering
+	
+	Computer Science and Engineering
+	\medskip
+	
+	\large
+	CS-GY 6763: Homework 4. 
+	
+	Due Wednesday., December 15th, 2022, 11:59pm.
+	\medskip
+	
+	\normalsize 
+	\noindent \emph{Collaboration is allowed on this problem set, but solutions must be written-up individually. Please list collaborators for each problem separately, or write ``No Collaborators" if you worked alone.}
+	\medskip
+\end{center} 
+
+\subsection{Problem 1: Accelerated Gradient Descent Through the Polynomial Lens}
+\textbf{(15 pts)}
+In Lecture 7, we saw how to analyze gradient descent for $f(\bv{x}) = \|\bv{A}\bv{x} - \bv{b}\|_2^2$, which has gradient $\nabla f(\bv{x}) = 2\bv{A}^T\bv{A}\bv{x} - 2\bv{A}^T\bv{b}$. The dominant cost for each gradient descent iteration is multiplying $\bv{x}$ by $\bv{A}^T\bv{A}$ to compute the gradient, which takes $O(nd)$ time when $A$ is $n\times d$. 
+
+We obtained a convergence bound depending on the largest and smallest eigenvalues of $\bv{A}^T\bv{A}$, which we denote $\lambda_1$ and $\lambda_d$ respectively. We did so by rearranging the gradient descent update rule:
+\begin{align*}
+	\bv{x}^{(i)} &= \bv{x}^{(i-1)} - \eta\left(2\bv{A}^T\bv{A}\bv{x}^{(i-1)} - 2\bv{A}^T\bv{b}\right) \\
+	\bv{x}^{(i)} - \bv{x}^* &= \bv{x}^{(i-1)} - \eta\left(2\bv{A}^T\bv{A}\bv{x}^{(i-1)} - 2\bv{A}^T\bv{A}\bv{x}^*\right) -\bv{x}^*&& \text{since $\nabla f(\bv{x}^*)=\bv{0}$, so $\bv{A}^T\bv{A}\bv{x}^* = \bv{A}^T\bv{b}$}\\
+	\bv{x}^{(i)} - \bv{x}^* &= (\bv{I} - 2\eta\bv{A}^T\bv{A})(\bv{x}^{(i-1)} - \bv{x}^*).
+\end{align*}
+By induction, it follows that the error $\bv{x}^{(i)} - \bv{x}^*$ equals $\bv{x}^{(i)} - \bv{x}^* = (\bv{I} - 2\eta\bv{A}^T\bv{A})^i(\bv{x}^{(0)} - \bv{x}^*)$. This allowed us to obtain a convergence bound by arguing that, if we set $\eta = 1/2\lambda_1$ where $\lambda_1$ is the largest eigenvalue of $\bv{A}^T\bv{A}$, then $(\bv{I} - \frac{1}{\lambda_1}\bv{A}^T\bv{A})^i$ has top eigenvalue $< \epsilon$ after $i = O(\frac{\lambda_1}{\lambda_d}\log(1/\epsilon))$ iterations. In this problem you will prove an ``accelerated'' version of this bound with a significantly improve condition number dependence of $O(\sqrt{\frac{\lambda_1}{\lambda_d}} \log(1/\epsilon))$ iterations.  
+
+\begin{enumerate}
+	\item Let $p$ be a degree $q$ polynomial. I.e. $p = c_0 + c_1 x + \ldots + c_q x^q$. Show that, for any $p$ with $c_0 + c_1 + \ldots + c_q = 1$ and any starting vector $\bv{x}^{(0)}$, we can compute in $q$ iterations (i.e., using $q$ gradient computations and up to $O(ndq)$ additional runtime) a vector $\bv{x}^{(q)}$ such that:
+	\begin{align*}
+			\bv{x}^{(q)} - \bv{x}^* = p\left(\bv{I} - \frac{1}{\lambda_1}\bv{A}^T\bv{A}\right)(\bv{x}^{(0)} - \bv{x}^*).
+		\end{align*}
+	\item Prove that for $q = O(\sqrt{\frac{\lambda_1}{\lambda_d}} \log(1/\epsilon))$, there exists a polynomial $p$ with coefficients $c_0 + c_1 + \ldots + c_q = 1$ such that the top eigenvalue of $p\left(\bv{I} - \frac{1}{\lambda_1}\bv{A}^T\bv{A}\right) \leq \epsilon$. \textbf{Hint:} You might want to use Claim 4 in the supplemental notes on the Lanczos method posted for Lecture 10.
+\end{enumerate}
+
+\subsection{Problem 2: Matrix Concentration from Scalar Concentration}
+\textbf{(15 pts)}   This problem asks you to prove a simplified (and slightly weaker) version of the matrix concentration result used in Lecture 10. 
+Construct a random \emph{symmetric} matrix $R \in \R^{n\times n}$ by setting $R_{ij} = R_{ji}$ to $+1$ or $-1$, uniformly at random. Prove that, with high probability,
+\begin{align*}
+	\|R\|_2 \leq c\sqrt{n\log n},
+\end{align*}
+for some constant $c$. This is much better than the naive bound of $\|R\|_2 \leq \|R\|_F = n$ and it's nearly tight: we always have that $\|R\|_2^2 \geq \|R\|_F^2/n$ (do you see why?) so $\|R\|_2 \geq \sqrt{n}$ no matter what. 
+
+Here are a few hints that might help you along:
+\begin{itemize}
+	\item Recall that for a matrix $R$,  $\|R\|_2 = \max_{x \in \R^n} \frac{\|R x\|_2}{\|x\|_2}$. When $R$ is symmetric, it also holds that $\|R\|_2 = \max_{x \in \R^n} \frac{|x^T R x|}{x^Tx}$.
+	\item Try to first bound $\frac{|x^T R x|}{x^Tx}$ for one particular $x$. You might want to use a {Hoeffding bound}.
+	\item Then try to extend the result to hold for all $x$ simultaneously, using an $\epsilon$-net argument.
+\end{itemize}
+
+\subsection{Problem 3: Spectral Methods for Cliques} 
+\textbf{(10 pts)} 
+A common tasks in data mining is to identify large \emph{cliques} in a graph. For example, in social networks, large cliques can be indicators of fraudulent accounts or networks of accounts designed to promote certain content. In this problem, we consider a spectral heuristic for finding a large clique based on the top eigenvector of the graph adjacency matrix $A$: 
+\begin{itemize}
+	\item Compute the leading eigenvector $v_1$ of $A$. 
+	\item Let $i_1, \ldots, i_k \in \{1, \ldots, n\}$ be the indices of the $k$ entries in $v_1$ with largest absolute value. 
+	\item Check if nodes $i_1, \ldots, i_k$ form a $k$-clique.
+\end{itemize}
+
+We will analyze this heuristic on a natural random graph model. Specifically, let $G$ be an Erdos-Renyi random graph: we start with $n$ nodes, and for every pair of nodes $(i,j)$, we add an edge between the pair with probability $p < 1$. To simplify the math, also assume that we add a self-loop at every vertex $i$ with probability $p$. Then, choose a fixed subset $S$ of $k$ nodes to form a clique. Connect all nodes in $S$ with edges and add self-loops. We will argue that, for sufficiently large $k$, we can expect the heuristic above to identify the nodes in the clique. 
+
+\begin{enumerate}
+	\item Let $A$ be the adjacency matrix of a random graph generated as above. What is $\E[A]$? Prove that the rank of $\E[A]$ is 2. In other words, the matrix only has two non-zero eigenvalues.
+	\item Derive expressions for the two non-zero eigenvalues of $\E[A]$, and their corresponding eigenvectors. \textbf{Hint:} First argue that, up to multiplying by a constant, any eigenvector $v$ must have $v[i] = 1$ for all $i \notin S$ and $v[i] = \alpha$ for all $i\in S$, where $\alpha$ is a constant. Then use some high school algebra 2!
+	\item Using your results from (2) above, argue that, up to a positive scaling, the top eigenvector $v_1$ has $v[i] = 1$ for all $i \notin S$ and $v[i] = \alpha$ for all $i\in S$, where $\alpha > 1$. In other words, the largest entries of $v_1$ exactly correspond to the nodes in the clique!
+	\item To prove the algorithm works, it is possible to use a matrix concentration inequality to argue that the top eigenvector of $A$ is close to that of $E[A]$. Instead of doing that, let's verify things experimentally. Generate a graph $G$ according to the prescribed model with $n = 900$, $k = 
+	|S|= 30$, and $p = .1$. Compute the top eigenvector of $A$ and look at its 30 largest
+	entries in magnitude. What fraction of nodes in the clique $S$ are among these 30 entries? Repeat the experiment and report the average fraction recovered. 
+\end{enumerate}
+
+\end{document}

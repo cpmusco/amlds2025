@@ -1,0 +1,17 @@
+.DS_Store
+*.bbl
+*.aux
+*.brf
+*.blg
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.bbl
+*.nav
+*.snm
+.Rproj.user
+*.Rproj
+*.Rhistory
+*.fdb_latexmk
+*.fls

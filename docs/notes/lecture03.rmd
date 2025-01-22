@@ -1,0 +1,540 @@
+---
+title: "**Concentration Inequalities and Fingerprinting**"
+header-includes:
+  - \usepackage{amsbsy}
+output:
+  html_document:
+    mathjax: https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+---
+
+## Concentration Inequalities
+
+Let's recall Chebyshev's inequality.
+
+**Chebyshev's Inequality:**
+Let $X$ be a random variable with expectation $\mu=\mathbb{E}[X]$ and variance $\sigma^2 = \textrm{Var}[X]$. Then for any $k > 0$,
+
+$$
+\Pr(|X - \mu| > k \sigma) \leq \frac{1}{k^2}.
+$$
+
+Last time, we applied Chebyshev's inequality to the load balancing problem.
+In particular, we showed if we assign $n$ requests to $n$ servers, the server with the maximum load has $O(\sqrt{n})$ requests with high probability.
+We proved this result by applying Chebyshev's to a particular server and then applying the union bound to get a bound on the maximum load across all servers.
+Recall that we proved both Chebyshev's inequality and the union bound with Markov's inequality.
+So, if you squint, we just used Markov's inequality twice.
+
+Today, we'll prove a stronger result that the server with the maximum load has $O(\log n)$ requests with high probability.
+For this result, we'll need a stronger concentration inquality than Chebyshev's.
+
+### Improving Chebyshev's Inequality
+
+We'll see that Chebyshev's inequality is accurate for *some* random variables.
+But, for many other random variables, the inequality is loose.
+
+One random variable for which Chebyshev's inequality is loose is the normal distribution.
+
+**Gaussian Tail Bound:**
+Consider a random variable $X$ drawn from the normal distribution $\mathcal{N}(\mu, \sigma^2)$ with mean $\mu$ and standard deviation $\sigma$.
+Then for any $k > 0$,
+$$
+\Pr \left( | X - \mu | \geq k \sigma \right)
+\leq 2 e^{-k^2/2}.
+$$
+
+Comparing the Gaussian tail bound to Chebyshev's inequality, we see that the Gaussian Tail Bound is *exponentially* better.
+Let's see the difference graphically in the figure below.
+(Notice that the vertical access is on a logarithmic scale.)
+By $10$ standard deviations above the mean, the Gaussian tail bound gives a bound that is 18 orders of magnitude smaller than the bound from Chebyshev's inequality!
+
+![](images/gaussian_vs_chebyshev.png)
+
+Based on how loosely Chebyshev's inequality bounds the Gaussian distribution, we might suspect that Chebyshev's inequality is loose in general.
+But, there are examples of random variables where Chebyshev's inequality gives the exactly the right probabilities.
+
+**Example Random Variable:**
+Fix a particular value $k$.
+We'll construct a random variable $X$ with mean $0$ and variance $1$.
+In particular, let
+
+$$
+X = \begin{cases}
+-k & \textrm{with probability } \frac{1}{2k^2} \\
+0 & \textrm{with probability } 1-\frac{1}{k^2} \\
+k & \textrm{with probability } \frac{1}{2k^2}.
+\end{cases}
+$$
+
+We should first check that $X$ is a proper random variable and all the probabilities sum to $1$.
+Next, notice that $\mathbb{E}[X] = 0$ and so
+$$
+\textrm{Var}[X] = \mathbb{E}[X^2] = (-k)^2 \cdot \frac{1}{2k^2} + (k)^2 \cdot \frac{1}{2k^2} = 1.
+$$
+
+Then Chebyshev's inequality tells us that
+$$
+\Pr(|X| \geq k) \leq \frac{1}{k^2}.
+$$
+This is exactly true for our random variable $X$
+so Chebyshev's inequality is tight for this random variable.
+Notice that we constructed the random variable after fixing the value $k$.
+Do you think there's one random variable that is tight for *all* values of $k$?
+
+While Chebyshev's inequality is tight for some random variables, it is loose for many other random variables.
+We may therefore suspect that if we make stronger assumptions on the random variables, we can get better concentration inequalities.
+The central limit theorem gives us a hint about what type of random variables we should consider.
+
+**Central Limit Theorem:**
+Any sum of *mutually independent* and identically distributed random variables $X_1, \ldots, X_k$ with mean $\mu$ and finite variance $\sigma^2$ converges to a Gaussian random variable with mean $k \cdot \mu$ and variance $k \cdot \sigma^2$ as $k$ goes to infinity.
+Formally,
+$$
+\lim_{n \rightarrow \infty}
+\sum_{i=1}^k X_i \sim \mathcal{N}(k \mu, k \sigma^2).
+$$
+
+By linearity of expectation and linearity of variance, we know what the mean and variance of the sum should be. The interesting part of the central limit theorem is that the sum converges to a Gaussian distribution.
+
+We stated the central limit theorem for random variables that are identically distributed so that we could cleanly describe the expectation and variance of the sum. But the central limit theorem also holds for random variables that are not identically distributed.
+
+For the central limit theorem to hold, we assumed that the random variables are *mutually independent*.
+Recall that $X_1, \ldots, X_k$ are mutually independent if, for all values $v_1, \ldots, v_k$, we have
+$$
+\Pr( X_1=v_1, \ldots, X_k = v_k)
+$$
+$$
+= \Pr(X_1=v_1) \cdot \ldots \cdot \Pr(X_k = v_k).
+$$
+
+Let's consider the central limit in the context of the coin flip example.
+The figure below shows how closely the sum of $k$ coin flips is approximated by the corresponding Gaussian distribution.
+As $k$ increases, the approximation gets better and better.
+
+![](images/central_limit_theorem.png)
+
+Using Chebyshev's inequality, we showed that if we flip a fair coin 100 times, the probability we see fewer than 30 or more than 70 heads is at most $6.25\%$.
+Let's *assume* that the central limit theorem holds exactly for 100 coin flips.
+Then the sum of the random variables $X_1, \ldots, X_{100}$ would be distributed as $\mathcal{N}(50, 25)$.
+(Recall we computed that the mean is 50 and the variance is 25 using a sum of indicator random variables for the event that each flip landed heads.)
+By the Gaussian tail bound, 
+$$
+\Pr(|X - \mu| \geq k \cdot \sigma) = 
+\Pr(|X - 50| \geq 4 \cdot 5 )
+$$
+$$
+\leq 2 e^{-4^2/2} = 2 e^{-8} \approx .06\%
+$$
+Notice that we set $k=4$ to get the probability that the number of heads is more than 20 away from its mean.
+The probability we get using the Gaussian tail bound is much smaller than the probability we got using Chebyshev's inequality!
+But, we made a big assumption that the central limit theorem holds exactly for 100 coin flips.
+
+Luckily, there are concentration inequalities that allow us to *formally* get exponentially small probability bounds.
+
+### Exponential Concentration
+
+There are many exponential concentration inequalities.
+Each one makes a different set of assumptions on the random variable and,
+depending on how stringent the assumptions, gives a different bound.
+Sometimes the bounds are stated with multiplicative error and sometimes the bounds are stated with additive error.
+The trick is determining which bound is appropriate for the application at hand.
+We'll state three exponential concentration inequalities today but there are many more.
+If you're having trouble finding an appropriate bound for your case, *Wikipedia is your friend.*
+
+**Chernoff Bound:**
+Let $X_1, \ldots, X_k$ be independent binary random variables.
+That is, $X_i \in \{0,1\}$.
+Let $p_i = \mathbb{E}[X_i]$ where $0 < p_i < 1$.
+Choose a parameter $\epsilon > 0$.
+Then the sum $S = \sum_{i=1}^k X_i$,
+which has mean $\mu = \sum_{i=1}^k p_i$,
+satisfies
+$$
+\Pr( S \geq (1+\epsilon) \mu )
+\leq \exp\left(\frac{-\epsilon^2 \mu}{2+\epsilon}\right)
+$$
+and, if $0 < \epsilon < 1$,
+$$
+\Pr( S \leq (1-\epsilon) \mu)
+\leq \exp\left(\frac{-\epsilon^2 \mu}{2}\right).
+$$
+
+Notice that the first inequality gives an upper bound on the pobability that $S$ exceeds is expectation by a factor of $1+\epsilon$ while the second inequality gives an upper bund on the probability that $S$ falls below its expectation by a factor of $1-\epsilon$.
+
+Using union bound, we can combine them into a single inequality.
+
+$$
+\Pr(|S - \mu| \geq \epsilon \mu) \leq 2 \exp\left(\frac{-\epsilon^2 \mu}{3}\right).
+$$
+
+Looking back, we may realize that the last expression looks similar to the Gaussian tail bound.
+This is because $\sigma \leq \sqrt{\mu}$.
+To see this, observe that
+$$
+\sigma^2 = \textrm{Var}[S] = \sum_{i=1}^k \textrm{Var}[X_i] = \sum_{i=1}^k \mathbb{E}[X_i^2] - \mathbb{E}[X_i]^2
+$$
+$$
+\leq \sum_{i=1}^k \mathbb{E}[X_i^2] = \sum_{i=1}^k \mathbb{E}[X_i] = \mu.
+$$
+Here, we used the property that squaring a binary variable does not change its value.
+Setting $k = \epsilon \sqrt{\mu}$
+so that $\epsilon \mu = k \sigma$, the Chernoff bound becomes
+$$
+\Pr(|S - \mu| \geq \epsilon \mu) =
+\Pr(|S - \mu| \geq k \sigma)
+$$
+$$
+\leq 2 \exp\left(\frac{-\epsilon^2 \mu}{3}\right) = 2 \exp\left(\frac{-k^2}{3}\right).
+$$
+Notice this is basically the same as the Gaussian tail bound but with a *slightly* worse constant in the exponent.
+
+The Chernoff bound may seem overly restrictive because we require that each variable is binary.
+The Bernstein inequality relaxes the assumption so that we can consider random variables defined on the inverval from $-1$ to $1$.
+
+**Bernstein Inequality:**
+Let $X_1, \ldots, X_k$ be independent random variables with each $X_i \in [-1, 1]$.
+Let $\mu = \sum_{i=1}^k \mathbb{E}[X_i]$
+and $\sigma^2 = \sum_{i=1}^k \textrm{Var}[X_i]$.
+Then, for any $k \leq \frac{\sigma}{2}$,
+the sum $S = \sum_{i=1}^k X_i$ satisfies
+$$
+\Pr(|S - \mu| > k \sigma) \leq 2 \exp\left(\frac{-k^2}{4}\right).
+$$
+Notice that the bound is similar to the Chernoff bound but the denominator in the exponent is larger.
+As we weaken the assumptions on the random variables, we get weaker bounds.
+
+Of course, while weaker than Chernoff bound, the assumption in the Bernstein bound is still not very general.
+Hoeffding's inequality relaxes it further.
+
+**Hoeffding's Inequality:**
+Let $X_1, \ldots, X_k$ be independent random variables with each $X_i \in [a_i, b_i]$.
+Let $\mu= \sum_{i=1}^k \mathbb{E}[X_i]$.
+Then, for any $k >0$,
+the sum $S = \sum_{i=1}^k X_i$ satisfies
+$$
+\Pr( | S - \mu | > k )
+\leq 2 \exp\left(\frac{-k^2}{\sum_{i=1}^k (b_i - a_i)^2}\right).
+$$
+
+Notice that $\sigma$ no longer appears in the bound.
+In some sense, the sum of the intervals in the denominator of the exponent is a measure of the variance of the random variables.
+
+We won't see the proofs of these concentration inequalities.
+The general techniques are to apply Markov's inequality to cleverly chosen random variables.
+Recall that we proved Chebyshev's inequality by applying Markov's inequality to the random variable $(X-\mathbb{E}[X])^2$.
+Similarly, many exponential concentration inequalities are proved by defining $q$th central moments 
+$$\mathbb{E}[(X-\mathbb{E}[X])^q]$$
+or functions like $\exp(X - \mathbb{E}[X])$
+and applying Markov's inequality.
+
+### Coin Flips
+
+Now that we have rigorous exponential concentration inequalities, let's apply them to the coin flip problem.
+
+**Biased Coin Bound:**
+Let the probability that a coin lands heads be $b$.
+Choose $k \geq \frac{3\log(2/\delta)}{\epsilon^2}$.
+If we flip a biased coin $k$ times, let $S$ be the number of heads.
+Notice that $\mu = bk$.
+Then
+$$
+\Pr(| S - b k | \geq \epsilon k) \leq \delta.
+$$
+
+**Proof:**
+We use the Chernoff bound because the number of heads is a sum of binary random variables.
+From the Chernoff bound, we know that for any $\epsilon'$,
+$$
+\Pr( | S - bk | \geq \epsilon' bk ) \leq 2 \exp\left(\frac{-\epsilon'^2 bk}{3}\right).
+$$
+Let's set $\epsilon' = \frac{\epsilon}{b}$.
+Then
+$$
+\Pr( | S - bk | \geq \epsilon k ) \leq 2 \exp\left(\frac{-\epsilon^2 k}{3b}\right)
+\leq 2 \exp\left(\frac{-\epsilon^2 k}{3}\right).
+$$
+For the last inequality, we used the fact that $b \leq 1$.
+If we want the probability to be at most $\delta$, then we can set $\delta$ greater than the probability and solve for $k$.
+Doing this, we see that
+$$
+2 \exp\left(\frac{-\epsilon^2 k}{3}\right) \leq \delta
+\Leftrightarrow
+\frac{-\epsilon^2 k}{3} \leq \log \frac{\delta}{2}
+\Leftrightarrow
+k \geq \frac{3 \log(2/\delta)}{\epsilon^2}.
+$$
+
+Notice that we have a very gentle dependence on $\delta$.
+If we increase $\delta$ from $1/10$ to $1/100$ or from $1/100$ to $1/10000$, then $\log(2/\delta)$ only increases by a factor of $2$.
+
+### Load Balancing Problem
+
+Let's apply our new tool to the load balancing problem.
+Recall we randomly assigned $n$ jobs to $n$ servers using hash functions.
+
+![](images/balls.png)
+
+We defined $S_i$ to be the number of jobs assigned to server $i$.
+Our goal was to find the smallest $B$ for which we could prove
+$$
+\Pr(\max_{i \in [n]} S_i \geq B)
+\leq\frac{1}{10}.
+$$
+
+Using Chebyshev's, we got $B = \sqrt{n}$.
+Let's see if we can do better.
+Remember that it suffices to prove that, for any $i$,
+$\Pr(S_i \geq B) \leq \frac{1}{10n}$.
+To see this, observe the definition of the maximum and apply the union bound,
+$$
+\Pr(\max_i S_i \geq B)
+= \Pr( S_1 \geq B \cup \ldots \cup S_n \geq B)
+$$
+$$
+\leq \Pr(S_1 \geq B) + \ldots + \Pr(S_n \geq B)
+\leq n \frac{1}{10n} = \frac{1}{10}.
+$$
+
+Consider a single server $i$.
+Let $X_j$ be the indicator random variable that job $j$ is assigned to server $i$.
+Then the number of jobs assigned to server $i$ is $S_i = \sum_{j=1}^n X_j$.
+Since the probability job $j$ goes to server $i$ is $\frac{1}{n}$,
+we have $\mathbb{E}[X_j] = \frac{1}{n}$ and so $\mathbb{E}[S_i] = \sum_{j=1}^n \frac{1}{n} = 1$.
+Recall the first Chernoff bound tells us that
+$$
+\Pr(S \geq 1+\epsilon)
+\leq \exp\left(\frac{-\epsilon^2}{2+\epsilon}\right)
+$$
+where we plugged in $\mu=1$.
+We know the probability has to be at most $\frac{1}{10n}$.
+We upper bound the probability to avoid the addition in the denominator of the exponent then we set the upperbound to be at most $\frac{1}{10n}$.
+Doing this, we get
+$$
+\exp\left(\frac{-\epsilon^2}{2+\epsilon}\right) 
+\leq \exp\left(\frac{-\epsilon^2}{2\epsilon}\right) \leq \frac{1}{10n}
+$$
+$$
+\Leftrightarrow
+-\frac{1}{2}\epsilon \leq \log \frac{1}{10n}
+\Leftrightarrow
+\epsilon \geq 2 \log(10n).
+$$
+Plugging in this choice of $\epsilon$,
+we have
+$$
+\Pr(S \geq 1 + 2 \log(10n))
+\leq \exp\left(\frac{-4 \log^2(10n)}{2 + 2 \log(10n)}\right)
+$$
+$$
+\leq \exp\left(-\log(10n)\right) = \frac{1}{10n}.
+$$
+
+So the server with the maximum load has at most $O(\log n)$ jobs with high probability.
+This is much better than the $O(\sqrt{n})$ bound we proved with Chebyshev's inequality.
+
+In practice, there's another strategy for assigning jobs to servers that works surprisingly well.
+The idea is called the *power of two choices*.
+Instead of assigning a job to a random server, we choose two random servers and assign the job to the least loaded server.
+With probability $1/10$, the maximum loaded server is $O(\log \log n)$.
+This is amazing! We barely changed the algorithm and we got an *exponentially* better bound.
+We may suspect that if we choose three random servers and assign the job to the least loaded server, then the maximum loaded server is $O(\log \log \log n)$.
+But, this is not the case.
+The bound stays asymptotatically the same.
+The analysis is notoriously tricky and we won't cover it in this class.
+But, if you're interested, you can find it in Section 2 of the notes [here](https://www.eecs.harvard.edu/~michaelm/postscripts/handbook2001.pdf).
+
+## Fingerprinting
+
+In the rest of the class, we'll discuss a randomized algorithm called *fingerprinting*. But first, we'll revisit universal hash functions and explore prime numbers.
+
+**Universal Hash Functions:**
+Consider a random hash function $h: \mathcal{U} \rightarrow \{1, \ldots, m\}$.
+We say $h$ is universal if, for any fixed $x,y \in \mathcal{U}$,
+$$
+\Pr(h(x) = h(y)) \leq \frac{1}{m}.
+$$
+
+Recall that we can efficiently construct a universal hash function with the following approach.
+Let $p$ be a prime number between $|\mathcal{U}|$
+and $2|\mathcal{U}|$.
+Let $a$ and $b$ be random numbers in $0, \ldots, p$ and make sure $a \neq 0$.
+Then the hash function
+$$
+h(x) = [(ax + b) \mod p] \mod m
+$$
+is universal.
+
+We won't prove that $h$ is universal but we will get a flavor for what tools are used in the proof.
+
+Notice that once we have a prime number, we only have to store $a$, $b$, $p$, and $m$.
+Then computing the hash function only requires a few arithmetic operations.
+This hash function seems easy to implement *except* for the challenge of finding a large prime number to use.
+
+### Finding Prime Numbers
+
+Finding a prime number seems pretty tough so let's consider the simpler problem of checking whether a number is prime.
+Given a number $x$, how can we efficiently check that $x$ is prime?
+Recall a number is prime if it is larger than 1 and can only be divided evenly by $1$ and itself.
+The first few primes are $2,3,5,7,11,13,17,19,\ldots$.
+Is 2023 prime?
+What about 2342098230982509?
+How can we check in general?
+
+Suppose we have an integer represented as a length $n$ binary string.
+For example,
+$$
+x = 011100100110011111\ldots0101011.
+$$
+The naive prime checking algorithm of simply dividing $x$ by all integers less than $x$ runs in $O(2^{n})$.
+The NYU Greene super computing cluster has 2 petaflops of throughput. 
+When $n=128$, we would need 1 million Greene clusters running for 1 million years to check if $x$ is prime.
+
+Fortunately, there is a much faster algorithm.
+In papers published in 1976 and 1980, Miller and Rabin presented a randomized algorithm that runs in time $O(n^3 \log(1/\delta))$.
+With probability $1-\delta$, the algorithm determines if an $n$-bit integer is prime.
+If $n = 128$ and $\delta = 10^{-9}$,
+then $n^3 \log(1/\delta) \approx 60$ million operations.
+We can run this in less than a tenth of a second on a modern computer!
+In addition to the practical applications,
+the Miller-Rabin algorithm was a big breakthrough that popularized randomized algorithms.
+
+<!--
+For decades, it was not clear how to get an algorithm that runs in polynomial time *deterministically*.
+In 2004, Agrawal, Kayal, and Saxena published a deterministic algorithm that runs in polynomial time.
+The algorithm itself is much slower than the randomized algorithms but it was a big breakthrough.
+-->
+
+Why was it such a big deal to get an efficient algorithm for checking if a number is prime?
+Well, one big reason is that prime numbers form the basis for modern public key cryptography.
+In cryptography, we imagine there are two parties, Alice and Bob, that communicate with each other. Bob wants to send Alice a message so that only Alice can read it.
+If someone else intercepts it, the message should be unreadable.
+
+![](images/encrypted_message.png)
+
+The obvious way for Alice and Bob to communicate securely is to share a secret key in advance.
+This is the approach that persisted for centuries.
+However, physically meeting to share a secret key is impractical if there are many senders and receivers.
+
+A more clever way for Alice and Bob to communicate securely is to use a *lock box*.
+The lock box has the property that anyone can deliver mail but only Alice can read the mail.
+
+The way we implement the lock box in practice is with RSA encryption.
+The idea is to have a private key and a public key.
+The private key consists of two very large prime numbers $p$ and $q$.
+The public key is the product $pq$.
+Even though checking if a number is prime can be done quickly, we still do not have efficient algorithms for factoring numbers.
+(In fact, one of the reasons that quantum computers are so exciting is that they can factor numbers efficiently. But, alas, we don't know how to build a quantum computer large enough to factor any interesting number.)
+
+The challenge of RSA encryption is to find two large primes.
+This is the same problem we faced when we wanted to construct a hash function!
+
+Here's a naive algorithm for finding primes:
+Pick a random large number $x$ and check if it is prime.
+If it's not prime, we repeat.
+Surprisingly, this algorithm works!
+The reason it works is because there are lots of primes even among large numbers.
+The prime number theorem formalizes this statement.
+
+**Prime Number Theorem:**
+Let $\pi(x)$ denote the number of primes less than some integer $x$.
+For $x > 55$,
+$$
+\frac{x}{\log x} \leq \pi(x)
+\leq \frac{x}{\log x - 4}.
+$$
+
+This is somewhat surprising because as numbers get larger, there are more smaller numbers that could be their factors.
+
+Let's plot the number of primes and the bound in the prime number thoerem. (Note the upper bound only makes sense for $x \geq 55$.)
+
+![](images/primes.png)
+
+The prime number theorem tells us that if
+we select a random 128 bit number $x$,
+the chance that it is prime is greater than
+$$
+\frac{1}{\log(2^{128})} \geq 1/90.
+$$
+
+After a few hundred tries, we will almost definitely find a prime number.
+In general, we need $O(n)$ tries to find an $n$-bit prime number.
+
+In the remainder of the class, we'll discuss a simple but important application of prime numbers to hashing.
+
+### Fingerprinting
+
+Our goal is to construct a compact "fingerprint" $h(f)$ for any given file $f$ with two properties:
+
+1. The fingerprints $h(f_1)$ and $h(f_2)$ should be different with high probability if the contents of $f_1$ and $f_2$ differ *at all.*
+
+2. If the contents of $f_1$ and $f_2$ are identical, we should have $h(f_1) = h(f_2)$.
+
+![](images/fingerprint.png)
+
+Fingerprinting is useful for quickly checking if two versions of the same file are identical.
+This is quite helpful for version control on systems like Git.
+The advantage is that we do not need to communicate the entire file between the server and local computer to perform the check; we only need to communicate the small fingerprint.
+
+Another application is to check if two images are identical. This is useful in contexts where we want to remove duplicate pictures.
+However, if the images are changed at all (e.g. compressed or converted to a different format), the fingerprints will be different.
+In a later class, we'll see a method which is robust to these changes.
+
+The approach for we'll learn about today is called a Rabin fingerprint.
+Let the file $f=010\ldots100$ be represented as $n$ bits.
+We'll interpret $f$ as a number between 0 and $2^n$.
+
+We'll construct the fingerprint function $h$ as follows.
+We choose a random prime number $p$ between $2$
+and $t n \log(2n)$ for some constant $t$.
+Then
+$$
+h(f) = f \mod p.
+$$
+Notice that we can store $h(f)$ in $\log p$.
+This is at most 
+$$
+\log (tn \log tn) \leq \log((tn)^2)
+$$
+$$
+= O(\log( tn)) = O(\log n + \log t)
+$$ bits.
+
+Let's analyze this fingerprint function.
+
+**Claim:** If $f_1 \neq f_2$, then $h(f_1) = h(f_2)$ with probability at most $\frac{2}{t}$.
+
+Since our fingerprint only takes $O(\log n + \log t)$ space, we can set $t$ to be *super large*.
+Then, effectively, the probability of $h(f_1)$ and $h(f_2)$ colliding is negligible for all practical purposes.
+
+Observe that if $h(f_1) = h(f_2)$, then
+$$
+f_1 - f_2 \mod p = 0.
+$$
+In other words, we only fail if $d = f_1 - f_2$ is divisible by $p$.
+
+We'll analyze the chance that $d$, which is an integer less than $2^n$, is divisible by a random prime $p \in \{2, \ldots, tn \log(tn)\}$.
+
+The first step is to upper bound the number of distinct prime factors of $d$.
+Since each prime factor is at least $2$ and $d$ is at most $2^n$, there can be at most $n$ distinct prime factors of $d$.
+
+The second step is to lower bound the number of primes less than $tn \log(tn)$. 
+By the prime number theorem,
+there are at least $\frac{tn \log(tn)}{\log(tn \log(tn))}$ primes in this range.
+So the chance that a random prime $p$ is a factor of $d$ is at most
+$$
+\frac{n}{\frac{tn \log(tn)}{\log(tn \log(tn))}}
+= \frac{\log(tn \log(tn))}{t \log(tn)}
+\leq \frac{2 \log(tn)}{t \log(tn)} = \frac{2}{t}.
+$$
+So, for two files $f_1 \neq f_2$, the chance that
+$h(f_1) = h(f_2)$ is at most $\frac{2}{t}$.
+
+Let's see how much space we need for the fingerprint in practice.
+Set $t$ to be $10^{18}$.
+(For context, $10^{-18}$ is the chance you win the Powerball lottery twice in a row.)
+Then the fingerprint size is at most $2 \log_2(nt) = 2 \log_2(n) + 2 \log_2(10^{18})$ bits.
+Suppose we are finger printing 1 megabyte image files so $n \approx 8 \times 10^6$.
+Then the fingerprint size is $166$ bits.
+This amounts to a 50,000 time reduction in space compared to sending the original file!

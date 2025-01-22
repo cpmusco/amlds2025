@@ -1,0 +1,159 @@
+\documentclass[10pt]{article}
+\usepackage{titlesec}
+\usepackage{geometry}
+\geometry{verbose,tmargin=.9in,bmargin=.9in,lmargin=1.0in,rmargin=1.0in}
+\usepackage{amsmath,amsfonts,amsthm,amssymb}
+\usepackage{url}
+\usepackage{color}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage[colorlinks=true, linkcolor=red, urlcolor=blue, citecolor=gray]{hyperref}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+\newcommand{\bv}[1]{\mathbf{#1}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\DeclareMathOperator*{\Var}{Var}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\definecolor{nyuDarkPurple}{HTML}{330662}
+\definecolor{nyuOfficialPurple}{HTML}{57068c}
+
+\newcommand{\spara}[1]{\vspace{.5em}\noindent {\large\sffamily\textcolor{nyuOfficialPurple}{#1}}}
+\titleformat{\section}[hang]{\Large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsection}[hang]{\large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsubsection}[hang]{\normalsize\sffamily\color{gray}}{\thesection}{1em}{}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{\includegraphics[width=4cm]{tandon_long_color.eps}}
+\rhead{\thepage}
+\pagenumbering{gobble}
+
+\setcounter{secnumdepth}{0}
+
+\begin{document}
+	
+\begin{center}
+	\normalsize
+	New York University Tandon School of Engineering
+	
+	Computer Science and Engineering
+	\medskip
+	
+	\large
+Midterm Practice. 
+	\medskip
+\end{center} 
+
+\section{Practice Problems}
+
+\subsection{Random variables and concentration.}
+
+\begin{enumerate}
+	\item Show that for any  random variable ${X}$, $\E[{X}^2] \ge \E[{X}]^2$.
+	\textcolor{blue}{$\E[X^2] - \E[{X}]^2 = \Var[X]$, and variance must be non-negative.}
+	\item Show that for independent ${X}$ and ${Y}$ with $\E[{X}] = \E[{Y}] = 0$, $\Var[{X} \cdot {Y}] = \Var[X] \cdot \Var[Y]$. 
+	\textcolor{blue}{Since $X$ and $Y$ are independent $\E[XY] = \E[X]\E[Y] = 0$. So $\Var[XY] = \E[X^2Y^2] = \E[X^2]\E[Y^2]$. The last step follows from that fact that $X^2$ and $Y^2$ are independent because $X$ and $Y$ are. Finally, since $\E[X] = \E[Y] = 0$, we have $\E[X^2] = \Var[X]$ and $\E[Y^2] = \Var[Y]$. Plugging in gives the proof.}
+	\item Given a random variable $X$, can we conclude that $\E[1/X] = 1/E[X]$? If so, prove this. If not, give an example where the equality does not hold.
+	\textcolor{blue}{Not true. Try a $\{-1,1\}$ random variable. $1/E[X]$ is infinite but $E[1/X]$ is not.}
+	\item Indicate whether each of the following statements is \textbf{always} true, \textbf{sometimes} true, or \textbf{never} true. Provide a short justification for your choice. 
+	\begin{enumerate}[label=(\alph*)]
+		\item $\Pr[{X} = s \text{ and } {Y} = t] > \Pr[{X} = s]$. \hspace{1em}ALWAYS\hspace{1em} SOMETIMES\hspace{1em} \textcolor{blue}{\textbf{NEVER}}. $\Pr[{X} = s] = \Pr[{X} = s \text{ and } {Y} = t] + \Pr[{X} = s \text{ and } {Y} \neq t] \leq \Pr[{X} = s \text{ and } {Y} = t]$. 
+		\item $\Pr[{X} = s \text{ or }  {Y} = t] \le \Pr[{X} = s] + \Pr[{Y} = t]$. \hspace{1em}\textcolor{blue}{\textbf{ALWAYS}}\hspace{1em} SOMETIMES\hspace{1em} NEVER
+		
+		\textcolor{blue}{This is the union bound.}
+		\item $\Pr[{X} = s \text{ and } {Y} = t] = \Pr[{X} = s] \cdot \Pr[{Y} = t]$. \hspace{1em}ALWAYS\hspace{1em} \textcolor{blue}{\textbf{SOMETIMES}}\hspace{1em} NEVER
+		This is true for independent random variables, but not if we don't have independence.
+		
+	\end{enumerate}
+	\item Assume there are $1000$ registered users on your site $u_1, \ldots, u_{1000}$, and in a given day, each user
+	visits the site with some probability $p_i$. The event that any user visits the site is independent of what the other users do. Assume that $\sum_{i=1}^{1000} p_i = 500$. 
+	\begin{enumerate}
+		\item  Let $X$ be the number of users that visit the site on the given day. What is $E[X]$?
+		\textcolor{blue}{{By linearity of expectation, 500}.}
+		\item Apply a Chernoff bound to show that $Pr[X \geq 600] \leq .01$. \textcolor{blue}{Setting $\epsilon = .2$ and applying the bound from class we have $Pr[X \geq 600] \leq e^{-.2^2 500/2.2} = .0001$}.
+		\item Apply Markov’s inequality and Chebyshev’s inequality to bound the same probability.
+		How do they compare?
+		\textcolor{blue}{By Markov's $Pr[X \geq 600] \leq \frac{1}{1.2} = .833$. For Chebyshev's we need a variance calculation. One thing we can say is that $\Var[X] = \sum_{i=1}^{1000} \Var[p_i] \leq \sum_{i=1}^{1000}p_i = 500$. By Chebyshev, $\Pr[|X-500| \geq k\sqrt{500}] \leq \frac{1}{k^2}$. Setting $k = 100/\sqrt{500} = 4.47$ gives $\frac{1}{k^2} = .05$.}
+	\end{enumerate}
+	\item Give an example of a random variable and a deviation t where Markov’s inequality gives a	tighter bound than Chebyshev’s inequality.
+	\textcolor{blue}{Take a uniform $\{0,1\}$ random variable and bound $\Pr[X \geq 1]$. Markov's will give the tight $1/2$ bound, but Chebyshev's gives a vacuously weak bound.}
+\end{enumerate}
+
+\subsection{Hashing, Dimensionality Reduction, High Dimensional Vectors}
+\begin{enumerate}
+	\item Suppose there is some unknown vector $\bs{\mu}$. We receive noise perturbed random samples of the form $\bv{Y}_1 = \bs{\mu} + \bv{X}_1, \ldots, \bv{Y}_k = \bs{\mu} + \bv{X}_k$ where each $\bv{X}_i$ is a random vector with each of its entries distributed as an independent random normal $\mathcal{N}(0,1)$. From our samples $\bv{Y}_1, \ldots, \bv{Y}_k$ we hope to estimate $\bs{\mu}$ by $\bs{\tilde{\mu}} = \frac{1}{k}\sum_{i=1}^k \bv{Y}_i$. 
+	\begin{enumerate}
+		\item How many samples $k$ do we require so that $\max|\bs{\mu} -\bs{\tilde{\mu}} | \leq \epsilon$ with probability $9/10$?
+		\textcolor{blue}{If we can show that for all $i\in 1, \ldots, n$, $|\bs{\mu}_i -\bs{\tilde{\mu}_i} | \leq \epsilon$ with probability $1 - \frac{1}{10n}$ then by a union bound we will have that $\max|\bs{\mu} -\bs{\tilde{\mu}}| \leq \epsilon$ with probability $1 - \frac{1}{10}$. So we focus on this simpler problem. Notice that $\bs{\tilde{\mu}}_i = \bs{{\mu}}_i + \frac{1}{k}\sum_{j=1}^k[\bv{X}_j]_i$, where $[\bv{X}_j]_i$ is the $i^\text{th}$ entry of $\bv{X}_j$, which is a norm random variable. Since the sum of random normals is norm, we have that $\frac{1}{k}\sum_{j=1}^k[\bv{X}_j] \sim \frac{1}{k}\mathcal{N}(0,k) = \mathcal{N}(0,1/k)$. Applying the Gaussian tail bound from lecture, we have thus have that $\Pr[|\bs{\mu}_i - \bs{\tilde{\mu}}_i| \geq \alpha/\sqrt{k}] \leq e^{-O(\alpha^2)}$. Setting $\alpha = O(\sqrt{\log(1/(1/10n)}) =  O(\sqrt{\log n})$ and $k = O({\log n}/\epsilon^2)$ gives the bound we need. So overall we need $k = O({\log n}/\epsilon^2)$ samples. }
+		
+		\item How many samples $k$ do we require so that $\|\bs{\mu} -\bs{\tilde{\mu}}\|_2 \leq \epsilon$ with probability $9/10$?
+		\textcolor{blue}{The proof is essentially the same. To ensure that $\|\bs{\mu} -\bs{\tilde{\mu}}\|_2 \leq \epsilon$, it suffices to have $|\bs{\mu}_i -\bs{\tilde{\mu}_i} | \leq \sqrt{\epsilon/n}$ for all $i$. This will happen with probability $9/10$ as long as  $k = O({\log n}/(\sqrt{\epsilon/n})^2) = k = O(n {\log n}/\sqrt{\epsilon}^2).$
+		}
+		
+		
+	\end{enumerate}
+	\item Let $\bs{\Pi}$ be a random Johnson-Lindenstrauss matrix (e.g. scaled random Gaussians) with $O(\log(1/\delta)/\epsilon^2)$ rows. Prove that with probability $(1-\delta)$,
+	\begin{align*}
+	\min_{\bv{x}} \|\bs{\Pi}\bv{A}\bv{x} - \bs{\Pi}\bv{b}\|_2^2 \leq (1+\epsilon) \min_{\bv{x}} \|\bv{A}\bv{x} - \bv{b}\|_2^2 
+	\end{align*}
+\textcolor{blue}{Let $\bv{x}^* = \argmin_{\bv{x}} \|\bv{A}\bv{x} - \bv{b}\|_2^2.$ Then by the distributional Johnson-Lindenstrauss lemma we have $\|\bs{\Pi}\bv{A}\bv{x}^* - \bs{\Pi}\bv{b}\|_2^2 = \|\bs{\Pi}(\bv{A}\bv{x}^* - \bv{b})\|_2^2 \leq (1+\epsilon)\|\bv{A}\bv{x}^* - \bv{b}\|_2^2$. And then we have that $\min_{\bv{x}} \|\bs{\Pi}\bv{A}\bv{x} - \bs{\Pi}\bv{b}\|_2^2 \leq \|\bs{\Pi}\bv{A}\bv{x}^* - \bs{\Pi}\bv{b}\|_2^2$, which gives the result.}
+
+% 	Is the following also true with high probability?
+% 	\begin{align*}
+% 	 (1-\epsilon) \min_{\bv{x}} \|\bv{A}\bv{x} - \bv{b}\|_2^2\leq \min_{\bv{x}} \|\bs{\Pi}\bv{A}\bv{x} - \bs{\Pi}\bv{b}\|_2^2
+% 	\end{align*}
+
+% \textcolor{blue}{This statement is not true. The problem is that, if we let $\bv{y}^* = \argmin_{\bv{x}} \|\bs{\Pi}\bv{A}\bv{x} - \bs{\Pi}\bv{b}\|_2^2$, we can't apply distributional JL lemma to show that $\|\bs{\Pi}\bv{A}\bv{y}^* - \bs{\Pi}\bv{b}\|_2^2 \approx \|\bv{A}\bv{y}^* - \bv{b}\|_2^2 $ because $\bv{y}^*$ is \emph{dependent} on $\bs{\Pi}$. JL lemma only holds to preserve the norms of vectors fixed ahead of time, that don't depend on $\bs{\Pi}$. 
+% }
+\end{enumerate}
+
+
+
+% \subsection{Convex optimization}
+% From \emph{Convex Optimization} book (\url{https://web.stanford.edu/\~boyd/cvxbook/bv_cvxbook.pdf}):
+% \begin{itemize}
+% 	\item \textbf{Exercises:} 3.7, 3.10, 3.11 (first part), 3.21 (lots of other problems if you want more practice, but many are on the harder si)
+% \end{itemize}
+
+% \begin{enumerate}
+% 	\item Let $f_1(x), \ldots, f_n(x)$ be $\beta$-smooth convex functions and let $g(x) = \frac{1}{n}\sum_{i=1}^n f_i(x)$ be their average. Show that $g$ is $\beta$-smooth.
+% 	\textcolor{blue}{
+% 	\begin{align*}
+% 	\|\nabla g(x) - \nabla g(y)\|_2 &= \frac{1}{n}\|\sum_{i=1}^n \nabla f_i(x) - \nabla_i(y)\|_2 \\
+% 	&\leq \frac{1}{n}\sum_{i=1}^n \|\nabla f_i(x) - \nabla_i(y)\|_2\\
+% 	&\leq \frac{1}{n}\sum_{i=1}^n\beta \|x - y\|_2 = \beta\|x -y\|_2
+% 	\end{align*}
+% The first inequality is from triangle inequality, the second is from assumed smoothnes of $f_1, \ldots, f_n$. 
+% }
+	
+% 	\item Let $f: \R\rightarrow \R$ be a $\beta$-smooth, $\alpha$-strongly  convex function. Let $g(x) = f(c\cdot x)$ for some constant $0< c < 1$.  How does $g$'s smoothness and strong convexity compare to that of $f$? How about $g$'s condition number?
+% 	\textcolor{blue}{
+% 		For a scalar function, $\beta = \max_x f''(x)$. $g''(x) = c^2 f''(cx)$. $\max_x f''(x) = \max_x f''(cx)$, so $g$'s smoothness parameter is larger than that of $f$ by a factor of $c$ by a factor $c^2$. By the same argument, and using that $\beta = \min_x f''(x)$, we get that $g$'s strong convexity parameter $\alpha$ is also larger by a factor of $c^2$. The condition number is the ratio between $\beta$ an $\alpha$. Since the $c^2$ factors will cancel out, it stays the same.
+% 	}
+% %	\item We stated in class that a $\beta$-smooth convex function can be optimized to error $\epsilon$ in $O(\beta R^2/\epsilon)$ iterations of gradient descent. Suppose $f$ is not $\beta$-smooth -- we only know it is $G$-Lipschitz. 
+% 	\item Let $f(x) = x^4$. Is $f$ $G$-Lipschitz for finite $G$?  Is $f$ $\beta$-smooth for finite $B$? 
+% 	\textcolor{blue}{
+% 		For $f$ to be $G$-Lipschitz, it gradient, in this case $4x^3$, would need to bounded in magnitude by some fixed constant. In this case it is not, because  $4x^3\rightarrow \infty$ as $x\rightarrow \infty$. Similarly, for it to be $\beta$ smooth, the second derivative, $12x^2$ would need to be bounded. But again it isn't. So the answer is no for both.
+% 	}
+% %	\item In stochastic gradient descent, we have a function $f(\bv{x}) = \sum_{i=1}^n f_i(\bv{x})$. At each step we pick an $f_i$ uniformly at random and update $\bv{x}^{(t+1)} = \bv{x}^{(t)} - \eta \nabla f_i(\bv{x}^{(t)} )$. In practice a different strategy is often used due to cache considerations: instead of picking $f_i$ at random, we cycle through functions $f_1, \ldots, f_n$, using each of their gradients in order. Specifically, we update $\bv{x}^{(t+1)} = \bv{x}^{(t)} - \eta \nabla f_j(\bv{x}^{(t)})$ where $j = t\mod (n+1)$.
+% %	
+% %	Show that this strategy can fail terribly in the worst case. In particular, describe a function $f(\bv{x}) = \sum_{i=1}^n f_i(\bv{x})$ where cyclic updates 
+% \end{enumerate}
+
+%	\item 
+%	
+%	ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER\vspace{4em}
+
+\end{document}

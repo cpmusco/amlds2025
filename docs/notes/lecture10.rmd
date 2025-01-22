@@ -1,0 +1,14 @@
+---
+title: "**Ellipsoid Method, LP Relaxation, Singular Value Decomposition**"
+header-includes:
+  - \usepackage{amsbsy}
+output:
+  html_document:
+    mathjax: https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+---
+
+The notes on the ellipsoid method and LP relaxation are in the second half of the Lecture 9 notes [here](https://www.chrismusco.com/amlds2023/notes/lecture09.html) while the notes on singular value decomposition are in the first half of the Lecture 11 notes [here](https://www.chrismusco.com/amlds2023/notes/lecture11.html).

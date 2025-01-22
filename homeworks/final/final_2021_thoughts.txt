@@ -1,0 +1,2 @@
+Good question: show that top singular value is preserved by a subspace embedding.
+Something about showing that one cut is preserved via a JL sketch.

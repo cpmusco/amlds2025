@@ -1,0 +1,7 @@
+Free probability book: http://www.cs.cmu.edu/~harchol/Probability/book.html
+
+Jelani gave a great talk on small space counters (probabilistic counting) which could be a cool problem to cover, or a cool problem set problem. Also great motivation. Used in popular Redis database. 
+
+Could do a problem on small space distinct elements estimation by counting the average "time to first duplicate", which I think is also an unbiased estimator. See email to student for more info: 
+Hi Tanay -- I thought the point you raised during our discussion in class yesterday was very interesting: The estimator you proposed to analyze only requires O(\sqrt{n}) space (bc it needs to store roughly sqrt(n) puzzles before hitting a repeat). In contrast, the one I suggested analyzing clearly has space complexity O(sqrt{n}/epsilon). This is good motivation to figure out the variance of your estimator. This link seems to suggest how this can be done:
+https://math.stackexchange.com/questions/314220/variance-of-time-to-find-first-duplicate. It's rather complicated, but they seen to get a variance of O(n) which means that 1/epsilon repeated trials will be enough to estimate n to +-epsilon n accuracy. So your method essentially match the query complexity of the bound we got in class, but with less space. Cool! 

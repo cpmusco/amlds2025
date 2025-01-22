@@ -1,0 +1,187 @@
+\documentclass[10pt]{article}
+\usepackage{titlesec}
+\usepackage{geometry}
+\geometry{verbose,tmargin=.9in,bmargin=.9in,lmargin=1.0in,rmargin=1.0in}
+\usepackage{amsmath,amsfonts,amsthm,amssymb}
+\usepackage{url}
+\usepackage{color}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage[colorlinks=true, linkcolor=red, urlcolor=blue, citecolor=gray]{hyperref}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{etoolbox}
+\usepackage{bbm}
+
+\definecolor{nyuDarkPurple}{HTML}{330662}
+\definecolor{nyuOfficialPurple}{HTML}{57068c}
+
+\newcommand{\spara}[1]{\vspace{.5em}\noindent {\large\sffamily\textcolor{nyuOfficialPurple}{#1}}}
+\titleformat{\section}[hang]{\Large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsection}[hang]{\large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsubsection}[hang]{\normalsize\sffamily\color{gray}}{\thesection}{1em}{}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{\includegraphics[width=4cm]{tandon_long_color.eps}}
+\rhead{\thepage}
+\pagenumbering{gobble}
+
+\setcounter{secnumdepth}{0}
+
+% math commands
+\DeclareMathOperator{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+\newcommand{\bv}[1]{\mathbf{#1}}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\Var}{Var}
+
+\newtheorem{theorem}{Theorem}
+
+\begin{document}
+	
+\begin{center}
+	\normalsize
+	New York University Tandon School of Engineering
+	
+	Computer Science and Engineering
+	\medskip
+	
+	\large
+	CS-GY 6763: Midterm Exam. 
+	
+	Friday  Oct. 20th, 2023.
+	
+	\textbf{47 points total}
+	
+	\vspace{1em}
+	You have 1 hour, 10 minutes to take the exam. 17.5 minutes per question.\\
+	Show your work to receive full (and partial) credit.
+
+	\vspace{1em}
+	You may find the following statement of the Chernoff bound from class useful.
+\end{center} 
+\begin{theorem}[Chernoff Bound]
+	Let $X_1,X_2,\ldots,X_k$ be independent $\{0,1\}$-valued random variables and let
+	$p_i = \E[X_i]$, where $0<p_i<1$.
+	Let $S = \sum_{i=1}^{k} X_i$ and $\E[S] = \mu$. For $\epsilon \in (0,1)$,
+	\begin{align*}
+			\Pr[|S - \mu| \geq \epsilon \mu] \leq 2e^{-\epsilon^2 \mu/3}.
+	\end{align*}
+\end{theorem} 
+
+\subsection{1. Short answer. (\textbf{\small 12pts -- 3pts each})} 
+Indicate whether each of the following statements is {always} true, {sometimes} true, or {never} true. To receive full credit, provide a \textbf{SHORT JUSTIFICATION OR EXAMPLE} to explain your choice. 
+\begin{enumerate}[label=(\alph*)]
+	\item Consider a random variable $Y$ that takes positive integer values. For $z > 0$,  $\Pr[Y \geq z] \leq \frac{\E[Y]}{z}$. 
+	
+	ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER\vspace{5em}
+	
+	\item For random variables $X$ and $Y$, $\Var[10X + 3Y] = 10^2\Var[X] + 3^2\Var[Y]$.
+	
+	ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER\vspace{5em}
+	
+
+
+	
+	\item Increasing the number of tables in a locality sensitive hashing scheme decreases the expected number of false positives.
+	
+	ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER\vspace{5em}
+	
+	
+	\item Let $X_1, \ldots, X_n$ be random variables (not necessarily independent). $\Pr\left[\max_j X_j \geq z\right] \leq \sum_{j=1}^n \Pr\left[X_j \geq z\right]$.
+	
+	ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER\vspace{5em} 
+	
+
+	
+	%	\item For convex functions $f(x)$ and $g(x)$, $f(x)\cdot g(x)$ is convex.
+	%	
+	%	ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER\vspace{4em}
+	
+%	\item For convex functions $f(x)$ and $g(x)$, $f(g(x))$ is convex.
+%	
+%	ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER\vspace{2em}
+	
+	%	\item Let $f_1(x), \ldots, f_n(x)$ be $\beta$-smooth convex functions and let $g(x) = \frac{1}{n}\sum_{i=1}^n f_i(x)$ be their average. $g$ is $\beta$-smooth.
+	%	
+	%	ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER\vspace{4em}
+\end{enumerate}
+
+\newpage
+%\subsection{2. Safety First (\textbf{\small 5pts})}
+%An airplane has 1000 critical parts, including engine components, navigation equipment, etc. Each part has been thoroughly tested, and during a given flight, each part is guaranteed not to fail with probability 9999/10000. 
+%What is the probability that no part fails during a given flight? Give the highest bound you can based on the problem information and explain how you obtained in.  
+
+
+\subsection{2. Collision Free Hashing Revisited (\textbf {\small 10pts})}
+You proved on Problem Set 1 that if we insert $m$ unique keys into a hash table of size  $O(m^2)$ using a uniformly random hash function, then there will be no collisions with high probability. 
+\vspace{1em}
+
+In this problem we consider an alternative data structure for storing items: build two tables, each of size $O(m^{1.5})$ and choose a separate random hash function (independently at random) for each table. To insert an item, hash it to a bucket in each table and place it in the emptier bucket (you can break ties arbitrarily).
+\vspace{1em}
+
+Prove that, if we insert $m$ items into the data structure described above, then with probability $\geq 9/10$, there will be no collisions. I.e., after inserting all $m$ items, every item inserted will be by itself in a bucket in one of the tables. 
+
+\newpage
+\subsection{3. LSH for Hamming Similarity (\textbf{\small 10pts})}
+% The giant internet company Popflix operates a movie streaming service that offers a total of $d$ movies. They keep track of the movies viewed by each subscriber to the service by storing a length $d$ binary vector with a $1$ in all entries corresponding to movies that subscriber has watched. All other entries are set to $0$. Popflix would like to efficiently find other subscribers with similar viewing habits using an LSH scheme.
+For two length $d$ binary vectors $\bv{q},\bv{y} \in \{0,1\}^d$, consider the hamming similarity: 
+\begin{align*}
+	s(\bv{q},\bv{y}) = 1 - \frac{\|\bv{q} - \bv{y}\|_0}{d}.
+\end{align*}
+Above $\|\bv{q} - \bv{y}\|_0$ is the hamming distance, $\|\bv{q} - \bv{y}\|_0 = \sum_{i=1}^d |q_i - y_i|$, where  $q_i$ and $y_i$ denote the $i^\text{th}$ entries of $\bv{q}$ and $\bv{y}$, respectively. For example, the hamming similarity between the following two vectors is $1 - \frac{2}{6} = \frac{2}{3}$.
+\begin{align*}
+	\bv{q} &= \begin{bmatrix}1,0,0,1,1,0\end{bmatrix} \\
+	\bv{y} &= \begin{bmatrix}1,0,1,1,0,0\end{bmatrix} 
+\end{align*}
+
+\begin{enumerate}[label=(\alph*)]
+	\item (5pts) 
+	% To implement their LSH scheme, Popflix first needs a locality sensitive hash function $h: \{0,1\}^d \rightarrow \{1, \dots, m\}$ that maps user vectors into a table of size $n$. 
+	Construct a function $h$ as follows:
+	define the random function $c: \{0,1\}^d \rightarrow \{0,1\}$ as $c(\bv{x}) = \bv{x}[j]$, where $j$ is a uniform random integer in $\{1, \ldots, d\}$. Then, let $g$ be a uniform random hash function from $\{0,1\} \rightarrow \{1, \ldots, m\}$. Finally, let:
+	\begin{align*}
+		h(\bv{x}) = g(c(\bv{x})).
+	\end{align*}
+	
+	 Prove that $h$ is a locality sensitive hash function for {hamming similarity}. 
+	\vspace{20em}
+	
+	\item (5pts) 
+	% Popflix wants to tune the LSH function above to reduce false negatives. 
+	Describe (in equations or pseudocode) a version of $h$ with $r > 1$ bands, and write down an expression for your new LSH function's collision probability as a function of the hamming similarity and $r$.
+	\vspace{8em}
+	
+\end{enumerate}
+
+
+\newpage 
+
+\subsection{4. A Random Walk Won't Go Very Far (\textbf {\small 15pts})}
+Suppose a tourist is randomly walking up and down 5th Avenue, which can be modeled as a number line. At time $t$, their position is denoted by $x_t$. At time $t=0$ they start at the origin, so $x_0 = 0$. At all subsequent time steps, the tourist either moves up or down one step with equal probability, so for $t = 1, 2, \ldots$ we have:
+\begin{align*}
+	x_t = \begin{cases}
+		x_{t-1} + 1 & \text{with probability } 1/2 \\
+		x_{t-1} - 1 & \text{with probability } 1/2. \\
+	\end{cases} 
+\end{align*}
+\begin{enumerate}[label=(\alph*)]
+	\item (7pts) 
+	Suppose the tourist walks for a total of $n$ steps. Show that, with probability $9/10$, they end up no more than $O(\sqrt{n})$ away from the origin. I.e., show that with probability $9/10$, $|x_n| \leq c\sqrt{n}$ for some constant $c$. \textbf{Hint:} Write $x_n$ as a sum of random variables.
+	\vspace{25em}
+	
+	\item (8pts) Prove that, in fact, the tourist \emph{never} strays too far away from the origin over the course of the walk. Specifically, show that with probability $9/10$, $\max_{i\in 1, \ldots, n} |x_i| \leq c\sqrt{n\log n}$.
+\end{enumerate}
+
+
+
+
+\end{document}

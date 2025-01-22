@@ -1,0 +1,200 @@
+\documentclass[10pt]{article}
+\usepackage{titlesec}
+\usepackage{geometry}
+\geometry{verbose,tmargin=.9in,bmargin=.9in,lmargin=1.0in,rmargin=1.0in}
+\usepackage{amsmath,amsfonts,amsthm,amssymb}
+\usepackage{url}
+\usepackage{color}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage[colorlinks=true, linkcolor=red, urlcolor=blue, citecolor=gray]{hyperref}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{etoolbox}
+
+\definecolor{nyuDarkPurple}{HTML}{330662}
+\definecolor{nyuOfficialPurple}{HTML}{57068c}
+
+\newcommand{\spara}[1]{\vspace{.5em}\noindent {\large\sffamily\textcolor{nyuOfficialPurple}{#1}}}
+\titleformat{\section}[hang]{\Large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsection}[hang]{\large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsubsection}[hang]{\normalsize\sffamily\color{gray}}{\thesection}{1em}{}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{\includegraphics[width=4cm]{tandon_long_color.eps}}
+\rhead{\thepage}
+\pagenumbering{gobble}
+
+\setcounter{secnumdepth}{0}
+
+% math commands
+\DeclareMathOperator{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+
+\begin{document}
+	
+\begin{center}
+	\normalsize
+	New York University Tandon School of Engineering
+	
+	Computer Science and Engineering
+	\medskip
+	
+	\large
+	CS-GY 9223I: Midterm Exam. 
+	
+	Week of Oct. 26th, 2020, any 2 hour slot. 
+	\medskip
+\end{center} 
+
+\subsection{Directions}
+\begin{itemize}
+	\item \emph{Absolutely no collaboration allowed.}
+	\item You are allowed to use any notes or resources from the class, and any programming language, graphing software (e.g., Desmos), or symbolic math package (e.g., WolframAlpha).  
+	\item Show all of your work to receive full (and partial) credit.
+	\item Clearly mark all submitted pages with the problem you are working on.
+\end{itemize}
+
+\subsection{1. Always, sometimes, never. (\textbf{\small 12pts -- 3pts each})} 
+Indicate whether each of the following statements is \textbf{always} true, \textbf{sometimes} true, or \textbf{never} true. A correct answer receives full credit, but you can provide a short justification or example to explain your choice, which might earn partial credit if you are wrong. 
+\begin{enumerate}[label=(\alph*)]
+	\item For random variables $X$ and $Y$, $\E[X - Y]  =  \E[X] - \E[Y]$. 
+	
+	ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER\vspace{4em}
+	
+	\item For random variables $X$ and $Y$, $\E[X Y]  \geq  \E[X]\E[Y]$. 
+	
+	ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER\vspace{4em}
+	
+	\item For convex functions $f(x)$ and $g(x)$, $f(x) + g(x)$ is convex.
+	
+	ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER\vspace{4em}
+	
+	%	\item For convex functions $f(x)$ and $g(x)$, $f(x)\cdot g(x)$ is convex.
+	%	
+	%	ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER\vspace{4em}
+	
+	\item For convex functions $f(x)$ and $g(x)$, $f(g(x))$ is convex.
+	
+	ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER\vspace{4em}
+	
+	%	\item Let $f_1(x), \ldots, f_n(x)$ be $\beta$-smooth convex functions and let $g(x) = \frac{1}{n}\sum_{i=1}^n f_i(x)$ be their average. $g$ is $\beta$-smooth.
+	%	
+	%	ALWAYS\hspace{1em} SOMETIMES\hspace{1em} NEVER\vspace{4em}
+\end{enumerate}
+
+
+\subsection{2. Safety First (\textbf{\small 5pts})}
+An airplane has 1000 critical parts, including engine components, navigation equipment, etc. Each part has been thoroughly tested, and during a given flight, each part is guaranteed not to fail with probability 9999/10000. 
+What is the probability that no part fails during a given flight? Give the highest bound you can based on the problem information. 
+
+\vspace{10em}
+
+\newpage
+
+\subsection{3. Approximating the Trace of a Matrix (\textbf{\small 15pts})}
+Let $\bv{A}\in \R^{n\times n}$ be a square matrix. Recall that the trace of $\bv{A}$ is the sum of its diagonal elements $\tr(\bv{A}) = \sum_{i=1}^n \bv{A}_{ii}$. 
+
+ class we saw that a matrix ${\Pi} \in\R^{m \times d}$ with \textbf{random Gaussian entries} satisfies the Johnson-Lindenstrauss Lemma with high probability when $m = {O(\log n /\epsilon^2)}$. Here we will consider the setting where $\Pi$'s entries are \textbf{scaled random $\pm 1$ random variables}. In particular, for all $i \in 1,\ldots, m$ and $j \in 1,\ldots d$, let 
+\begin{align*}
+	\Pi_{i,j} = \begin{cases}
+		+\frac{1}{\sqrt{m}} & \text{ with probability $1/2$.} \\
+		-\frac{1}{\sqrt{m}} & \text{ with probability $1/2$.} 
+	\end{cases}
+\end{align*}
+
+\begin{enumerate}[label=(\alph*)]
+	\item (6pts) Let $\pi_i \in \R^d$ be the first row of $\Pi$. Show that for any $z \in \R^d$, $\E[ \langle\pi_i, z\rangle^2] = \frac{1}{m}\|z\|_2^2$
+	\vspace{14em}
+	
+	\item (6pts) Use (a) to conclude that for any two vectors $x,y \in \R^d$, 
+	\begin{align*}
+		\E[\|\Pi x - \Pi y\|_2^2] = \|x - y\|_2^2
+	\end{align*}
+	\vspace{12em}
+	
+	
+	\item (3pts) What's one reason you might you want to use a matrix with each entry equal to $\pm\frac{1}{\sqrt{m}}$ instead of being a random Gaussian?
+	\vspace{3em}
+\end{enumerate}
+
+
+%\subsection{3. Johnson-Lindenstrauss with Sign Matrices (\textbf{\small 15pts})}
+%In class we saw that a matrix ${\Pi} \in\R^{m \times d}$ with \textbf{random Gaussian entries} satisfies the Johnson-Lindenstrauss Lemma with high probability when $m = {O(\log n /\epsilon^2)}$. Here we will consider the setting where $\Pi$'s entries are \textbf{scaled random $\pm 1$ random variables}. In particular, for all $i \in 1,\ldots, m$ and $j \in 1,\ldots d$, let 
+%\begin{align*}
+%	\Pi_{i,j} = \begin{cases}
+%		+\frac{1}{\sqrt{m}} & \text{ with probability $1/2$.} \\
+%		-\frac{1}{\sqrt{m}} & \text{ with probability $1/2$.} 
+%	\end{cases}
+%\end{align*}
+%
+%\begin{enumerate}[label=(\alph*)]
+%	\item (6pts) Let $\pi_i \in \R^d$ be the first row of $\Pi$. Show that for any $z \in \R^d$, $\E[ \langle\pi_i, z\rangle^2] = \frac{1}{m}\|z\|_2^2$
+%	\vspace{14em}
+%	
+%	\item (6pts) Use (a) to conclude that for any two vectors $x,y \in \R^d$, 
+%	\begin{align*}
+%		\E[\|\Pi x - \Pi y\|_2^2] = \|x - y\|_2^2
+%	\end{align*}
+%	\vspace{12em}
+%	
+%	
+%	\item (3pts) What's one reason you might you want to use a matrix with each entry equal to $\pm\frac{1}{\sqrt{m}}$ instead of being a random Gaussian?
+%	\vspace{3em}
+%\end{enumerate}
+
+
+\vspace{10em}
+
+\newpage
+\subsection{4. Smoothness, strong convexity, and condition number. (\textbf{\small 10pts})}
+
+\begin{enumerate}[label=(\alph*)]
+	\item (5pts) Draw below:
+	\begin{itemize}
+		\item A convex function which is smooth but not $\alpha$-strongly convex for any $\alpha > 0$.
+		\item A convex function which is strongly convex but not $\beta$-smooth for any finite $\beta$. 
+		\item A convex function which is not $\beta$-smooth for any finite $\beta$ and not $\alpha$-strongly convex for any $\alpha > 0$.
+	\end{itemize} 
+	\textbf{Extra credit (3pts):} Given explicit expressions for your functions.
+	\vspace{20em}
+	
+	\item (3pts) What is the condition number  $\kappa$ of the convex function $f(x) = x^2$. Recall that $\kappa = \frac{\beta}{\alpha}$ where $\beta$ and $\alpha$ are the smoothness and strong convexity parameters of $f(x)$. 
+	\vspace{14em}
+	
+	\item (2pts) Does $f(x) = x^6$ have a finite condition number? Justify your answer. 
+	\vspace{4em}
+\end{enumerate}
+
+
+\vspace{8em}
+
+\newpage
+
+\subsection{5. Simple locality sensitive hash. (\textbf{\small 8pts})}
+Define the \emph{hamming similarity} between two length $d$ binary vectors $q,y \in \{0,1\}^d$ as:
+\begin{align*}
+	1 - \frac{\|q - y\|_1}{d}.
+\end{align*}
+Here $\|q - y\|_1$ is the $\ell_1$ distance, which is defined as $\|z\|_1 = \sum_{i=1}^d |z_i|$.
+
+\begin{enumerate}[label=(\alph*)]
+	\item (4pts) 
+	%	For an integer $m$, let $f: \{0,1\} \rightarrow \{1, \ldots, m\}$ be a uniformly random hash function from $\{0,1\}$ to $\{1,\ldots, m\}$. 
+	Let $g$ be a uniform random integer in $\{1, \ldots, d\}$. Define the function $h: \{0,1\}^d \rightarrow \{0,1\}$ as $h(x) = x_g$, where $x_g$ is the $g^\text{th}$ entry in the vector $x$. Show that $h$ is a locality sensitive hash function for {hamming similarity}.
+	\vspace{10em}
+	
+	\item (4pts) What are \textbf{two reasons} to \emph{not use} locality sensitive hashing for similarity search, but instead to perform a linear scan. 
+	\vspace{8em}
+\end{enumerate}
+
+
+
+\end{document}

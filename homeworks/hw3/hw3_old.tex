@@ -1,0 +1,249 @@
+\documentclass[10pt]{article}
+\usepackage{titlesec}
+\usepackage{geometry}
+\geometry{verbose,tmargin=.9in,bmargin=.9in,lmargin=1.0in,rmargin=1.0in}
+\usepackage{amsmath,amsfonts,amsthm,amssymb}
+\usepackage{url}
+\usepackage{color}
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+\usepackage[colorlinks=true, linkcolor=red, urlcolor=blue, citecolor=gray]{hyperref}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{etoolbox}
+
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+\newcommand{\bv}[1]{\mathbf{#1}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cost}{Cost}
+\DeclareMathOperator{\cut}{cut}
+\DeclareMathOperator{\tr}{tr}
+
+\definecolor{nyuDarkPurple}{HTML}{330662}
+\definecolor{nyuOfficialPurple}{HTML}{57068c}
+
+\newcommand{\spara}[1]{\vspace{.5em}\noindent {\large\sffamily\textcolor{nyuOfficialPurple}{#1}}}
+\titleformat{\section}[hang]{\Large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsection}[hang]{\large\sffamily\color{nyuDarkPurple}}{\thesection}{1em}{}
+\titleformat{\subsubsection}[hang]{\normalsize\sffamily\color{gray}}{\thesection}{1em}{}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{\includegraphics[width=4cm]{tandon_long_color.eps}}
+\rhead{\thepage}
+\pagenumbering{gobble}
+
+\setcounter{secnumdepth}{0}
+
+\begin{document}
+	
+\begin{center}
+	\normalsize
+	New York University Tandon School of Engineering
+	
+	Computer Science and Engineering
+	\medskip
+	
+	\large
+	CS-GY 9223D: Homework 3. 
+	
+	Due Wednesday, November 25th, 2020, 11:59pm.
+	\medskip
+	
+	\normalsize 
+	\noindent \emph{Collaboration is allowed on this problem set, but solutions must be written-up individually. Please list collaborators for each problem separately, or write ``No Collaborators" if you worked alone.}
+	\medskip
+\end{center} 
+
+
+\subsection{Problem 1: Acceleration Through the Polynomial Lens}
+\textbf{(15 pts)}
+In Lecture 7, we saw how to analyze gradient descent for $f(\bv{x}) = \|\bv{A}\bv{x} - \bv{b}\|_2^2$, which has gradient $\nabla f(\bv{x}) = 2\bv{A}^T\bv{A}\bv{x} - 2\bv{A}^T\bv{b}$. The dominant cost for each gradient descent iteration is multiplying $\bv{x}$ by $\bv{A}^T\bv{A}$ to compute the gradient, which takes $O(nd)$ time when $A$ is $n\times d$. 
+
+We obtained a convergence bound depending on the largest and smallest eigenvalues of $\bv{A}^T\bv{A}$, which we denote $\lambda_1$ and $\lambda_d$ respectively. We did so by rearranging the gradient descent update rule:
+\begin{align*}
+	\bv{x}^{(i)} &= \bv{x}^{(i-1)} - \eta\left(2\bv{A}^T\bv{A}\bv{x}^{(i-1)} - 2\bv{A}^T\bv{b}\right) \\
+	\bv{x}^{(i)} - \bv{x}^* &= \bv{x}^{(i-1)} - \eta\left(2\bv{A}^T\bv{A}\bv{x}^{(i-1)} - 2\bv{A}^T\bv{A}\bv{x}^*\right) -\bv{x}^*&& \text{since $\nabla f(\bv{x}^*)=\bv{0}$, so $\bv{A}^T\bv{A}\bv{x}^* = \bv{A}^T\bv{b}$}\\
+	\bv{x}^{(i)} - \bv{x}^* &= (\bv{I} - 2\eta\bv{A}^T\bv{A})(\bv{x}^{(i-1)} - \bv{x}^*).
+\end{align*}
+By induction, it follows that the error $\bv{x}^{(i)} - \bv{x}^*$ equals $\bv{x}^{(i)} - \bv{x}^* = (\bv{I} - 2\eta\bv{A}^T\bv{A})^i(\bv{x}^{(0)} - \bv{x}^*)$. This allowed us to obtain a convergence bound by arguing that, if we set $\eta = 1/2\lambda_1$ where $\lambda_1$ is the largest eigenvalue of $\bv{A}^T\bv{A}$, then $(\bv{I} - \frac{1}{\lambda_1}\bv{A}^T\bv{A})^i$ has top eigenvalue $< \epsilon$ after $i = O(\frac{\lambda_1}{\lambda_d}\log(1/\epsilon))$ iterations. In this problem you will prove an ``accelerated'' version of this bound that only requires $O(\sqrt{\frac{\lambda_1}{\lambda_d}} \log(1/\epsilon))$ iterations.  
+
+\begin{enumerate}
+	\item Let $p$ be a degree $q$ polynomial. I.e. $p = c_0 + c_1 x + \ldots + c_q x^q$. Show that, for any $p$ with $c_0 + c_1 + \ldots + c_q = 1$ and any starting vector $\bv{x}^{(0)}$, we can compute in $O(ndq)$ time a vector $\bv{x}^{(q)}$ such that:
+	\begin{align*}
+		\bv{x}^{(q)} - \bv{x}^* = p\left(\bv{I} - \frac{1}{\lambda_1}\bv{A}^T\bv{A}\right)(\bv{x}^{0} - \bv{x}^*).
+	\end{align*}
+	\item Prove that for $q = O(\sqrt{\frac{\lambda_1}{\lambda_d}} \log(1/\epsilon))$, there exists a polynomial $p$ with coefficients $c_0 + c_1 + \ldots + c_q = 1$ such that the top eigenvalue of $p\left(\bv{I} - \frac{1}{\lambda_1}\bv{A}^T\bv{A}\right) \leq \epsilon$. \textbf{Hint:} What does this requirement on the coefficients tell us about the value of $p(0)$ and $p(1)$? 
+	\item \textbf{Quick answer:} Write down a convergence bound for your new algorithm based on the above result. 
+\end{enumerate}
+
+\subsection{Problem 2: Non-convex Optimization}
+\textbf{(10 pts)} Consider the problem of computing the top right singular vector $\bv{v}_1$ of a matrix $\bv{A}\in \R^{n\times d}$. As mentioned, it is possible to frame this problem as an optimization problem and solve it with gradient descent. As discussed in class, a benefit of doing so is that it makes it easier to introduce stochastic and online methods, and possible use projection to add additional constraints. 
+\begin{enumerate}
+	\item \textbf{Quick answer:} Assume we have know some coarse upper bound $\tilde{\lambda}\geq \lambda_1$. Let $f(\bv{x}) = \tilde{\lambda}\cdot \bv{x}^T\bv{x} -\bv{x}^T\bv{A}^T\bv{A}\bv{x}$. It is easy to check that $\bv{v}_1 = \argmin_{\bv{x} \in \mathcal{S}} f(\bv{x})$ where $\mathcal{S} = \{\bv{y}: \|\bv{y}\|_2^2 \geq 1\}$. Prove that $f(\bv{x})$ is a convex function, but $\mathcal{S}$ is not a convex set. 
+	\item \textbf{Quick answer:} Since $\mathcal{S}$ is not convex, our analysis of projected gradient descent will give no guarantees for this problem. However, we could try using it anyway. Prove that power method is \emph{exactly equivalent} to using projected gradient descent to solve $\argmin_{\bv{x} \in \mathcal{S}} f(\bv{x})$ with a specific learning rate $\eta$. 
+	
+	\item Consider an alternative approach through unconstrained optimization. Let $g(\bv{x}) = -\frac{\bv{x}^T\bv{A}^T\bv{A}\bv{x}}{\bv{x}^T\bv{x}}$. Now we have that $\bv{v}_1 \in \argmin g(\bv{x})$. Prove that $g$ is non-convex and derive an expression for its gradient $\nabla g(\bv{x})$. Show that $c\cdot \bv{v}_i$ is a statitionary point of $g$ for any right singular vector $\bv{v}_i$ and scaling $c$. 
+	
+	\item While $g$'s non-convexity also rules out a direct convergence bound: in theory gradient descent could converge to any singluar vector of $\bv{A}$, not the top one. However, we can argue this is unlikely to happen. In particular, we claim that for any $i\neq 1$,  $\bv{v}_i$ is actually just a \emph{saddle point} of $g$, not a local minimum. To prove this, it suffices to show that for any such $\bv{v}_i$, and any $t > 0$,
+	\begin{align*}
+		&\text{There exists a perturbation $t\bv{z}$ with $\|\bv{z}\|_2 = 1$ such that} & g(\bv{v}_i + {t}\bv{z})  &< g(\bv{v}_i).
+	\end{align*}
+	Prove the above. You can assume that $\bv{A}$ has unique singular values -- i.e., $\sigma_1 > \sigma_2 > \ldots, \sigma_d$. 
+	
+	If you are interested, you can find a some work on proving gradient methods won't get stuck at saddle points here \url{https://arxiv.org/abs/1703.00887}.
+\end{enumerate}
+
+\subsection{Problem 3: Locating Points via the SVD}
+	
+	\textbf{(15 pts)} Suppose you are given all pairs distances between a set of points $\bv{x}_1, \ldots, \bv{x}_n \in \R^d$. You can assume that $d \ll n$. Formally, you are given an $n\times n$ matrix $\bv{D}$ with $\bv{D}_{i,j} = \|\bv{x}_i - \bv{x}_j\|_2^2$. You would like to recover the location of the original points, at least up to possible rotation and translation (which do not change pairwise distances). 
+	
+	Since we can only recover up to a translation, it may be easiest to assume that the points are centered around the origin. I.e. that $\sum_{i=1}^n \bv{x}_i = \bv{0}$. 
+	\begin{enumerate}
+		\item Under this assumption, describe a polynomial time algorithm for learning $\sum_{i=1}^n \|\bv{x}_i\|_2^2$ from $\bv{D}$. Hint: expand $\|\bv{x}_i - \bv{x}_j\|_2^2$ as $(\bv{x}_i - \bv{x}_j)^T(\bv{x}_i - \bv{x}_j)$ and go from there.
+		\item Next, describe a polynomial time algorithm for learning $\|\bv{x}_i\|_2^2$ for each $i \in 1, \ldots, n$. 
+		\item Finally, describe an algorithm for recovering a set of points $\bv{x}_1,\ldots, \bv{x}_n$ which realize the distances in $\bv{D}$. Hint: This is where you will use the SVD! It might help to know (and prove to yourself) that $\bv{D}$ has rank $\leq d + 2$.
+		\item
+		Implement your algorithm and run it on the U.S. cities dataset provided in \texttt{UScities.txt}. Note that the distances in the file are unsquared Euclidean distances, so you need to square them to obtain $\bv{D}$. Plot your  estimated city locations on a 2D plot and label the cities to make it clear how the plot is oriented. Submit these images and your code with the problem set (in the same file, as plaintext) -- I don't need to be able to run the code.
+	\end{enumerate}
+
+
+\subsection{Problem 4: Faster Trace Estimation}
+\textbf{(10 pts)} A common task in linear algebra is to approximately compute the trace $\tr(\bv{A})$ of a matrix $\bv{A}$ that you do not have explicit access to, but can multiply vectors by efficiently. For example, in machine learning, the trace of the Hessian $\bv{H}$ is often useful to compute. While constructing $\bv{H}$ and then computing its trace directly would be very expensive, the cost of computing $\bv{H}\bv{x}$ for any vector $\bv{x}$ is the same as the cost of two gradient evaluations -- do you see why? (Look up ``Pearlmutter's trick'' if you don't.)
+
+On the midterm, we analyzed a randomized algorithm for approximating the trace of any matrix $\bv{A} \in \R^{n\times n}$ using a small number of matrix-vector multiplication with $\bv{A}$. In particular, let $\bv{x}_1,\ldots, \bv{x}_m$ be vectors with uniformly random $\pm 1$ entries and consider the estimator $\tilde{t} = \frac{1}{m}\sum_{i=1}^m \bv{x}_i^T(\bv{A}\bv{x}_i)$. We proved that:
+\begin{align*}
+	\E[\tilde{t}] &= \tr(\bv{A}) & \Var[\tilde{t}] &\leq \|\bv{A}\|_F^2. 
+\end{align*}  
+We concluded via Chebyshev's that if $m = O(1/\epsilon^2)$, then with probability $9/10$, $\left|\tr(\bv{A}) - \tilde{t}\right|\leq \epsilon\|\bv{A}\|_F$.
+\begin{enumerate}
+	\item Assume $\bv{A}$ is symmetric and positive semi-definite with eiganvalues $\lambda_1 \geq \ldots \geq \lambda_n \geq 0$. For example, it might be a Hessian. Show that the above implies a relative error approximation:
+	\begin{align*}
+		(1-\epsilon)\tr(\bv{A}) \leq \tilde{t} \leq (1+\epsilon)\tr(\bv{A}).
+	\end{align*}
+\textbf{Hint:} Use the fact that  $\|\bv{A}\|_F^2 = \sum_{i=1}^n \lambda_i^2$ and $\tr(\bv{A}) = \sum_{i=1}^n \lambda_i$.
+
+\item \textbf{Quick answer:} Let $k = 1/\epsilon$ and let $\bv{V}_k$ be a span for the top eigenvectors of $\bv{A}$ (which are the same as its top right singular vectors since $A$ is symmetric PSD). Prove that:
+\begin{align*}
+	\tr(\bv{A}) = \tr(\bv{A} - \bv{A}\bv{V}_k\bv{V}_k^T) + \tr(\bv{V}_k^T\bv{A}\bv{V}_k).
+\end{align*}
+\textbf{Hint:} You might want to use cyclic property of the trace. 
+
+\item Prove that $\|\bv{A} - \bv{A}\bv{V}_k\bv{V}_k^T\|_F^2 \leq \epsilon \tr(\bv{A})^2$ for $k=1/\epsilon$. \textbf{Hint:} Write both sides as sums involving eigenvalues. 
+
+\item Argue that using $m = O(1/\epsilon)$ matrix vector multiplications with $\bv{A}$, it is possible to find some estimate $\tilde{z}$ such that with probability $9/10$:
+\begin{align*}
+	\left|\tilde{z} - \tr(\bv{A} - \bv{A}\bv{V}_k\bv{V}_k^T) \right| \leq \epsilon \tr(\bv{A}).
+\end{align*}
+\item \textbf{Quick answer:} $\bv{V}_k$ can be computed with roughly $O(k) = O(1/\epsilon)$ matrix vector multiplications using e.g block power method.\footnote{For the sake of this problem, assume you get an exact answer in that time. It is possible to rigorously address the case when $\bv{V}_k$ is only computed approximately, but I'm not asking you to do that here.}  Conclude from the pieces above that with $O(1/\epsilon)$ matrix-vector multiplications total we can find some $\tilde{t}$ such that with probability $9/10$ $(1-\epsilon)\tr(\bv{A}) \leq \tilde{t} \leq (1+\epsilon)\tr(\bv{A})$. 
+\end{enumerate}
+Note that this approach beats the naive estimator by a factor of $1/\epsilon$, which is quite a lot!
+
+
+
+%
+%\subsection{Problem 2: Putting Online Gradient Descent to Work.}
+%\textbf{(5 pts)}
+%Read the \textbf{Portfolio Management Case Study} presented in Section 2.2 of the notes \href{https://www.cs.princeton.edu/courses/archive/fall18/cos521/Lectures/lec16.pdf}{here}.
+%Suppose you wish to use Online Gradient Descent along with the Constantly Rebalanced Portfolio strategy. In particular, you will adjust over time which proportion of your money is kept in each of $n$ assets. Let $\bv{x}^{(t)} \in [0,1]^n$ be a vector representing this allocation at time step $t$. Since you can only invest $100 \%$ of the money you have, and we assume you keep all your money in some asset, we always have that $\sum_{i=1}^n\bv{x}^{(t)}= 1$.
+%
+%\begin{enumerate}
+%	\item Derive an equation for the Online Gradient Descent update if your goal is to maximize total wealth increase over time. You can assume $R$, $G$, and your total number of time steps $T$ are known ahead of time. Also assume you have access to a projection oracle $P$ for the (convex) probability simplex: $\{\bv{z} : \text{for all $i$, } z_i \geq 0 \text{ and } \sum_{i=1}^n z_i = 1\}$ (a simple way of implementing one is discussed \href{https://eng.ucmerced.edu/people/wwang5/papers/SimplexProj.pdf}{here}).
+%\end{enumerate}
+%
+%\subsection{Problem 2: Clustering vs. Low-rank Approximation}
+%\textbf{(10 pts)}
+%Suppose we're given a data matrix $\bv{X}\in \R^{n\times d}$ with $d \leq n$ and singular values $\sigma_1, \ldots, \sigma_d$. Denote $\bv{X}$'s rows by $\bv{x}_1,\ldots, \bv{x}_n \in \R^d$. 
+%\begin{enumerate}
+%	\item \textbf{(3 pts)} Prove the following statement from class: For any $k \leq d$, 
+%	\begin{align*}
+%\min_{\bv{B} \text{ with } \,\rank(\bv{B})=k} \|\bv{X} - \bv{B}\|_F^2= \sum_{i=k+1}^d\sigma_i^2.
+%	\end{align*}
+%	You can use the fact that the SVD can be used to give the optimal rank $k$ approximation. 
+%\end{enumerate}
+%Recall the $k$-means objective: partition a data set $\bv{x}_1,\ldots, \bv{x}_n \in \R^d$ into clusters $\mathcal{C}_1, \ldots,\mathcal{C}_k$ to minimize:
+%\begin{align*}
+%\Cost(\mathcal{C}_1, \ldots,\mathcal{C}_k) = \sum_{i=1}^k \sum_{x_j \in \mathcal{C}_i} \|\bv{x}_j - \bs{\mu}_i\|_2^2
+%\end{align*}
+%where $\mu_i = \frac{1}{|\mathcal{C}_i|}\sum_{x\in \mathcal{C}_i} \bv{x}$ is the centroid of the $i^\text{th}$ cluster.
+%
+%\begin{enumerate}
+%	\setcounter{enumi}{1}
+%	\item \textbf{(4 pts)} Prove that $\min \Cost(\mathcal{C}_1, \ldots,\mathcal{C}_k) \geq \sum_{i=k+1}^d\sigma_i^2$. In other words, the optimal $k$-means objective cost is always larger than the optimal low-rank approximation bost. 
+%	
+%	\item \textbf{(3 pts)} Describe data sets where:
+%	\begin{enumerate}
+%		\item $\min\Cost(\mathcal{C}_1, \ldots,\mathcal{C}_k)\neq 0$ and $\min \Cost(\mathcal{C}_1, \ldots,\mathcal{C}_k) = \sum_{i=k+1}^d\sigma_i^2$, and where
+%		\item $\min \Cost(\mathcal{C}_1, \ldots,\mathcal{C}_k) \gg \sum_{i=k+1}^d\sigma_i^2$ (e.g., where the $k$-means cost 10x greater).
+%	\end{enumerate}
+%\end{enumerate}
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%\subsection{Problem 1: Putting Online Gradient Descent to Work.}
+%\textbf{(5 pts)}
+%Read the \textbf{Portfolio Management Case Study} presented in Section 2.2 of the notes \href{https://www.cs.princeton.edu/courses/archive/fall18/cos521/Lectures/lec16.pdf}{here}.
+%Suppose you wish to use Online Gradient Descent along with the Constantly Rebalanced Portfolio strategy. In particular, you will adjust over time which proportion of your money is kept in each of $n$ assets. Let $\bv{x}^{(t)} \in [0,1]^n$ be a vector representing this allocation at time step $t$. Since you can only invest $100 \%$ of the money you have, and we assume you keep all your money in some asset, we always have that $\sum_{i=1}^n\bv{x}^{(t)}= 1$.
+%
+%\begin{enumerate}
+%	\item Derive an equation for the Online Gradient Descent update if your goal is to maximize total wealth increase over time. You can assume $R$, $G$, and your total number of time steps $T$ are known ahead of time. Also assume you have access to a projection oracle $P$ for the (convex) probability simplex: $\{\bv{z} : \text{for all $i$, } z_i \geq 0 \text{ and } \sum_{i=1}^n z_i = 1\}$ (a simple way of implementing one is discussed \href{https://eng.ucmerced.edu/people/wwang5/papers/SimplexProj.pdf}{here}).
+%\end{enumerate}
+
+%\subsection{Problem 3: Sketches for Cut Estimation}
+%\textbf{(10 pts)}
+%Let $G(V,E)$ be a graph with vertex set $V$ and edge set $E$. Suppose $|V| = n$ and $G$ has edge vertex incidence matrix $\bv{B} \in \R^{m\times n}$. Let $\bs{\Pi} \in \R^{k \times m}$ be a random Johnson-Lindenstrauss matrix with $k$ rows. Suppose we sketch $G$ by forming the $O(kn)$ matrix $\bs{\Pi}\bv{B}$.
+%
+%Given any vertex set $S \subseteq V$, describe an algorithm that estimates $\cut(S,V\setminus S)$ up to $(1\pm \epsilon)$ error with probability $1-\delta$ using only the information in $\bs{\Pi}\bv{B}$, as long as $k = O(\log(1/\delta)/\epsilon^2)$. 
+%
+%
+%\subsection{Problem 4: Matrix Concentration from Scalar Concentration}
+%\textbf{(15 pts)}   This problem asks you to prove a simplified (and slightly weaker) version of the matrix concentration result used in Lecture 11. 
+%Construct a random \emph{symmetric} matrix $R \in \R^{n\times n}$ by setting $R_{ij} = R_{ji}$ to $+1$ or $-1$, uniformly at random. Prove that, with high probability,
+%\begin{align*}
+%\|R\|_2 \leq c\sqrt{n\log n},
+%\end{align*}
+%for some constant $c$. This is much better than the naive bound of $\|R\|_2 \leq \|R\|_F = n$.
+%
+%Here are a few hints that might help you along:
+%\begin{itemize}
+%	\item Recall that for a matrix $R$,  $\|R\|_2 = \max_{x \in \R^n} \frac{\|M x\|_2}{\|x\|_2}$. When $R$ is symmetric, it also holds that $\|R\|_2 = \max_{x \in \R^n} \frac{|x^T R x|}{x^Tx}$.
+%	\item Try to first bound $\frac{|x^T R x|}{x^Tx}$ for one particular $x$ -- you might want to use a \href{https://en.wikipedia.org/wiki/Hoeffding\%27s_inequality}{Hoeffding bound}.
+%	\item Then try to extend the result to hold for all $x$, simultaneously using an $\epsilon$-net argument.
+%\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
