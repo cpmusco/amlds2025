@@ -50,7 +50,7 @@
 	\large
 	CS-GY 6763: Homework 1. 
 	
-	Due Tuesday, September 26th, 2023, 11:59pm ET.
+	Due Thursday, Feb. 6th, 2024, 11:59pm ET.
 	\medskip
 	
 	\normalsize 
@@ -84,13 +84,13 @@ Prove that using $O(m)$ space,  Count-Min actually returns an estimate $\tilde{f
 with $9/10$ probability. This is strictly better than the $\frac{1}{m} n$ error bound shown in class. 
 
 
-\subsection{Problem 3: Randomized methods for COVID-19 group testing. (12 pts)}
-One of the most important factors in controlling diseases like COVID-19 is testing. Before at-home kits became available, testing was expensive and slow. One way to make it cheaper was to test patients in \emph{groups}. The biological samples from multiple patients (e.g., multiple nose swabs) are combined into a single test tube and tested for COVID-19 all at once. If the test comes back negative, we know everyone in the group is negative. If the test comes back positive, we do not know which patients in the group actually had COVID-19, so further testing would be necessary. There's a trade-off here, but it turns out that, overall, group testing can save on the total number of tests run. 
+\subsection{Problem 3: Randomized methods for efficient disease identification group testing. (12 pts)}
+One of the most important factors in controlling diseases like bird flu or, a few years ago, COVID-19, is testing. However, testing often requires processing in a lab, so can be expensive and slow. One way to make it cheaper is to test patients/livestock/etc. in \emph{groups}. The biological samples from multiple individuals (e.g., multiple nose swabs) are combined into a single test tube and tested for the disease all at once. If the test comes back negative, we know everyone in the group is negative. If the test comes back positive, we do not know which patients in the group actually have the disease, so further testing would be necessary. There's a trade-off here, but it turns out that, overall, group testing can save on the total number of tests run. 
 
 \begin{enumerate}
-	\item (6pts) Consider the following deterministic ``two-level'' testing scheme. We divide a population of $n$ individuals to be tested into $C$ groups of the same size. We then test each of these groups. For any group that comes back positive, we retest all members of the group individually. Show that there is a choice for $C$ such that, if $k$ individuals in the population have COVID-19, we can find all of those individuals with $\leq 2\sqrt{nk}$ tests. You can assume $k$ is known in advance (often it can be estimated accurately from the positive rate of prior tests). This is already an improvement on the naive $n$ tests when $k < 25\% \cdot n$.
+	\item (6pts) Consider the following deterministic ``two-level'' testing scheme. We divide a population of $n$ individuals to be tested into $C$ groups of the same size. We then test each of these groups. For any group that comes back positive, we retest all members of the group individually. Show that there is a choice for $C$ such that, if $k$ individuals in the population have a disease (would test positive), we can find all of those individuals with $\leq 2\sqrt{nk}$ tests. You can assume $k$ is known in advance (often it can be estimated accurately from the positive rate of prior tests). This is already an improvement on the naive $n$ tests when $k < 25\% \cdot n$.
 	
-	\item (6pts) We can use randomness to do better. Consider the following scheme: Collect $q = O(\log n)$ nose swabs from each individual (I know... not pleasant). Then, repeat the following process $q$ times: randomly partition our set of $n$ individuals into $C$ groups, and test each group in aggregate. Once this process is complete, report that an individual ``has COVID'' if the group they were part of tested positive all $q$ times. Report that an individual ``is clear'' if \emph{any} of the groups they were part of tested negative. Show that for $C = O(k)$, with probability $9/10$, this scheme finds all truly positive patients and reports no false positives. Thus, we only require $O(k\log n)$ tests! 
+	\item (6pts) We can use randomness to do better. Consider the following scheme: Collect $q = O(\log n)$ biological samples from each individual (in reality, divide one sample into $q$ parts). Then, repeat the following process $q$ times: randomly partition our set of $n$ individuals into $C$ groups, and test each group in aggregate. Once this process is complete, report that an individual ``is positive'' if the group they were part of tested positive all $q$ times. Report that an individual ``is negative'' if \emph{any} of the groups they were part of tested negative. Prove that for $C = O(k)$, with probability $9/10$, this scheme finds all truly positive patients and reports no false positives. Thus, we only require $O(k\log n)$ tests! 
 	
 %	\textbf{Hint:} If your proof would also work for $q = O(1)$ then it has a bug! See EC below.
 	
@@ -109,28 +109,28 @@ One of the most important factors in controlling diseases like COVID-19 is testi
 %\end{enumerate}
 % f does not need to be strictly monotonic! Why? Sort of counterintuitive but got a question about this last year. 
 
-\subsection{Problem 4: Exploring Concentration Bounds. (8 pts)}
-Using combinatorics, write down and evaluate (e.g., run some code) an exact expression for the probability of flipping 60 or more heads when flipping a fair coin 100 times. Do the same for 600 or more heads in 1000 flips. Compare your results to the upper bound given by the Chernoff bound from Lecture 2:
-\begin{align*}
-	\Pr[S > (1+\epsilon)\mu] \leq e^{-\frac{\epsilon^2\mu}{2+\epsilon}}.
-\end{align*}
-Also compare to this slightly different and less commonly used form of the bound from Wikipedia:
-\begin{align*}
-	\Pr[S > (1+\epsilon)\mu] \leq \left(\frac{e^\epsilon}{(1+\epsilon)^{1+\epsilon}}\right)^{\mu}.
-\end{align*}
-Also compute what each Chernoff Bound would give if you wanted to bound the probability of flipping more than 70 or 700 heads. 
-Write a 1-2 sentence comment on how what your findings suggest about how ``tight'' the Chernoff bound is. 
+% \subsection{Problem 4: Exploring Concentration Bounds. (8 pts)}
+% Using combinatorics, write down and evaluate (e.g., run some code) an exact expression for the probability of flipping 60 or more heads when flipping a fair coin 100 times. Do the same for 600 or more heads in 1000 flips. Compare your results to the upper bound given by the Chernoff bound from Lecture 2:
+% \begin{align*}
+% 	\Pr[S > (1+\epsilon)\mu] \leq e^{-\frac{\epsilon^2\mu}{2+\epsilon}}.
+% \end{align*}
+% Also compare to this slightly different and less commonly used form of the bound from Wikipedia:
+% \begin{align*}
+% 	\Pr[S > (1+\epsilon)\mu] \leq \left(\frac{e^\epsilon}{(1+\epsilon)^{1+\epsilon}}\right)^{\mu}.
+% \end{align*}
+% Also compute what each Chernoff Bound would give if you wanted to bound the probability of flipping more than 70 or 700 heads. 
+% Write a 1-2 sentence comment on how what your findings suggest about how ``tight'' the Chernoff bound is. 
 
-\subsection{Problem 5: Try out mark-and-recapture! (12 pts)}
+\subsection{Problem 4: Try out mark-and-recapture! (12 pts)}
 \begin{enumerate}
-	\item (6pts) Prove the claim on Slide 32 of Lecture 1. Specifically, if we collection $O(\sqrt{n}/\epsilon)$ samples uniformly from a set of unknown size $n$, then we can return an estimation $\tilde{n}$ which, with probability $9/10$ satisfies:
+	\item (6pts) Prove the claim on Slide 31 of Lecture 1. Specifically, if we collection $O(\sqrt{n}/\epsilon)$ samples uniformly from a set of unknown size $n$, then we can return an estimation $\tilde{n}$ which, with probability $9/10$ satisfies:
 	\begin{align*}
 		(1-\epsilon)n \leq \tilde{n} \leq (1+\epsilon)n.
 	\end{align*}
 	
 	\item (6pts) Wikipedia provides a way to access a random article by following the link \url{https://en.wikipedia.org/wiki/Special:Random}. Implement the mark-and-recapture algorithm from class and use this link to evaluate \href{https://en.wikipedia.org/wiki/English_Wikipedia}{the claim} that English Wikipedia has 6.7 million unique articles. In my experiments, downloading 5000 articles took 30 minutes, so scanning all possible articles to check the claim would take $\sim 25$ days (if you don't get blacklisted for scrapping first). How long did your code take to run?
 	
-	Include your code, all relevant results and calculations, and a discussion of how accurate you think your estimate is. Do you think its accuracy will be impacted by the fact that the random article feature doesn't return \emph{perfectly} random articles (see discussion \href{https://en.wikipedia.org/wiki/Wikipedia:FAQ/Technical#random}{here})?
+	Include your code, your best estimte for the number of articles on Wikipedia, and how many samples you used to compute the estimate. 
 	
 	 I  used Python, but you can use any language. In Python, you can get a random url by running:
 \begin{verbatim}
@@ -139,6 +139,12 @@ response = requests.get("https://en.wikipedia.org/wiki/Special:Random")
 random_url = response.url	
 \end{verbatim}
 
+\item In part (2)My guess is that the underestimate is due to the fact that 
+Wikipedia's random article generator does not return \emph{truly uniform} random articles. As discussed \href{https://en.wikipedia.org/wiki/Wikipedia:FAQ/Technical#random}{here}, Wikipedia assigns each article $i$ a random id $r_i$, which we can model as a random real number in $[0, 1]$. Then, to pick a random article, a random real number in $[0, 1]$ is sampled and article $i$ is return if that number lies in the range $[r_i, r_{i+1}].$ That is, the range $[0, 1]$ is partitioned into $n$ intervals and the probability of returning article $i$ is equal to the length of the $i^\text{th}$ interval, which we denote by $p_i$. Since these intervals themselves are random, the probability distribution won't be \emph{perfectly} uniform.
+\begin{enumerate}
+	\item Prove that, when the interval lengths are not perfectly uniform, the mark-and-recapture method should be expected to underestimate the number of articles. \textbf{Hint:} Prove that the expected number of collisions $D$ after $m$ samples equals $\binom{m}{2}\sum_{i=1}^n p_i^2$, and show that this expectation is minimized when $p_1 = \ldots = p_n = \frac{1}{n}$.  So, we get too many collisions for a non-uniform distribution, causing an underestimate of $n$.
+	\item Show that, if Wikipedia uses the scheme above, we expect that the mark-and-recapture method will systematically underestimate the number of articles by almost exactly a factor of two. \textbf{Hint:} Try to prove a bound on $\E\left[\sum_{i=1}^n p_i^2\right]$. 
+\end{enumerate}
 \end{enumerate}
 
 

@@ -1,3 +1,4 @@
+%!LW recipe=latexmk-xelatex
 \documentclass[]{beamer}
 
 \usetheme[block=fill]{metropolis}
@@ -102,7 +103,7 @@
 	\begin{frame}
 		\frametitle{applications by the numbers}
 		\begin{itemize}
-			\item \textbf{X (Twitter)} receives 6,000 tweets \emph{every second}.
+			\item \textbf{ChatGPT} processes 1 billion queries per day, at at a cost of \$700,000+ per day for OpenAI. 
 			\item \textbf{Google} receives $\approx$ 20,000 Maps queries \emph{every second}.
 			\item \textbf{NASA} collects 6.4 TB of satallite images \emph{every day}. 
 			\item \textbf{Rubin Observatory in Chile} will collect 20 TB of images \emph{every night}. 
@@ -114,9 +115,10 @@
 		\frametitle{role of algorithms}
 		\textbf{Growing demands of data science and machine learning have ushered in a new ``golden age'' for algorithms research.}
 		\begin{itemize}
-			\item Bolstered by our limited ability to build faster computers (or to access computational resources with a limited financial  budget). 
-			\item Typical data applications require combining a diverse set of algorithmic tools. Most are not heavily covered in your traditional algorithms curriculum.
-		\end{itemize} 
+			\item Slowing raw performance increases in CPUs + GPUs.
+			\item Parallelization limited by financial and environmental costs. Currently, data centers account for $~5\%$ of US electricity use. Expected to double in next 3 years. 
+		\end{itemize}
+		Typical data applications require combining a diverse set of algorithmic tools. Most are not heavily covered in your traditional algorithms curriculum. 
 	\end{frame}
 	
 	\begin{frame}
@@ -125,8 +127,7 @@
 			\begin{enumerate}[label=(\arabic*)]
 				\item Randomized methods.
 				\item Optimization.
-				\item Spectral methods and linear algebra.
-				\item Touch on Fourier methods.
+				\item Spectral methods (linear algebra) and Fourier methods.
 			\end{enumerate}
 			
 			\vspace{1em}
@@ -139,10 +140,10 @@
 		\small
 		\textbf{Section 1: Randomized Algorithms.}
 		
-		\alert{\textbf{It is hard to find an algorithms paper in 2023 that does not use randomness in some way, but this wasn't always the case!}}
+		\alert{\textbf{It is hard to find an algorithms paper in 2025 that does not use randomness in some way, but this wasn't always the case!}}
 		\begin{itemize}
 			\item Probability tools and concentration of random variables (Markovs, Chebyshev, Chernoff/Bernstein inequalities).
-			\item Random hashing for fast data search, load balancing, and more. Locality sensitive hashing, MinHash, SimHash, etc.
+			\item Random hashing for fast data search, load balancing, faster language models, and more. Locality sensitive hashing, MinHash, SimHash, etc.
 			\item Sketching and streaming algorithms for compressing and processing data on the fly.
 			\item High-dimensional geometry and the Johnson-Lindenstrauss lemma for compressing high dimensional vectors.
 		\end{itemize}
@@ -171,31 +172,21 @@
 		\alert{\textbf{``Complex math operations (machine learning, clustering, trend detection) [are] mostly specified as linear algebra on array data'' -- Michael Stonebraker, Turing Award Winner}}
 		
 		\begin{itemize}
-			\item How to compute singular value decompositions and eigendecomposition.
+			\item Efficient algorithms for singular value decomposition and eigendecomposition, including randomized methods.
 			\item Spectral graph theory: i.e. how to use linear algebara to understanding large graphs through linear algebra (social networks, interaction graphs, etc.). 
 			\item Spectral clustering and non-linear dimensionality reduction.
-			\item Random sampling and sketching methods for matrix computations.
-		\end{itemize}
-	\end{frame}
-	
-	\begin{frame}
-		\frametitle{fourier methods}
-		\small
-		\textbf{Section 4: Fourier methods.}
-		\begin{itemize}
 			\item Compressed sensing, sparse recovery, and their applications.
 			\item Fast Fourier Transform inspired methods in linear algebra and dimensionality reduction.
-			\item Fourier perspective on machine learning techniques like kernel methods, and the algorithmic benefits.
 		\end{itemize}
 	\end{frame}
 	
 	\begin{frame}
 		\frametitle{what we won't cover}
 		
-		\textbf{Software tools or frameworks.} Spark, Tensorflow, etc.  If you are interested, CS-GY 6513 might be a good course.
+		\textbf{Software tools or frameworks.} Spark, Torch, Tensorflow, HPC, AWS, etc.  If you are interested, CS-GY 6513 might be a good course.
 		\vspace{1em}
 		
-		\textbf{Machine Learning Models + Techniques.} Neural nets, reinforcement learning, Bayesian methods, unsupervised learning, etc. I assume you have already had a course in ML and the focus of this class is on \emph{computational considerations}.
+		\textbf{Machine Learning Models + Techniques.} Neural nets, genertive models, reinforcement learning, Bayesian methods, unsupervised learning, etc. I assume you have already had a course in ML and the focus of this class is on \emph{computational considerations}.
 		
 		\begin{center}
 			But if your research is in machine learning, I think you will find the theoretical tools we learn are more broadly applicable than in designing faster algorithms. 
@@ -244,7 +235,7 @@
 	\begin{frame}
 		\frametitle{course structure and logistics}
 		\begin{center}
-			All of this information is on the course webpage \url{https://www.chrismusco.com/amlds2023/} and in the syllabus posted there! Please take a look.
+			All of this information is on the course webpage \url{https://www.chrismusco.com/amlds2025/} and in the syllabus posted there! Please take a look.
 		\end{center}
 		
 		\textbf{Class structure:}
@@ -270,12 +261,12 @@
 		\frametitle{course structure and logistics}
 		\textbf{Class work:}
 		\begin{itemize}
-			\item \textbf{5 problem sets} (50\% of course grade). 
+			\item \textbf{5 problem sets} (45\% of course grade). 
 			\begin{itemize}
 				\item These are challenging, and the most effective way to learn the material. I recommend you start early, work with others, ask questions on Ed, etc.
 				\item You must \emph{write-up} solutions on your own.\footnote{10\% bonus on first problem set for using Markdown or LaTex. It should save you time in the long run!} 
 			\end{itemize}
-			\item \textbf{Midterm (Oct. 20th)} {20}\% of course grade). 
+			\item \textbf{Midterm (Mar. 14th)} {25}\% of course grade). 
 		\end{itemize}
 	\end{frame}
 	
@@ -284,7 +275,7 @@
 		\textbf{Final project \emph{or} final exam (20\% of grade):}
 		\begin{itemize}
 			\item Final exam will be similar to midterm and problem sets. 
-			\item Final project can be based on a recent algorithms paper, and can be either an experimental or theoretical project. \emph{Must work in a pair.}
+			\item Final project can be based on a recent algorithms paper, and can be either an experimental or theoretical project. \emph{Must work in a group of 2 or 3.}
 			\item We will hold a \textbf{reading group} outside of class for those who decide to complete a final project to workshop topics and papers. 
 			\item Others can join as well -- it's a great opportunity to get better at reading and presenting papers.
 		\end{itemize}
@@ -305,16 +296,11 @@
 	\end{frame}
 	
 	\begin{frame}
-		\frametitle{rockstar course team}
+		\frametitle{rockstar tas}
 		\begin{center}
-			\includegraphics[width=\textwidth]{courseTeam.png}
+			\includegraphics[width=.7\textwidth]{course_team.png}
 		\end{center}
-	\textbf{Things to look forward to:}
-	\begin{itemize}
-		\item Teal's typeset lecture notes.
-		\item Apoorv and Raphael's ``proof writing sessions''.
-		\item Feyza's guest lecture on ``fine grained complexity''.
-	\end{itemize}
+	Both will hold office hours, which are a good place to work on homeworks. Noah will also host ``problem solving'' recitations for more practice with proof writing. Times TBA.
 	\end{frame}
 	
 	\begin{frame}[standout]
@@ -334,8 +320,8 @@
 		\end{itemize}
 		\textbf{Problem set applications:}
 		\begin{itemize}
-			\item Group testing for COVID-19.
-			\item Smarter load balancing. 
+			\item Group testing for diseases (like bird flu, COVID-19, etc.)
+			\item Efficient packet routing over networks. 
 		\end{itemize}	
 	\end{frame}
 	
@@ -355,7 +341,7 @@
 		\begin{center}
 			\includegraphics[width=.45\textwidth]{rvs.png}
 			
-			\textbf{Exercise:} For any scalar $\alpha$,  $\E[\alpha X] = \alpha \E[X]$. $\Var[\alpha X] = \alpha^2 \Var[X]$.
+			For any scalar $\alpha$,  $\E[\alpha X] = \alpha \E[X]$. $\Var[\alpha X] = \alpha^2 \Var[X]$.
 		\end{center} 
 	\end{frame}
 	
@@ -382,7 +368,7 @@
 		Let $X$ and $Y$ be \emph{random variables}. $X$ and $Y$ are independent if, for all events $s, t$, the \emph{random events} $[X = s]$ and $[Y = t]$ are independent.
 	\end{frame}
 	
-	\begin{frame}
+	\begin{frame}[t]
 		\frametitle{the most powerful theorem in all of probability?}
 		\textbf{Linearity of expectation:}
 		\begin{align*}
@@ -411,9 +397,11 @@
 		\frametitle{first application}
 		You run a web company that is considering contracting with a vendor that provides CAPTCHAs for logins.
 		\begin{center}
-			\includegraphics[width=.5\textwidth]{latex_captcha.jpeg}
+			\vspace{-.6em}
+			\includegraphics[width=.3\textwidth]{captcha_new.png}
+			\vspace{-1.4em}
 		\end{center}
-		They claim to have a data base of $n = \mathbf{1,000,000}$ unique CAPTCHAs in their database, and a random one will be shown on each API call to their service. They give you access to a test API so you can try it out.
+		Claim to have a database of $n = \mathbf{1,000,000}$ unique CAPTCHAs. A random one will be shown on each API call to their service. They give you access to a test API so you can try it out.
 		
 		\textbf{Question:} Roughly how many queries to the API, $m$, would you need to independently verify the claim that there are $\sim 1$ million unique puzzles?  
 	\end{frame}
@@ -554,7 +542,7 @@
 		\end{align*}
 		With a little more work it is possible to show the following: 
 		
-		\textbf{Claim:} If $m = \Omega\left(\frac{\sqrt{n}}{\epsilon}\right)$, then with probability $9/10$, $(1-\epsilon)n \leq \tilde n \leq (1+\epsilon) n$. This is a two-sided \alert{multiplicative} error guarantee.
+		\textbf{Claim:} If $m = O\left(\frac{\sqrt{n}}{\epsilon}\right)$, then with probability $9/10$, $(1-\epsilon)n \leq \tilde n \leq (1+\epsilon) n$. This is a two-sided \alert{multiplicative} error guarantee. \textbf{You will prove this on homework.}
 		
 		\begin{center}
 			\textbf{\alert{This is a lot better than our original method that required $O(n)$ queries!}}
@@ -601,7 +589,7 @@
 	\begin{frame}
 		\frametitle{the frequent items problem}
 		\small
-		\textbf{$k$-Frequent Items (Heavy-Hitters) Problem}: Consider a stream of $n$ items $x_1,\ldots, x_n$ with duplicates. Assume there are $u\leq n$ unique items in the stream. Return any item at appears at least $\frac{n}{k}$ times.
+		\textbf{$k$-Frequent Items (Heavy-Hitters) Problem}: Consider a stream of $n$ items $x_1,\ldots, x_n$ with duplicates. These items take $u$ possible values. Return any item at appears at least $\frac{n}{k}$ times.
 		\begin{align*}
 			&x_1,\,\, x_2,\,\,x_3,\,x_4,x_5,\,\,x_6,\ldots\hspace{20em}\\
 			&v_{10},v_{10},v_2,v_5,v_{10},v_2\ldots\hspace{20em}
@@ -618,7 +606,7 @@
 	\begin{frame}
 		\frametitle{the frequent items problem}
 		\small
-		\textbf{$k$-Frequent Items (Heavy-Hitters) Problem}: Consider a stream of $n$ items $x_1,\ldots, x_n$ with duplicates. Assume there are $u\leq n$ unique items in the stream. Return any item that appears at least $\frac{n}{k}$ times.
+		\textbf{$k$-Frequent Items (Heavy-Hitters) Problem}: Consider a stream of $n$ items $x_1,\ldots, x_n$ with duplicates. These items take $u$ possible values. Return any item that appears at least $\frac{n}{k}$ times.
 		\begin{center}
 			\includegraphics[width=.95\textwidth]{fi.png}
 		\end{center}
@@ -645,7 +633,7 @@
 		\end{center}
 		\begin{itemize}
 			\item For product recommendations, the number of pairs of products might grow quadratically with the number of products. Amazon has $12$ million products. $(12 \text{ million})\times 4 \text{ bytes }= 48 \text{ megabytes }$.  $(12 \text{ million})^2\times 4 \text{ bytes }= 576 \text{ terabytes}$ to maintain counts.
-			\item For social media recommendations, we might have a set of followers for each Twitter user and want to count frequent subsets of who they follow. Even higher complexity. 
+			\item For social media recommendations, we might have a set of followers for each user and want to count frequent subsets of who they follow. Even higher complexity. 
 		\end{itemize}
 	\end{frame}
 	
@@ -655,9 +643,8 @@
 		
 		\vspace{1em}
 		\textbf{$(\epsilon,k)$-Frequent Items Problem}: Consider a stream of $n$ items $x_1,\ldots, x_n$. Return a set  of items $F$, including \alert{all items that appear $ \geq \frac{n}{k}$ times} and \alert{only items that appear $\geq (1-\epsilon) \cdot \frac{n}{k}$ times}.
-		\begin{itemize}
-			\item For items with frequencies in $[(1-\epsilon) \frac{n}{k},\frac{n}{k}]$, no output guarantee.
-		\end{itemize}
+
+	The deterministic \textbf{Misra-Gries algorithm} solves this problem using $O(k/\epsilon)$ space. We will see a randomized algorithm that matches this, and is more flexible in many settings.
 	
 %	\begin{center}\textbf{What is the maximum number of items we will return?}\end{center}
 	\end{frame}
@@ -706,10 +693,11 @@
 		\textbf{Caveat:}
 		It is not possible to efficiently implement uniform random hash functions! But:
 		\begin{itemize}
-			\item In practice ``random looking'' functions like MD5, SHA256, etc. often suffice.
-			\item If we have time, we will discuss weaker hash functions (in particular, \emph{universal functions}) which suffice for our application, and are efficient to implement.
+			\item In practice ``random looking'' functions suffice.
+			\item We will discuss weaker, efficiently implementable hash functions (in particular, \emph{universal hash functions}) next week.
+			\item Our analysis will work with these weaker hash functions.
 		\end{itemize}	
-		For now, \textbf{assume} we have access to a uniformly random hash function. This is an assumption we will use in future lectures as well. 
+		But, we will make our lives easier by \textbf{assuming} we have access to a uniformly random hash function. This is an assumption we will use in future lectures as well. The assumption is often made in reseach papers even. 
 	\end{frame}
 	
 	
@@ -946,7 +934,7 @@
 		\begin{align*}
 			h(x) = \left[a\cdot x + b \pmod{p}\right] \pmod{m}
 		\end{align*} 
-		is universal. Lecture notes with proof posted on website. 
+		is universal.
 	\end{frame}
 	
 	\begin{frame}
