@@ -121,14 +121,14 @@ One of the most important factors in controlling diseases like bird flu or, a fe
 % Also compute what each Chernoff Bound would give if you wanted to bound the probability of flipping more than 70 or 700 heads. 
 % Write a 1-2 sentence comment on how what your findings suggest about how ``tight'' the Chernoff bound is. 
 
-\subsection{Problem 4: Try out mark-and-recapture! (12 pts)}
+\subsection{Problem 4: Try out mark-and-recapture! (16 pts)}
 \begin{enumerate}
 	\item (6pts) Prove the claim on Slide 31 of Lecture 1. Specifically, if we collection $O(\sqrt{n}/\epsilon)$ samples uniformly from a set of unknown size $n$, then we can return an estimation $\tilde{n}$ which, with probability $9/10$ satisfies:
 	\begin{align*}
 		(1-\epsilon)n \leq \tilde{n} \leq (1+\epsilon)n.
 	\end{align*}
 	
-	\item (6pts) Wikipedia provides a way to access a random article by following the link \url{https://en.wikipedia.org/wiki/Special:Random}. Implement the mark-and-recapture algorithm from class and use this link to evaluate \href{https://en.wikipedia.org/wiki/English_Wikipedia}{the claim} that English Wikipedia has 6.7 million unique articles. In my experiments, downloading 5000 articles took 30 minutes, so scanning all possible articles to check the claim would take $\sim 25$ days (if you don't get blacklisted for scrapping first). How long did your code take to run?
+	\item (6pts) Wikipedia provides a way to access a random article by following the link \url{https://en.wikipedia.org/wiki/Special:Random}. Implement the mark-and-recapture algorithm from class and use this link to evaluate \href{https://en.wikipedia.org/wiki/Wikipedia:Size_of_Wikipedia}{the claim} that Wikipedia has $\sim 6.9$ million unique articles. In my experiments, downloading 5000 articles took 30 minutes, so scanning all possible articles to check the claim would take $\sim 25$ days (if you don't get blacklisted for scrapping first). How long did your code take to run?
 	
 	Include your code, your best estimte for the number of articles on Wikipedia, and how many samples you used to compute the estimate. 
 	
@@ -139,7 +139,7 @@ response = requests.get("https://en.wikipedia.org/wiki/Special:Random")
 random_url = response.url	
 \end{verbatim}
 
-\item You might notice that your estimate above seems to underestimate Wikipedia's \emph{claimed} number of articles. A student last year noticed that this is due to the fact that 
+\item (4pts) You might notice that your estimate above seems to underestimate Wikipedia's claimed number of articles. A student last year figured out that this is due to the fact that 
 Wikipedia's random article generator does not return \emph{truly uniform} random articles. As discussed \href{https://en.wikipedia.org/wiki/Wikipedia:FAQ/Technical#random}{here}, Wikipedia assigns each article $i$ a random id $r_i$, which we can model as a random real number in $[0, 1]$. Then, to pick a random article, a number is sampled uniformly from $[0, 1]$ article $i$ is return if that number lies in the range $[r_i, r_{i+1}]$. Since these intervals themselves are random, the probability distribution won't be \emph{perfectly} uniform.\\
 
 Prove that, when the interval lengths are not perfectly uniform, the mark-and-recapture method is \emph{always} expected to underestimate the number of articles.
