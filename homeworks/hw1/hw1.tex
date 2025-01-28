@@ -140,9 +140,9 @@ random_url = response.url
 \end{verbatim}
 
 \item (4pts) You might notice that your estimate above seems to underestimate Wikipedia's claimed number of articles. A student last year figured out that this is due to the fact that 
-Wikipedia's random article generator does not return \emph{truly uniform} random articles. As discussed \href{https://en.wikipedia.org/wiki/Wikipedia:FAQ/Technical#random}{here}, Wikipedia assigns each article $i$ a random id $r_i$, which we can model as a random real number in $[0, 1]$. Then, to pick a random article, a number is sampled uniformly from $[0, 1]$ article $i$ is return if that number lies in the range $[r_i, r_{i+1}]$. Since these intervals themselves are random, the probability distribution won't be \emph{perfectly} uniform.\\
+Wikipedia's random article generator does not return \emph{truly uniform} random articles. As discussed \href{https://en.wikipedia.org/wiki/Wikipedia:FAQ/Technical#random}{here}, Wikipedia assigns each article $i$ a random id $r_i$, which we can model as a random real number in $[0, 1]$. Then, to pick a random article, a number is sampled uniformly from $[0, 1]$ article $i$ is returned if that number lies in the range $[r_i, r_{i+1}]$. Since these intervals themselves are random, the probability distribution won't be \emph{perfectly} uniform.\\
 
-Prove that, when the interval lengths are not perfectly uniform, the mark-and-recapture method is \emph{always} expected to underestimate the number of articles.
+Prove that, when the interval lengths are not perfectly uniform, the mark-and-recapture will systematically underestimate the number of articles. I.e., it will return an underestimate even as the number of samples $m \rightarrow \infty$.
 
 \item \textbf{Extra Credit -- optional.} (3pts) Show that, if Wikipedia uses the scheme above, we expect that the mark-and-recapture method will systematically underestimate the number of articles by almost exactly a factor of two. We could thus correct for this in our estimate. 
 
