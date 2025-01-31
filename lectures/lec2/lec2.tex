@@ -1,3 +1,4 @@
+%!LW recipe=latexmk-xelatex
 \documentclass[handout,compress]{beamer}
 
 \usetheme[block=fill]{metropolis}
@@ -74,7 +75,7 @@
 %	TITLE PAGE
 %----------------------------------------------------------------------------------------
 
-\title{CS-GY 6763: Lecture 2 \\ Chebyshev's Inequality, Union Bound, Exponential Tail Bounds}
+\title{CS-GY 6763: Lecture 2 \\ Hashing + Fingerprinting, Chebyshev's Inequality}
 \author{NYU Tandon School of Engineering, Prof. Christopher Musco}
 \date{}
 
@@ -141,8 +142,8 @@
 \end{frame}
 
 \begin{frame}
-	\frametitle{definitions of variance}
-	Suppose we have random variables $X_1, \ldots, X_k$. We say that $X_i$ and $X_j$ are \emph{independent} if, for all possible values $v_i, v_j$,
+	\frametitle{definitions of independence}
+	Suppose we have random variables $X_1, \ldots, X_k$. We say that \textbf{a pair of random variables} $X_i$ and $X_j$ are \emph{independent} if, for all possible values $v_i, v_j$,
 	\begin{align*}
 			\Pr[X_i = v_i \text{ and } X_j = v_j] = 	\Pr[X_i = v_i]\cdot \Pr[X_j = v_j].
 	\end{align*}
@@ -158,7 +159,7 @@ We say $X_1, \ldots, X_k$ are \emph{mutually independent} if, for all possible v
 \end{frame}
 
 \begin{frame}[t]
-	\frametitle{definitions of variance}
+	\frametitle{definitions of independence}
 		\begin{center}
 		\textbf{\alert{Give an example of three random variables that are pairwise independent but not mutually independent.}}
 	\end{center}
@@ -170,16 +171,32 @@ We say $X_1, \ldots, X_k$ are \emph{mutually independent} if, for all possible v
 	\begin{align*}
 		\Pr[X_1 = v_1, \ldots, X_k = v_k] = 	\Pr[X_1 = v_1]\cdot\ldots \cdot\Pr[X_k = v_k].
 	\end{align*}
+\end{frame}
 
+\begin{frame}[t]
+	\frametitle{linearity of variance}
+	If we have two independent random variables $X,Y$, then:
+	\begin{align*}
+	\Var[X + Y] = \Var[X] + \Var[Y].
+	\end{align*}
+	\vspace{4.5em}
+
+	If we have a set of pairwise independent\footnote{Technically, pairwise uncorrelated suffices, which is a weaker assumption.} random variables $X_1, \ldots, X_k$ then:\vspace{-1em}
+	\begin{align*}
+		\Var\left[\sum_{i=1}^k X_i\right] = \sum_{i=1}^k\Var[X_i].
+	\end{align*}
+	\begin{center}
+	\textbf{\alert{Mutual independence is not necessary!}}\vspace{1em}
+	\end{center}
 \end{frame}
 
 
 
 	\begin{frame}
-	\frametitle{note on random hash functions}
-	Let $h$ be a \emph{random function} from $|\mathcal{U}| \rightarrow \{1,\ldots, m\}$. This means that $h$ is constructed by an algorithm using a seed of random numbers, but then the function is fixed. Given input $x\in \mathcal{U}$, it always returns the same output, $h(x)$. 
+		\frametitle{uniformly random hash function}
+		Let $h$ be a \emph{random function} from $|\mathcal{U}| \rightarrow \{1,\ldots, m\}$. This means that $h$ is constructed by an algorithm using a seed of random numbers, but then the function is fixed. Given input $x\in \mathcal{U}$, it always returns the same output, $h(x)$. 
 	
-	\textbf{Definition: Uniformly Random Hash Function.} 
+	\textbf{Recall: Uniformly Random Hash Function.} 
 	A random function $h: \mathcal{U}\rightarrow \{1, \ldots, m\}$ is called uniformly random if:
 	\begin{itemize}
 		\item $\Pr[h(x) = i] = \frac{1}{m}$ for all $x\in \mathcal{U}$, $i\in \{1,\ldots, m\}$.  
@@ -187,7 +204,9 @@ We say $X_1, \ldots, X_k$ are \emph{mutually independent} if, for all possible v
 		\item $h(x), h(y), h(z), \ldots$ are mutually independent random variables for all $x,y,z, \ldots \in \mathcal{U}$. 
 		\begin{itemize}
 			\vspace{.5em}
-			\item Which implies that $\Pr[h(x) = h(y)] = $ 
+			\item Which implies that $\Pr[h(x) = h(y)] = $ \vspace{2em}
+			\item Which implies that $\Pr[h(x) = h(y) = h(z)] = $ 
+
 		\end{itemize}
 	\end{itemize}
 	
@@ -198,7 +217,7 @@ We say $X_1, \ldots, X_k$ are \emph{mutually independent} if, for all possible v
 \end{frame}
 
 	\begin{frame}[t]
-	\frametitle{note on random hash functions}
+	\frametitle{uniformly random hash function}
 	\begin{center}
 	The only way to implement a \emph{truly} random hash function is to create a giant lookup table, where the numbers on the right are chosen independently at random from $\{1, \ldots, m\}$. 
 	
@@ -217,7 +236,7 @@ If we're hashing 35 char ASCII strings (e.g. urls) the length of the table is \e
 	\end{frame}
 
 	\begin{frame}[t]
-	\frametitle{note on random hash functions}
+	\frametitle{universal hash functions}
 	For the application to CountMin from last class we can weaken our assumption that $h$ is uniformly random.
 	\begin{definition}[Universal hash function]
 		A random hash function $h: \mathcal{U} \rightarrow \{1, \ldots, m\}$ is \emph{universal} if, for any fixed $x,y\in \mathcal{U}$,
@@ -230,8 +249,8 @@ If we're hashing 35 char ASCII strings (e.g. urls) the length of the table is \e
 \end{frame}
 
 	\begin{frame}
-	\frametitle{note on random hash functions}
-	\begin{definition}[Universal hash function]
+		\frametitle{universal hash functions}
+		\begin{definition}[Universal hash function]
 		A random hash function $h: \mathcal{U} \rightarrow \{1, \ldots, m\}$ is \emph{universal} if, for any fixed $x,y\in \mathcal{U}$,\vspace{-1.5em}
 		\begin{align*}
 			\Pr[h(x) = h(y)] \leq \frac{1}{m}.
@@ -241,7 +260,7 @@ If we're hashing 35 char ASCII strings (e.g. urls) the length of the table is \e
 	\begin{align*}
 		h(x) = \left[a\cdot x + b \pmod{p}\right] \pmod{m}
 	\end{align*} 
-	is universal. Lecture notes with proof posted on website. 
+	is universal. Lecture notes with proof posted on website. Requires some abstract algebra.
 	
 	\begin{center}
 	\textbf{How much space does this hash function take to store?}
@@ -249,35 +268,306 @@ If we're hashing 35 char ASCII strings (e.g. urls) the length of the table is \e
 \end{frame}
 
 \begin{frame}[t]
-	\frametitle{note on random hash functions}
+	\frametitle{limited independence hash functions}
 Similar alternative definition:
 	\begin{definition}[Pairwise independent hash function]
 		A random hash function $h: \mathcal{U} \rightarrow \{1, \ldots, m\}$ is pairwise independent if, for any fixed $x,y\in \mathcal{U}, i,j \in \{1\ldots, m\}$,
 		\begin{align*}
-			\Pr[h(x) = i \cap h(y) = j] = \frac{1}{m^2}.
+			\Pr[h(x) = i \text{ and } h(y) = j] = \frac{1}{m^2}.
 		\end{align*}
 	\end{definition}
-\vspace{-1em}
-Basically same construction as universal hash, except we don't restrict $a \neq 0$ and need to be careful about rounding.
+Basically same construction as universal hash, except we don't restrict $a \neq 0$ and $m$ to be a prime power.
 
-	Can naturally be extended to $k$-wise independence for $k > 2$, which is strictly stronger, and needed for some applications. 
-	\begin{align*}
-		\Pr[h(u_1) = v_1 \cap h(u_2) = v_2 \cap \ldots h(u_k) = v_k] = \frac{1}{m^k}, 
-	\end{align*}
-for all $u_1, \ldots, u_k \in \mathcal{U}$ and $v_1, \ldots, v_k \in \{1, \ldots, m\}$.
+\textbf{Claim:} A pairwise independent hash-function is universal. 
+
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{limited independence hash functions}
+	\begin{definition}[$k$-wise independent hash function]
+		A random hash function $h: \mathcal{U} \rightarrow \{1, \ldots, m\}$ is $k$-wise independent if, for any fixed $x,y\in \mathcal{U}, i,j \in \{1\ldots, m\}$,
+		\begin{align*}
+			\Pr[h(u_1) = v_1 \text{ and } h(u_2) = v_2 \text{ and } \ldots h(u_k) = v_k] = \frac{1}{m^k}, 	
+		\end{align*}
+		for all $u_1, \ldots, u_k \in \mathcal{U}$ and $v_1, \ldots, v_k \in \{1, \ldots, m\}$.
+	\end{definition}
+
+Strictly stronger than pairwise independence and needed for some applications. But we will never need $k > O(\log n)$ in this class. 
+
+\textbf{Example:} For random coefficients $c_0, \ldots, c_k \in \{0, \ldots, p\}$,
+\begin{align*}
+	h(x) = \left[c_0 + c_1 x + c_2 x^2 + \ldots c_k x^k \pmod{p}\right] \pmod{m}
+\end{align*}
+\end{frame}
+
+
+
+\begin{frame}
+	\frametitle{pseudorandom hash functions}
+	We won't prove that random polynomials provide good hash functions, but I want to give a flavor of what is involved (e.g., why do prime numbers show up?).
 \end{frame}
 
 \begin{frame}
-	\frametitle{lecture road map}
-	Last week we saw the power of \emph{Linearity of Expectation} + \emph{Markov's}. This week we will discuss four more tools:
+	\frametitle{fingerprinting}
+	\textbf{Goal:} Construct a compact ``fingerprint'' $h(f)$ for any given file $f$ with two properties:
+	\begin{itemize}
+		\item The fingerprints $h(f_1)$ and $h(f_2)$ should be different with high probability if the contents of $f_1$ and $f_2$ differ at all. 
+		\item If the contents of $f_1$ and $f_2$ are identical, we should have $h(f_1) = h(f_2)$.
+	\end{itemize}
+	\begin{center}
+		\includegraphics[width=.75\textwidth]{finger_print.png}
+	\end{center}
+	\begin{center}
+	(Basically the same goal as most applications of hashing.)
+	\end{center}
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{applications of finger printing}
+	\begin{itemize} 
+		\item Quickly check if two versions of the same file are identical (e.g. in version control systems like Git). Do not need to communicate the entire file between servers. Also used in webcaching and content delivery networks. 
+		\item Check that a file pieced together from multiple parts is not missing anything. 
+	\end{itemize}
+	
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{applications of finger printing}
+	\begin{center}
+		\includegraphics[width=\textwidth]{redfin_1.png}
+	\end{center}
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{applications of finger printing}
+	\begin{center}
+		\includegraphics[width=\textwidth]{redfin_2.png}
+	\end{center}
+	
+	Fingerprints used as file names for the images to make sure we did not reupload new images that we already had, and to detect duplicate images and listings.
+\end{frame}
+
+\begin{frame}
+	\frametitle{fingerprinting}
+	\textbf{Goal:} Construct a compact ``fingerprint'' function $h(f)$ such that:
+	\begin{itemize}
+		\item $h(f_1) \neq h(f_2)$ if $f_1 \neq f_2$ with high probability.
+	\end{itemize}
+\vspace{1em}
+	Ideally, length of $h(f_1)$ (i.e. the size of the integers hashed to) is much less than the file size. 
+\end{frame}
+
+\begin{frame}
+	\frametitle{random fingerprinting}
+	\textbf{Rabin Fingerprint (1981)}: Let file $f = 010\ldots1101$ of length $n$ be interpreted as an $n$ bit integer. So something between $0$ and $2^n$. 
+	
+	\textbf{Construct $h$ randomly:} Choose random prime number $p$  between $2$ and $tn\log(tn)$ for a constant $t$.
+	\begin{align*}
+		h(f) = f \pmod{p}.
+	\end{align*} 
+	
+	\begin{center}
+		How many bits does $h(f)$ take to store?
+	\end{center}
+	
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{random fingerprinting}
+	\begin{align*}
+		h(f) = f \pmod{p} \text{\hspace{1em} for random prime } p\in \{2, \ldots, tn\log(tn)\}
+	\end{align*} 
+	\textbf{Claim:} If $f_1\neq f_2$ then $h(f_1) = h(f_2)$ with probability  $\leq \frac{2}{t}$.
+	\vspace{3em}
+	
+	Since our fingerprint only takes $O(\log n + \log t)$ space,   we can  set $t$ to be \emph{super large}, so effectively the probability of $h(f_1)$ and $h(f_2)$ colliding is negligible for all real-world applications.
+	
+	E.g. set fingerprint length to $\log n + 28$ bits and you are more likely to win Megamillions.
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{random fingerprinting}
+	How do we sample a random prime between $2,\ldots, tn\log n$?
+
+
+	Keep in mind that $n$ is pretty large here. For a 200kb image, $n \approx 1.6$ million. 
+\end{frame}
+
+% \begin{frame}
+% 	\frametitle{prime number checking}
+% 	\begin{center}
+% 		\textbf{\alert{One of the most famous applications of randomness in algorithm design.}}
+% 	\end{center}
+% 	\textbf{Computational Problem:} Given a number $x$, is $x$ prime? 
+	
+% 	\textbf{Recall:} 
+% 	\begin{itemize}
+% 		\item A number is prime if it can only be divided evenly by $1$ and itself. 
+% 		\item The first few primes are $2,3,5,7,11,13, 17, 19,\ldots$.
+% 		\item Is 2023 prime?
+% 		\item What about 49301977064557719291?
+% 	\end{itemize}
+% 	\textbf{How would you design a generic algorithm to check?}
+% \end{frame}
+
+% \begin{frame}
+% 	\frametitle{prime number checking}
+% 	Suppose we have an integer represented as a length $n$ binary string. 
+% 	\begin{align*}
+% 		x = 0110100010110101\ldots1010001110
+% 	\end{align*}
+% The naive prime checking algorithm runs in $O(2^n)$ time. 
+
+% NYU Greene Super Computer has $~ 2$ petaFLOPS of throughput. When $n = 128$, would need 1 million Greene Super computers running for 1 million years to check is $x$ is prime. 
+% \end{frame}
+
+% \begin{frame}
+% 	\frametitle{randomized primality test}
+% 	\textbf{Miller-Rabin 1976, 1980:} There is a \emph{randomized} algorithm running in $O(n^3 \log_2(1/\delta))$ time that, with probability $1-\delta$ determines if an $n$-bit integer $x$ is prime.  
+% 	\begin{itemize}
+% 		\item $n = 128$
+% 		\item $\delta = 10^{-9}$ (chance of winning the Powerball Jackpot)
+% 		\item $n^3\log_2(1/\delta) \approx 60$ million operations.
+% 	\end{itemize}
+% 	Could check in $< .1$ second on my laptop.
+% 	\begin{center}
+% 		\large \alert{\textbf{This was a really big break through!}}
+% 	\end{center}
+% \end{frame}
+
+% \begin{frame}
+% 	\frametitle{randomized primality test}
+% 	Took over 20 more years to find a \emph{deterministic} polynomial time primality test.
+% 	\begin{center}
+% 		\includegraphics[width=\textwidth]{primes_in_p.png}
+% 	\end{center}
+% \end{frame}
+
+
+\begin{frame}
+	\frametitle{from prime testing to prime generation}
+	\textbf{Rejection sampling:}
+	\begin{itemize}
+		\item Pick a random $q$ bit number. 
+		\item Check if it's prime. Can be done in $O(q^3)$ time.
+		\item If not, repeat.
+	\end{itemize}
+	Here we would have $q \approx \log(tn\log n) \approx 48$ for the example above. So each iteration is efficient, but is this efficient overall?
+	\begin{center}
+		\emph{Roughly how many tries do you expect this to take?}
+	\end{center}
+\end{frame}
+
+\begin{frame}
+	\frametitle{prime number theorem}
+ Let $\pi(x)$ denote the number of primes less than some integer $x$. 	\textbf{Informally:}
+	\vspace{-.5em}
+	\begin{align*}
+		\pi(x) \sim \frac{x}{\ln(x)}
+	\end{align*}
+	\vspace{-1em}
+	
+	\begin{center}
+		\includegraphics[width=.6\textwidth]{prime_number_theorem.png}
+	\end{center}
+\end{frame}
+
+\begin{frame}
+	\frametitle{prime number theorem}
+	\textbf{Formally:}	For $x > 17$,
+	\begin{align*}
+		\frac{x}{\ln(x)} \leq	\pi(x) \leq \frac{x}{\ln(x) - 4}
+	\end{align*}
+	
+	So if we select a random $q = 48$ bit number, the chance that it is prime is great than:
+	\begin{align*}
+		\frac{1}{\ln(2^{q})} \geq \frac{1}{34}
+	\end{align*} 
+	After a few hundred tries, we will almost definitely find a prime number. \textbf{In general, need $O(q)$ tries in expectation to find a prime with $q$ bits.}
+
+	\textbf{Remark:} Finding large prime numbers is important in some other applications beyond hashing.
+\end{frame}
+
+
+
+\begin{frame}[t]
+	\frametitle{random fingerprinting}
+	\begin{align*}
+		h(f) = f \pmod{p} \text{\hspace{1em} for prime } p\in \{2, \ldots, tn\log(tn)\}
+	\end{align*} 
+	\textbf{Claim:} If $f_1\neq f_2$ then $h(f_1) = h(f_2)$ with probability $\leq \frac{2}{t}$.
+	\vspace{3em}
+	
+	\textbf{First observation:} If $h(f_1) = h(f_2)$, then:
+	\begin{align*}
+		(f_1 - f_2) \pmod{p} = 0. 
+	\end{align*}
+	In other words, we only fail  \emph{if $|f_1 - f_2|$ is divisible by $p$}.
+	
+	
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{random fingerprinting}
+	\textbf{Question:} What is the chance that $|f_1 - f_2|$ is divisible by a random prime $p\in \{2, \ldots, tn\log(tn)\}$?
+	
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{random fingerprinting}
+	\textbf{Number of distinct prime factors of $f_1 - f_2$}: At most $n$.
+	\vspace{1em}
+	
+	\textbf{Number of primes between $\{2, \ldots, tn\log(tn)\}$}: At least $\frac{tn\log(tn)}{\log(tn\log(tn))}$ via prime number theorem.
+	
+	\vspace{-.25em}
+	\begin{center}
+		\includegraphics[width=.8\textwidth]{number_line.png}
+	\end{center}
+	\vspace{-.25em}
+Chance we pick a prime factor of $f_1 - f_2$ is less than:
+	\begin{align*}
+		\frac{n}{\frac{tn\log(tn)}{\log(tn\log(tn))}} =  \frac{\log(tn\log(tn))}{t\log(tn)} \leq \frac{2\log(tn)}{t\log(tn)}
+	\end{align*}	
+	
+\end{frame}
+
+
+\begin{frame}[t]
+	\frametitle{random fingerprinting}
+	\textbf{Conclusion:} The chance that a \emph{random} prime $p\in \{2, \ldots, tn\log(tn)\}$ is a factor of $|f_1 - f_2|$ is $\leq \frac{2}{t}$.
+	
+	So, for two files $f_1 \neq f_2$, the chance that $h(f_1) = h(f_2) \leq \frac{2}{t}$.
+	\vspace{2em}
+	
+	Set $t = 2^{28}$ (the chance you win Megamillions).
+	
+	\textbf{Fingerprint size:} At most $2\log_2(nt) = 2\log_2(n) + 2\log_2(2^{28})$ bits. 
+	
+	Suppose we are fingerprinting $200$kb image files. $n \approx 1,600,000$, so our fingerprint has size:
+	\begin{align*}
+		\alert{\mathbf{96}}\text{ \textbf{\alert{bits}}}
+	\end{align*}
+	
+	This amounts to a \emph{17,000x reduction} over sending and comparing the original files.
+\end{frame}
+
+
+
+\begin{frame}
+	\frametitle{remainder of lecture}
+	Last week we saw the power of \emph{Linearity of Expectation} + \emph{Markov's}. This week we will discuss two more tools:
 	\begin{itemize}
 		\item \emph{Linearity of Variance} + \emph{Chebyshev's Inequality}
-		\item \emph{Union Bound} + \emph{Exponential Tail Bounds}
+	\end{itemize}
+	Next week:
+	\begin{itemize}
+	\item \emph{Union Bound} + \emph{Exponential Tail Bounds}
 	\end{itemize}
 	\begin{center}
 		\includegraphics[width=.5\textwidth]{4function.png}
 		
-		\textbf{\alert{These six simple tools combined are surprising powerful and flexible. They form the cornerstone of randomized algorithm design.}}
+		\textbf{\alert{These six tools combined are surprising powerful and flexible. They form the cornerstone of randomized algorithm design.}}
 	\end{center}
  \end{frame}
 
@@ -341,7 +631,7 @@ for all $u_1, \ldots, u_k \in \mathcal{U}$ and $v_1, \ldots, v_k \in \{1, \ldots
 \begin{frame}
 	\frametitle{quick example}
 	\begin{center}
-	\textbf{If I flip a fair coin $100$ times, show that with $93\%$ chance I get between $30$ and $70$ heads?}
+	\textbf{If I flip a fair coin $100$ times, show that with $> 93\%$ chance I get between $30$ and $70$ heads.}
 	\end{center}
 	Let $C_1, \ldots, C_{100}$ be independent random variables that are $1$ with probability $1/2$, $0$ otherwise.
 
@@ -357,19 +647,19 @@ for all $u_1, \ldots, u_k \in \mathcal{U}$ and $v_1, \ldots, v_k \in \{1, \ldots
 \vspace{4em}
 \end{frame}
 
-\begin{frame}
-	\frametitle{linearity of variance}
-	\textbf{Fact:} For \emph{pairwise independent}\footnote{Technically, pairwise uncorrelated suffices, which is a slightly weaker assumption.} random variables $X_1, \ldots, X_m$, 
-	\begin{align*}
-		\Var[X_1 + X_2 + \ldots + X_m] = 	\Var[X_1]+ \Var[X_2] + \ldots + \Var[X_m]. 
-	\end{align*}
-I.e., we require that for any $i,j$ $X_i$ and $X_j$ are independent. 
+% \begin{frame}
+% 	\frametitle{linearity of variance}
+% 	\textbf{Recall:} For \emph{pairwise independent}\footnote{Technically, pairwise uncorrelated suffices, which is a slightly weaker assumption.} random variables $X_1, \ldots, X_m$, 
+% 	\begin{align*}
+% 		\Var[X_1 + X_2 + \ldots + X_m] = 	\Var[X_1]+ \Var[X_2] + \ldots + \Var[X_m]. 
+% 	\end{align*}
+% I.e., we require that for any $i,j$ $X_i$ and $X_j$ are independent. 
 
-This is strictly weaker than \emph{mutual independence}, which requires that for all possible values $v_1, \ldots, v_k$,
-\begin{align*}
-	\Pr[X_1 = v_1, \ldots, X_k = v_k] = 	\Pr[X_1 = v_1]\cdot\ldots \cdot\Pr[X_k = v_k].
-\end{align*}
-\end{frame}
+% This is strictly weaker than \emph{mutual independence}, which requires that for all possible values $v_1, \ldots, v_k$,
+% \begin{align*}
+% 	\Pr[X_1 = v_1, \ldots, X_k = v_k] = 	\Pr[X_1 = v_1]\cdot\ldots \cdot\Pr[X_k = v_k].
+% \end{align*}
+% \end{frame}
 
 \begin{frame}
 	\frametitle{quick example}
@@ -380,7 +670,7 @@ This is strictly weaker than \emph{mutual independence}, which requires that for
 	
 	Let $H = \sum_{i=1}^{100} C_i$ be the number of heads that get flipped.	
 	
-	$\Var[H] = 25$.  
+	$\E[H] = 50$,  $\Var[H] = 25$.  
 	
 	\textbf{Chebyshev's:}
 
@@ -404,7 +694,7 @@ This is strictly weaker than \emph{mutual independence}, which requires that for
 
 
 \begin{frame}
-	\frametitle{streaming algorithms}
+	\frametitle{applications of chebyshevs inequality}
 	\textbf{Abstract architecture of a streaming algorithm:} 
 	
 	Have massive dataset $X = {x_1, \ldots, x_n}$ with $n$ pieces of data that arrive in a sequential stream. There is far too much data to store or process it in a single location.
@@ -447,6 +737,7 @@ This is strictly weaker than \emph{mutual independence}, which requires that for
 		\textbf{Applications}:
 			\begin{itemize}
 				\item Distinct users hitting a webpage. 
+				\item Distinct users using a new feature or UI in a certain way.
 				\item Distinct values in a database column (e.g. for estimating the size of group by queries)
 				\item Number of distinct queries to a search engine.
 				\item Distinct motifs in DNA sequence.
@@ -470,7 +761,7 @@ This is strictly weaker than \emph{mutual independence}, which requires that for
 	Store a dictionary of all items seen so far. Takes $O(D)$ space. We will aim to do a lot better than that. 
 	
 	\vspace{1em}
-	\textbf{Goal:} Return $\tilde{D}$ satisfying $(1-\epsilon) D \leq \tilde{D} \leq (1+\epsilon) D$ and only used $O(1/\epsilon^2)$ space.
+	\textbf{Goal:} Return $\tilde{D}$ satisfying $$(1-\epsilon) D \leq \tilde{D} \leq (1+\epsilon) D$$ using only $O(1/\epsilon^2)$ space.
 
 \end{frame}
 
@@ -536,6 +827,19 @@ This is strictly weaker than \emph{mutual independence}, which requires that for
 	\includegraphics[width=.75\textwidth]{better_minhash_cut.png}
 	\end{center}
 \end{frame}
+
+\begin{frame}
+	\frametitle{visualization}
+	\begin{center}
+	\includegraphics[width=.75\textwidth]{minhash_final_dist.png}
+	\end{center}
+	\textbf{Important:} If $\mathcal{U} \rightarrow [0,1]$ uniformly at random, we can assume that there are \emph{no collisions}. If we instead used a discrete grid, it would suffice to use a hash table of size $O(D^2)$ or, conservatively, ${O}(|\mathcal{U}|^2)$. \vspace{1em}
+	
+	We will not do a formal analysis, but roughly how many bits does $S$ takes to store?
+\end{frame}
+
+
+
 
 
 \begin{frame}
@@ -622,6 +926,17 @@ This is strictly weaker than \emph{mutual independence}, which requires that for
 \end{frame}
 
 \begin{frame}
+\frametitle{$\epsilon$ manipulation tricks}
+\textbf{Recall:}
+\begin{align*}
+	1+\epsilon \leq \frac{1}{1-\epsilon} \leq 1+ 2\epsilon \text{ for } \epsilon \in [0,.5].
+\end{align*}
+\begin{align*}
+	1-\epsilon \leq \frac{1}{1+\epsilon} \leq 1 - .5\epsilon \text{ for } \epsilon \in [0,1].
+\end{align*}
+\end{frame}
+
+\begin{frame}
 	\frametitle{calculus proof}	
 	\begin{lemma}
 	$\Var[S] = \E [S^2] - \E[S]^2= \frac{2}{(D+1)(D+2)} - \frac{1}{(D+1)^2} \leq \frac{1}{(D+1)^2}$.
@@ -635,7 +950,7 @@ This is strictly weaker than \emph{mutual independence}, which requires that for
 	\end{align*}
 	
 	\small
-	\url{www.wolframalpha.com/input/?i=integral+from+0+to+1+of+\%281-sqrt\%28x\%29\%29\%5ED}
+	\url{www.wolframalpha.com/input?i=antiderivative+of+\%281-sqrt\%28x\%29\%29\%5ED}
 \end{frame}
 
 \begin{frame}
@@ -650,10 +965,11 @@ This is strictly weaker than \emph{mutual independence}, which requires that for
 
 \begin{frame}
 	\frametitle{fm analysis}
+	Recall we want to show that, with high probability, $(1-\epsilon) \E[S] \leq S \leq (1-\epsilon) \E[S]$. \vspace{1em}
 	\begin{itemize}
-		\item $\E[S] = \frac{1}{D+1} = \mu.$
-		\item $\Var[S] \leq \frac{1}{(D+1)^2} = \mu^2$. Standard deviation: $\sigma \leq \mu$.
-		\item Want to bound $\Pr[|S - \mu| \geq \epsilon \mu] \leq \delta$.
+		\item $\E[S] = \frac{1}{D+1} = \mu.$ \vspace{.5em}
+		\item $\Var[S] \leq \frac{1}{(D+1)^2} = \mu^2$. Standard deviation: $\sigma \leq \mu$. \vspace{.5em}
+		\item Want to bound $\Pr[|S - \mu| \geq \epsilon \mu] \leq \delta$. \vspace{.5em}
 	\end{itemize}
 	
 	\textbf{Chebyshev's}: $\Pr[|S - \mu| \geq \epsilon \mu] = \Pr[|S - \mu| \geq \epsilon \sigma] \leq \frac{1}{\epsilon^2}$.
@@ -737,10 +1053,10 @@ This is strictly weaker than \emph{mutual independence}, which requires that for
 	$\alert{O\left(\frac{1}{\epsilon^2\delta}\right)}$ space is an impressive bound:
 	\begin{itemize}
 		\item $1/\epsilon^2$ dependence cannot be improved.
-		\item No linear dependence on number of distinct elements $D$.\footnote{Technically, we need to store the hash functions $h_1, \ldots, h_k$, which each take $O(\log |\mathcal{U}|) \geq O(\log |\mathcal{D}|)$ space. So if we are more careful, the space complexity is $O\left(\frac{\log D}{\epsilon^2\delta}\right)$.}
+		\item No linear dependence on number of distinct elements $D$.\footnote{Technically, if we account for the bit complexity of storing $S_1, \ldots, S_k$ and the hash functions $h_1, \ldots, h_k$, the space complexity is $O\left(\frac{\log D}{\epsilon^2\delta}\right)$.}
 		\item But... $1/\delta$ dependence is not ideal. For $95\%$ success rate, pay a $\frac{1}{5\%} = 20$ factor overhead in space. 
 	\end{itemize}
-We can get a better bound depending on $O(\log(1/\delta))$ using \emph{exponential tail bounds.}
+We can get a better bound depending on $O(\log(1/\delta))$ using \emph{exponential tail bounds.} We will see next lecture.
 \end{frame}
 
 \begin{frame}
@@ -785,15 +1101,16 @@ We can get a better bound depending on $O(\log(1/\delta))$ using \emph{exponenti
 \begin{frame}
 	\frametitle{hyperloglog in practice}
 	\begin{center} 
-		Although, to be fair, storing a dictionary with $1$ billion bits only takes 125 megabytes. No tiny, but not unreasonable.
+		Although, to be fair, storing a dictionary with $1$ billion bits only takes 125 megabytes. Not tiny, but not unreasonable.
 		
 		\includegraphics[width=\textwidth]{google_bit_calculations.png}
 	\end{center}
-	The real value in distinct elements sketches is in more complex applications than a simple stream.
+	These estimators become more important when you want to count \emph{many} different things (e.g., a software company tracking clicks on 100s of UI elements).
 \end{frame}
 
 \begin{frame}
 	\frametitle{distributed distinct elements}
+	Also very important in distributed settings. 
 	\begin{center}
 		\includegraphics[width=\textwidth]{dist_min_hash.png}
 	\end{center}
@@ -835,640 +1152,13 @@ We can get a better bound depending on $O(\log(1/\delta))$ using \emph{exponenti
 %	much as 525 trillion cells in (hypothetical) full scans.''
 %\end{frame}
 
-\begin{frame}[standout]
-	\begin{center}
-		break
-	\end{center}
-\end{frame}
+% \begin{frame}[standout]
+% 	\begin{center}
+% 		break
+% 	\end{center}
+% \end{frame}
 
 
-\begin{frame}
-	\frametitle{load balancing}
-	\textbf{Load balancing problem:}
-	
-	Suppose Google answers map search queries using servers $A_1, \ldots, A_q$. Given a query like ``new york to rhode island'', common practice is to choose a random hash function $h \rightarrow \{1\ldots, q\}$ and to route this query to server:
-	\begin{align*}
-		A_{h(\text{``new york to rhode island'})}
-	\end{align*}
-
-	\textbf{Goal:} Ensure that requests are distributed evenly, so no one server gets loaded with too many requests. We want to avoid  downtime and slow responses to clients. 
-	
-	\begin{center}
-		\alert{\textbf{Why use a hash function instead of just distributing requests randomly?}}
-	\end{center}
-	
-
-\end{frame}
-
-\begin{frame}
-	\frametitle{load balancing}
-	Suppose we have $n$ servers and $m$ requests, $x_1,\ldots, x_m$. Let $s_i$ be the number of requests sent to server $i \in \{1,\ldots, n\}$ :
-	\begin{align*}
-		s_i = \sum_{j=1}^m \mathbbm{1}[h(x_j) = i]. 
-	\end{align*}
-	
-	Formally, our goal is to understand the value of maximum load on any server, which can be written as the random variable:
-	\begin{align*}
-		S = \max_{i\in \{1,\ldots, n\}} s_i.
-	\end{align*}	
-\end{frame}
-
-\begin{frame}
-	\frametitle{load balancing}
-	A good first step in any analysis of random variables is to first think about expectations. 
-	If we have $n$ servers and $m$ requests, for any $i\in \{1,\ldots, n\}$:
-	\begin{align*}
-		\E[s_i] = \sum_{j=1}^m \E\left[\mathbbm{1}[h(x_j) = i]\right] = \frac{m}{n}.
-	\end{align*}
-	
-	But it's very unclear what the expectation of $S = \max_{i\in \{1,\ldots, n\}} s_i$ is... in particular, $\E[S] \alert{\neq} \max_{i\in \{1,\ldots, n\}} \E[s_i]$. 
-	
-	\textbf{Exercise:} Convince yourself that for two random variables $A$ and $B$, $\E[\max(A,B)] \neq \max(\E[A], \E[B])$ even if those random variable are independent. 
-\end{frame}
-
-\begin{frame}
-	\frametitle{simplifying assumptions}
-	\textbf{Number of servers:} To reduce notation and keep the math simple, let's assume that $m = n$. I.e., we have exactly the same number of servers and requests. 
-	
-	\textbf{Hash function:} Continue to assume a fully (uniformly) random hash function $h$.
-	
-	\begin{center}
-		\includegraphics[width=.8\textwidth]{balls_into_bins.png}
-		
-		Often called the ``balls-into-bins'' model. 
-	\end{center}
-	
-	$\E[s_i] = $ expected number of balls per bin $=\frac{m}{n} = 1$. We would like to prove a bound of the form:
-	\begin{align*}
-		\Pr[\max_i s_i \geq C] \leq \frac{1}{10}. 
-	\end{align*}
-	for as tight a value of $C$. I.e., something much better than $C = n$. 
-\end{frame}
-
-\begin{frame}
-	\frametitle{bounding a union of events}
-	\textbf{Goal:} Prove that for some $C$,
-	\begin{align*}
-		\Pr[\max_i s_i \geq C] \leq \frac{1}{10}. 
-	\end{align*}
-	 $\cap$ means ``and''. $\cup$ means ``or''.
-	
-	\textbf{Equivalent statement:} Prove that for some $C$, 
-	\begin{align*}
-		\Pr[(s_1 \geq C) \cup (s_2 \geq C) \cup \ldots \cup (s_n \geq C)] \leq \frac{1}{10}. 
-	\end{align*}
-	
-	\begin{center}
-		\textbf{\alert{Need to bound the probability of a \emph{union} of different events.}}
-		
-		These events are not independent!!
-	\end{center}
-	
-	\vspace{1em}
-	\begin{block}{\vspace*{-3ex}}
-		\small $n = $ number of balls and number of bins. $s_i$ is number of balls in bin $i$. $C =$ upper bound on maximum number of balls in any bin.
-	\end{block}
-\end{frame}
-
-\begin{frame}
-	\frametitle{use a union bound}
-	\begin{lemma}[Union Bound]
-		For \emph{any} random events $A_1, \ldots, A_k$:
-		\begin{align*}
-			\Pr[A_1 \cup A_2 \cup \ldots \cup A_k] \leq \Pr[A_1] + \Pr[A_2] + \ldots +\Pr[A_k].
-		\end{align*}
-	\end{lemma}
-	\begin{center}
-		\includegraphics[width=.8\textwidth]{union_bound_proof.png}
-	\end{center}
-We will prove formally in a few slides.
-\end{frame}
-
-%\begin{frame}
-%	\frametitle{proof of union bound}
-%	\begin{lemma}[Union Bound]
-%		For \emph{any} random events $A_1, \ldots, A_k$:
-%		\begin{align*}
-%			\Pr[A_1 \cup A_2 \cup \ldots \cup A_k] \leq \Pr[A_1] + \Pr[A_2] + \ldots +\Pr[A_k].
-%		\end{align*}
-%	\end{lemma}
-%	Just use linearity of expectation!
-%	\begin{align*}
-%		\Pr[A_1 \cup A_2 \cup \ldots \cup A_k] &= \E[\max(\mathbbm{1}[A_1], \ldots, \mathbbm{1}[A_k])]\\
-%		&\leq  \E[\mathbbm{1}[A_1] + \ldots + \mathbbm{1}[A_k]]\\
-%		&= \E[\mathbbm{1}[A_1]] + \ldots + \E[\mathbbm{1}[A_k]]\\
-%		& = \Pr[A_1] + \ldots +\Pr[A_k].
-%	\end{align*}
-%\end{frame}
-
-\begin{frame}
-	\frametitle{application of union bound}
-	We want to prove that:
-	\begin{align*}
-		\Pr[\max_i s_i \geq C] = \Pr[(s_1 \geq C) \cup (s_2 \geq C) \cup \ldots \cup (s_n \geq C)] \leq \frac{1}{10}. 
-	\end{align*}
-	
-	\alert{To do so, it suffices to prove that for all $i$:
-		\begin{align*}
-			\Pr[s_i \geq C] \leq \frac{1}{10n}. 
-	\end{align*}}
-	Why? Because then by the union bound, 
-	\begin{align*}
-		\Pr[\max_i s_i \geq C] &\leq \sum_{i=1}^n \Pr[s_i \geq C] \text{\hspace{1em}\blue{(Union bound)}}\\
-		&\leq \sum_{i=1}^n \frac{1}{10n} = \frac{1}{10}. \qed
-	\end{align*}
-	
-
-	\begin{block}{\vspace*{-3ex}}
-		\small $n = $ number of balls and number of bins. $s_i$ is number of balls in bin $i$.
-	\end{block}
-\end{frame}
-
-\begin{frame}
-	\frametitle{new goal}
-	Prove that for some $C$, 
-	\begin{align*}
-		\Pr[s_i \geq C] \leq \frac{1}{10n}. 
-	\end{align*}
-	
-	\begin{center}
-		This should look hard! We need to prove that $s_i < C$ (i.e. the $i^\text{th}$ bin has a small number of balls) with \emph{very high} probability (specifically $1- \frac{1}{10n})$. 
-		
-		\alert{\textbf{Markov's inequality is too weak of a bound for this.}}
-	\end{center}
-	
-	\vspace{2em}
-	\begin{block}{\vspace*{-3ex}}
-		\small $n = $ number of balls and number of bins. $s_i$ is number of balls in bin $i$. $C =$ upper bound on maximum number of balls in any bin.
-	\end{block}
-\end{frame}
-
-
-%\begin{frame}
-%	\frametitle{attempt with markov's inequality}
-%	\vspace{1em}
-%	\textbf{Goal:} Prove that $\Pr[s_i \geq C] \leq \frac{1}{10n}$. 
-%	\begin{itemize}
-%		\item \textbf{Step 1.} Verify we can apply Markov's: $s_i$ takes on non-negative values only. Good to go!
-%		\item \textbf{Step 2.} Apply Markov's: $\Pr[s_i \geq C] \leq \frac{\E[s_i]}{C} = \frac{1}{C}$. 
-%	\end{itemize}
-%	To prove our target statement, need to see $C = 10n$. 
-%	
-%	\emph{Meaningless!} There are only $n$ balls, so of course there can't be more than $10n$ in the most overloaded bin. 
-%	
-%	\vspace{2em}
-%	\begin{block}{\vspace*{-3ex}}
-%		\small $n = $ number of balls and number of bins. $s_i$ is number of balls in bin $i$. $\E[s_i] = 1$. $C =$ upper bound on maximum number of balls in any bin. \textbf{Markov's inequality}: for positive r.v. $X$, $\Pr[X \geq t] \leq \E[X]/t$.  
-%	\end{block}
-%\end{frame}
-
-\begin{frame}
-	\frametitle{application to balls into bins}
-	\textbf{Goal:} Prove that $\Pr[s_i \geq C] \leq \frac{1}{10n}$. 
-	\begin{itemize}
-		\item \textbf{Step 1.} To apply Chebyshev's inequality, we need to understand $\sigma^2 = \Var[s_i]$. 
-	\end{itemize}
-	Use \emph{linearity of variance}. Let $s_{i,j}$ be a $\{0,1\}$ indicator random variable for the event that ball $j$ falls in bin $i$. We have:
-	\begin{align*}
-		s_i = \sum_{j=1}^n s_{i,j}. 
-	\end{align*}
-	And $s_{i,1}, \ldots, s_{i,n}$ are  independent so:
-	\begin{align*}
-		\Var[s_i] = \sum_{j=1}^n \Var[s_{i,j}]. 
-	\end{align*}
-	
-	\vspace{0em}
-	\begin{block}{\vspace*{-3ex}}
-		\small $n = $ number of balls and number of bins. $s_i$ is number of balls in bin $i$. $\E[s_i] = 1$. $C =$ upper bound on max number of balls in bin. 
-	\end{block}
-\end{frame}
-
-\begin{frame}
-	\frametitle{variance analysis}
-
-	\begin{align*}
-		s_{i,j} = \begin{cases}
-			1 \text{ with probability } \frac{1}{n}\\
-			0 \text{ otherwise}.
-		\end{cases}
-	\end{align*}
-	\begin{align*}
-		\E[s_{i,j}] &= \hspace{10em}\\
-		\E[s_{i,j}^2] &=  \hspace{10em}
-	\end{align*}
-	So:
-	\begin{align*}
-		\Var[s_{i,j}] = \E[s_{i,j}^2] - \E[s_{i,j}]^2 =  \hspace{10em}
-	\end{align*}
-	
-	\vspace{0em}
-	\begin{block}{\vspace*{-3ex}}
-		\small $n = $ number of balls and number of bins. $s_{i,j}$ is event ball $j$ lands in bin $i$.
-	\end{block}
-\end{frame}
-
-\begin{frame}
-	\frametitle{applying chebyshev's}
-	\textbf{Goal:} Prove that $\Pr[s_i \geq C] \leq \frac{1}{10n}$. 
-	
-	\textbf{Step 1.} To apply Chebyshev's inequality, we need to understand $\sigma^2 = \Var[s_i]$. 
-	\begin{align*}
-		\Var[s_i] = \sum_{j=1}^n \Var[s_{i,j}] = \sum_{j=1}^n \frac{1}{n} - \frac{1}{n^2} = {1- \frac{1}{n} \alert{\leq 1}.}
-	\end{align*}
-	
-	\textbf{Step 2.} Apply Chebyshev's inequality:
-	\begin{align*}
-		&\Pr\left[\left|s_i - \E[s_i]\right| \geq k\cdot 1\right] \leq \frac{1}{k^2} \\
-		&\text{which implies }\Pr\left[\left|s_i - 1\right| \geq k\cdot 1\right] \leq \frac{1}{k^2}.
-	\end{align*}
-	
-	\vspace{0em}
-	\begin{block}{\vspace*{-3ex}}
-		\small $n = $ number of balls and number of bins. $s_i=$ number of balls in bin $i$.  $s_{i,j}$ is event ball $j$ lands in bin $i$. $\E[s_i] = 1$. 
-	\end{block}
-\end{frame}
-
-\begin{frame}
-	\frametitle{applying chebyshev's}
-	\textbf{Goal:} Prove that $\Pr[s_i \geq C] \leq \frac{1}{10n}$. 
-	
-	We just proved: \blue{$\Pr[\left|s_i - 1\right| \geq k] \leq \frac{1}{k^2}$.}
-	
-	Setting $k = \sqrt{10n}$ gives: 
-	\begin{align*}
-		\Pr[\left|s_i - 1\right| &\geq \sqrt{10n}] \leq \frac{1}{10 n}.
-	\end{align*}
-	So, we have that:
-	\begin{align*}
-		\alert{\Pr[s_i \geq \sqrt{10n} + 1] \leq \frac{1}{10n}.}
-	\end{align*}
-	By the union bound argument from earlier, it thus holds that:
-	\begin{align*}
-		\Pr[\max_{i\in \{1,\ldots, n\}}s_i \geq \sqrt{10n} + 1] \leq \frac{1}{10}.
-	\end{align*}
-	
-	
-	\vspace{1em}
-	\begin{block}{\vspace*{-3ex}}
-		\small $n = $ number of balls and number of bins. $s_i$ is number of balls in bin $i$. $C =$ upper bound on maximum number of balls in any bin.
-	\end{block}
-\end{frame}
-
-\begin{frame}
-	\frametitle{final result}
-	
-	\begin{center}
-		When hashing $n$ balls into $n$ bins, the maximum bin contains $o(\sqrt{n})$ balls with probability $\frac{9}{10}$.
-		
-		\vspace{1em}
-		\includegraphics[width=.8\textwidth]{balls_into_bins.png}
-		\vspace{1em}
-		
-		Much better than the trivial bound of $n$! 
-	\end{center}
-\end{frame}
-
-\begin{frame}[t]
-	\frametitle{proof a union bound}
-	\begin{lemma}[Union Bound]
-		For \emph{any} random events $A_1, \ldots, A_k$:
-		\begin{align*}
-			\Pr[A_1 \cup A_2 \cup \ldots \cup A_k] \leq \Pr[A_1] + \Pr[A_2] + \ldots +\Pr[A_k].
-		\end{align*}
-	\end{lemma}
-
-		Let $X_i =  \mathbbm{1}[A_i]$ and apply Markov's to $S = \sum_{i=1}^k X_i$. 
-	
-\end{frame}
-
-\begin{frame}
-	\frametitle{takeaways}
-	\textbf{Techniques used that will appear again:}
-	\begin{itemize}
-		\item Union bound to control the \emph{maximum} of many random variables. 
-		\item Chebyshev's inequality to bound a variable whose variance we can compute.
-		\item To compute the variance, break down random variable into smaller pieces and apply linearity of variance. 
-	\end{itemize}
-	
-	\textbf{But...}
-	For this problem we can actually use even stronger tools to prove a better bound of \emph{$O(\log n)$} for the most loaded bin.
-	
-\end{frame}
-
-
-
-\begin{frame}
-	\frametitle{beyond chebyshev}
-	\textbf{Motivating question:} Is Chebyshev's Inequality tight?
-	
-	It is the worst case, but often not in reality.
-	\vspace{-1em}
-	\begin{figure}
-		\centering
-		\includegraphics[width=0.4\textwidth]{689599rule.png}
-			\vspace{-.5em}
-		\caption{68-95-99 rule for Gaussian bell-curve. \alert{$\mathbf{X\sim N(0,\sigma^2)}$}}
-	\end{figure}
-			\vspace{-.5em}
-	
-	\begin{columns}
-		\begin{column}{.5\textwidth}
-			\small
-			\textbf{Chebyshev's Inequality:}
-			\vspace{-.5em}
-			\begin{align*}
-				\Pr\left(|X - \E[X]| \geq 1\sigma \right) &\leq 100\% \\
-				\Pr\left(|X - \E[X]| \geq 2\sigma \right) &\leq 25\% \\
-				\Pr\left(|X - \E[X]| \geq 3\sigma \right) &\leq 11\% \\
-				\Pr\left(|X - \E[X]| \geq 4\sigma \right) &\leq 6\%.
-			\end{align*}
-		\end{column}
-		\begin{column}{.5\textwidth}
-			\small
-			\textbf{Truth:}
-			\vspace{-.5em}
-			\begin{align*}
-				\Pr\left(|X - \E[X]| \geq 1\sigma \right) &\approx 32\% \\
-				\Pr\left(|X - \E[X]| \geq 2\sigma \right) &\approx 5\% \\
-				\Pr\left(|X - \E[X]| \geq 3\sigma \right) &\approx 1\% \\
-				\Pr\left(|X - \E[X]| \geq 4\sigma \right) &\approx .01\%
-			\end{align*}
-		\end{column}
-	\end{columns}
-\end{frame}
-
-\begin{frame}
-	\frametitle{gaussian concentration}
-	\small
-	For $X \sim \mathcal{N}(\mu,\sigma^2)$:
-	\begin{align*}
-		\Pr[X = \mu \pm x] \sim \frac{1}{\sigma\sqrt{2\pi}} \alert{\mathbf{e^{-x^2/2\sigma^2}}}
-	\end{align*}
-	\vspace{-1em}
-	\begin{lemma}[Gaussian Tail Bound]
-		For $X \sim \mathcal{N}(\mu,\sigma^2)$:\vspace{-.5em}
-		\begin{align*}
-			\Pr[|X - \E X| \geq k\cdot\sigma] \leq 2e^{-k^2/2}.
-		\end{align*}
-	\end{lemma}
-	\begin{figure}
-		\begin{subfigure}[t]{0.45\textwidth}
-			\centering
-			\includegraphics[width=\textwidth]{standardScale.png}
-			\caption{Standard $y$-scale.}
-		\end{subfigure}
-		\hspace{1em}
-		\begin{subfigure}[t]{0.45\textwidth}
-			\centering
-			\includegraphics[width=\textwidth]{logScale.png}
-			\caption{Logarithmic $y$-scale.}
-		\end{subfigure}
-	\end{figure}
-	
-\end{frame}
-
-\begin{frame}
-	\frametitle{gaussian concentration}
-	\textbf{Takeaway:} Gaussian random variables concentrate much tighter around their expectation than variance alone (i.e. Chebyshevs's inequality)  predicts.
-	
-	\begin{center}
-		\alert{\textbf{Why does this matter for algorithm design?}}
-	\end{center}
-\end{frame}
-
-\begin{frame}
-	\frametitle{central limit theorem}
-	\begin{theorem}[CLT -- Informal]
-		Any sum of \alert{mutually independent}, \alert{(identically distributed)}  r.v.'s $X_1,  \ldots, X_k$ with mean $\mu$ and finite variance $\sigma^2$ converges to a Gaussian r.v. with mean $k\cdot\mu$ and variance $k\cdot\sigma^2$, as $k\rightarrow \infty$.
-		\vspace{-.5em}
-		\begin{align*}
-			S = \sum_{i=1}^n X_i \Longrightarrow \mathcal{N}(k\cdot\mu, k\cdot\sigma^2).
-		\end{align*}	
-		\vspace{-.5em}	
-	\end{theorem}
-	\vspace{-.5em}	
-	\begin{figure}
-		\begin{subfigure}[t]{0.4\textwidth}
-			\centering
-			\includegraphics[width=\textwidth]{cltWide.png}
-		\end{subfigure}
-		\hspace{4em}
-		\begin{subfigure}[t]{0.4\textwidth}
-			\centering
-			\includegraphics[width=\textwidth]{cltSkinny.png}
-		\end{subfigure}
-	\end{figure}
-\end{frame}
-
-\begin{frame}
-	\frametitle{independence}
-	Recall:
-	\vspace{1em}
-	\begin{definition}[Mutual Independence]
-		Random variables $X_1, \ldots, X_k$ are \emph{mutually independent} if, for all possible values $v_1, \ldots, v_k$,
-		\begin{align*}
-			\Pr[X_1 = v_1, \ldots, X_k = v_k] = 	\Pr[X_1 = v_1]\cdot\ldots \cdot\Pr[X_k = v_k]
-		\end{align*}
-	\end{definition}
-	\begin{center}
-		\uncover<2->{\textbf{Strictly stronger than pairwise independence.}}
-	\end{center}
-\end{frame}
-
-\begin{frame}
-	\frametitle{exercise}
-	\small 
-	\begin{center}
-	\textbf{If I flip a fair coin $100$ times, lower bound the chance I get between $30$ and $70$ heads?}
-	\end{center}
-	%	As in the previous lecture, we we would like to use concentration bounds to study the randomized load balancing problem. $n$ jobs are distributed randomly to $n$ servers using a hash function. Let $S_i$ be the number of jobs sent to server $i$. 
-	%	\begin{enumerate}[label=(\alph*)]
-	%		\item Using the CLT and our lemma for Gaussian concentration, estimate a bound for $\max_i[S_i]$. For example, your bound should take the form: $\Pr[max_i S_i \geq \alert{\textbf{B}}] \leq 1/10$. What's the smallest value of $\textbf{\alert{B}}$ you should hope to achieve? 
-	%		\item Last class we proved the above bound with $\textbf{B} = O(\sqrt{n})$ using Chebyshev inequality. How does your bound compare?
-	%	\end{enumerate}
-	
-	For this problem, we will assume the limit of the CLT holds \emph{exactly} -- i.e., that this sum looks exactly like a Gaussian random variable.
-\begin{lemma}[Gaussian Tail Bound]
-	For $X \sim \mathcal{N}(\mu,\sigma^2)$:\vspace{-.5em}
-	\begin{align*}
-		\Pr[|X - \E X| \geq k\cdot\sigma] \leq 2e^{-k^2/2}.
-	\end{align*}
-	\end{lemma}
-
-$2e^{-8} = 06\%$
-\end{frame}
-
-%\begin{frame}
-%	\frametitle{back-of-the-envelop calculation}
-%	\includegraphics[width=.9\textwidth]{envelope.jpg}
-%\end{frame}
-
-
-\begin{frame}
-	\frametitle{quantitative versions of the clt}
-	\textbf{These back-of-the-envelop calculations can be made rigorous!}
-	\uncover<2->{\textbf{\alert{Lots of different ``versions'' of bound which do so.}}
-		\begin{center}
-			\begin{itemize}
-				\item Chernoff bound
-				\item Bernstein bound
-				\item Hoeffding bound
-				\item $\ldots$
-			\end{itemize}
-			Different assumptions on random varibles (e.g. binary vs. bounded), different forms (additive vs. multiplicative error), etc. \textbf{Wikipedia is your friend.}
-		\end{center}
-	}
-\end{frame}
-
-\begin{frame}
-	\frametitle{quantitative versions of the clt}
-	\begin{theorem}[Chernoff Bound]
-		Let $X_1,X_2,\ldots,X_k$ be independent $\{0,1\}$-valued random variables and let
-		$p_i = \E[X_i]$, where $0<p_i<1$.
-		Then the sum $S = \sum_{i=1}^{k} X_i$, which has mean
-		$\mu = \sum_{i=1}^{k} p_i$, satisfies
-		\begin{align*}
-			\Pr[S \geq (1+\epsilon)\mu] \leq e^{\frac{-\epsilon^2\mu}{2+ \epsilon}}.
-		\end{align*}
-		and for $0<\epsilon <1$
-		\begin{align*}
-			\Pr[S \leq (1-\epsilon)\mu] \leq e^{\frac{-\epsilon^2\mu}{2}}.
-		\end{align*}
-	\end{theorem} 
-\end{frame}
-
-\begin{frame}
-	\frametitle{quantitative versions of the clt}
-	\begin{theorem}[Bernstein Inequality]
-		Let $X_1, X_2, \ldots, X_k$ be independent random variables with each $X_i \in [-1,1]$.
-		Let $\mu_i =\E[X_i]$ and $\sigma_i^2 = \Var[X_i]$. Let  $\mu =\sum_i \mu_i$ and $\sigma^2 =\sum_i \sigma_i^2$. Then, for $k \leq \frac{1}{2}\sigma$, $S =\sum_i X_i$ satisfies
-		$$\Pr[|S - \mu| > k\cdot \sigma] \leq  2 e^{-\frac{k^2}{4}}.$$
-	\end{theorem}
-\end{frame}
-
-\begin{frame}
-	\frametitle{quantitative versions of the clt}
-	\begin{theorem}[Hoeffding Inequality]
-		Let $X_1, X_2, \ldots, X_k$ be independent random variables with each $X_i \in [a_i,b_i]$.
-		Let $\mu_i =\E[X_i]$ and $\mu =\sum_i \mu_i$. Then, for any $\alpha > 0$, $S =\sum_i X_i$ satisfies:
-		$$\Pr[|S - \mu| > \alpha] \leq  2 e^{-\frac{\alpha^2}{\sum_{i=1}^k (b_i-a_i)^2}}.$$
-	\end{theorem}
-\end{frame}
-
-\begin{frame}
-	\frametitle{how are these bounds proven?}
-	Variance is a natural \emph{measure of central tendency}, but there are others. 
-	\begin{align*}
-		q^\text{th} \text{ central moment: } \E[(X-\E X)^q]
-	\end{align*}
-	$k = 2$ gives the variance. Proof of Chebyshev's applies Markov's inequality to the random variable $(X - \E X)^2)$.
-	
-	\textbf{Idea in brief:} Apply Markov's inequality to $\E[(X-\E X)^q$ for larger $q$, or more generally to $f(X-\E X)$ for some other non-negative function $f$. E.g., to $\exp(X-\E X)$. 
-\end{frame}
-
-\begin{frame}
-	\frametitle{chernoff bound application}
-	\small
-	\textbf{Sample Application:} Flip biased coin $k$ times: i.e. the coin is heads with probability $b$. As long as $k \geq O\left(\frac{\log(1/\delta)}{\epsilon^2}\right)$,
-	\vspace{-.5em}
-	\begin{align*}
-		\Pr[|\text{\# heads} - b\cdot k| \geq \epsilon k] \leq \delta 
-	\end{align*}
-	
-	\textbf{Setup:}
-	Let $X_i = \mathbbm{1}[i^\text{th} \text{ flip is heads}]$. Want bound probability that  $\sum_{i=1}^k X_i$ deviates from it's expectation.
-	
-	\textbf{Corollary of Chernoff bound}: Let $S = \sum_{i=1}^k X_i$ and $\mu = \E[S]$. For $0< \epsilon < 1$, 
-	\vspace{-.75em}
-	\begin{align*}
-		\Pr[|S - \mu| \geq \epsilon \mu] \leq 2e^{-\epsilon^2 \mu/3}
-	\end{align*} 
-	\vspace{6em}
-\end{frame}
-
-\begin{frame}
-	\frametitle{chernoff bound application}
-	\textbf{Sample Application:} Flip biased coin $k$ times: i.e. the coin is heads with probability $b$. As long as $k \geq O\left(\frac{\log(1/\delta)}{\epsilon^2}\right)$,
-	\begin{align*}
-		\Pr[|\text{\# heads} - b\cdot k| \geq \epsilon k] \leq \delta 
-	\end{align*}
-	
-	
-	
-	Pay very little for higher probability -- if you increase the number of coin flips by 4x, $\delta$ goes from $1/10 \rightarrow 1/100 \rightarrow 1/10000$
-\end{frame}
-
-%\begin{frame}
-%	\frametitle{application to minhash}
-%	Let $J = J(\bv{q},\bv{y})$ denote the true Jaccard similarity.
-%	
-%	\textbf{Estimator:} $\tilde{J} = \frac{1}{k} \sum_{i=1}^k \mathbbm{1}[c_i(\bv{q}) = c_i(\bv{y})]$. 
-%	
-%	By the analysis above,
-%	\begin{align*}
-%		\Pr[|\tilde{J} - J| \geq \epsilon] = \Pr[|\tilde{J} \cdot k - J\cdot k| \geq \epsilon k] \leq \delta 
-%	\end{align*} 
-%	as long as $k = O\left(\frac{\log(1/\delta)}{\epsilon^2}\right)$. 
-%	
-%	Much better than the $k = O\left(\frac{1}{\delta\epsilon^2}\right)$.
-%	
-%	For example, if we had a data base of $n=1,000,000$ songs, setting $\delta = \frac{1}{n}$ would only require space depending on $\log(n) \approx 14$, instead of on $n=1,000,000$.  
-%	
-%\end{frame}
-
-
-\begin{frame}
-	\frametitle{load balancing}
-	\small
-	We are going to see a more interesting application of exponential concentration bounds to the randomized load balancing problem. $n$ jobs are distributed randomly to $n$ servers using a hash function. Let $S_i$ be the number of jobs sent to server $i$.  What's the smallest $\alert{\mathbf{B}}$ for which we can prove:
-	\begin{align*}
-		\Pr[\max_i S_i \geq \alert{\mathbf{B}}] \leq 1/10
-	\end{align*}
-	\vspace{-1em}
-	\begin{center}
-		\includegraphics[width=.6\textwidth]{ballsinbins.png}
-	\end{center}
-	
-	\textbf{Recall:} Suffices to prove that, for any $i$, $\Pr[ S_i \geq {\mathbf{B}}] \leq 1/10n$:
-	\begin{align*}
-		\Pr[\max_i S_i \geq {\mathbf{B}}] &= \Pr[S_1 \geq {\mathbf{B}} \text{ or } \ldots \text{ or } S_1 \geq {\mathbf{B}}] \\
-		&\leq \Pr[S_1 \geq {\mathbf{B}}] + \ldots + \Pr[S_n \geq {\mathbf{B}}] \text{\hspace{1em} (union bound)}.
-	\end{align*}
-\end{frame}
-
-\begin{frame}[t]
-	\frametitle{load balancing}
-	\begin{theorem}[Chernoff Bound]
-		Let $X_1,X_2,\ldots,X_n$ be independent $\{0,1\}$-valued random variables and let
-		$p_i = \E[X_i]$, where $0<p_i<1$.
-		Then the sum $S = \sum_{j=1}^{n} X_i$, which has mean
-		$\mu = \sum_{j=1}^{n} p_i$, satisfies
-		\begin{align*}
-			\Pr[X \geq (1+\epsilon)\mu] \leq e^{\frac{-\epsilon^2\mu}{2+ \epsilon}}.
-		\end{align*}
-	\end{theorem} 
-	Consider a single bin. Let $X_j = \mathbbm{1}[\text{ball $j$ lands in that bin}]$. $\E[X_j] = \frac{1}{n}$. $S = \sum_{j=1}^n X_j$, so $\mu = 1$. 
-	\begin{align*}
-		\Pr[S \geq (1+c\log n)\mu] \leq e^{\frac{-c^2\log^2 n}{2 + c\log n}} \leq e^{\frac{-c\log^2 n}{2\log n}} \leq e^{-.5c\log n} \leq \frac{1}{10n},
-	\end{align*}
-	for sufficiently large $c$
-	
-\end{frame}
-
-\begin{frame}
-	\frametitle{power of two choices}
-	\begin{center}\alert{\textbf{So max load for randomized load balancing is $O(\log n)$!}} Best we could prove with Chebyshev's was $O(\sqrt{n})$. \end{center}
-\end{frame}
-
-\begin{frame}
-	\frametitle{power of two choices}
-	\textbf{Power of 2 Choices:} Instead of assigning job to random server, choose 2 random servers and assign to the least loaded. With probability $1/10$ the maximum load is bounded by:
-	
-	(a) $O(\log n)$ \hspace{1em} (b) $O(\sqrt{\log n})$  \hspace{1em}  (c) $O(\log \log n)$  \hspace{1em} (d) $O(1)$
-	\begin{center}
-		\includegraphics[width=.9\textwidth]{power_of_two.png}
-	\end{center}
-\end{frame}
 
 \end{document} 
 
