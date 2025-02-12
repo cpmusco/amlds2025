@@ -55,7 +55,7 @@
 	\large
 	CS-GY 6763: Homework 2. 
 	
-	Due Tuesday, October 17th, 2023, 11:59pm ET.
+	Due Thursday, February 20th, 2025, 11:59pm ET.
 	\medskip
 	
 	\normalsize 
@@ -63,7 +63,52 @@
 
 \end{center} 
 
-\subsection{Problem 1: Hashing around the clock.}
+\subsection{Problem 1: Exploring Concentration Bounds}
+\textbf{(8 pts)} Let $X$ be a random variable uniformly distributed in the interval $[0,1]$. Since we know $X$'s distribution exacty, we can easily check that $\Pr[X \geq 7/8] = 1/8$. But let's take a look at what various concentration inequalities would predict about this probability using less information about $X$. 
+\begin{enumerate}
+	\item Given an upper bound on $\Pr[X \geq 7/8]$ using Markov's inequality. 
+	\item Give an upper bound on $\Pr[X \geq 7/8]$ using Chebyshev's inequality.
+	\item Given an upper bound on $\Pr[X \geq 7/8]$ by applying Markov's inequality to the random variables $X^2$ (the ``raw'' second moment). 
+	Note that this is slightly different than using Chebyshev's inequality, which applies Markov to the ``central'' second moment $(X - \E[X])^2$.
+	\item What happens for higher moments? Applying Markov's to $X^q$ for $q = 3,4, \ldots, 10$. Describe what you see in a sentence. What value of $q$ gives the tightest bound?
+		\item One take-away here is that, depending on the random variable being studied, it is not always optimal to use the variance as a deviation measure to show concentration. Markov's can be used with any monotonic function $g$, and as we see above, different choices might give better bounds. Exhibit a monotonic function $g$ so that applying Markov’s to $g(X)$ gives as tight an upper bound on $\Pr[X \geq 7/8]$ as you can. Maximum points if you can get $\Pr[X \geq 7/8] \leq 1/8$, which would be the best possible.
+\end{enumerate}
+% f does not need to be strictly monotonic! Why? Sort of counterintuitive but got a question about this last year. 
+
+
+\subsection{Problem 2: Boosting Success Probability}
+\textbf{(12 pts)}
+We saw in class that computing the \emph{mean} of many different answers from a randomized algorithm is often an effective way to improve accuracy. It turns out that the \emph{median} is also very useful: it can be used to improve \emph{success probability}. 
+
+In particular, suppose our goal is to estimate some scalar quantity $f(X)$ of a dataset $X$ (e.g, the number of distinct items in a stream). Suppose we have developed a high-accuracy randomized algorithm, $\mathcal{A}$, but it only succeeds with probability $\geq 2/3$. I.e., on any input $X$, with with probability $\geq 2/3$,
+\begin{align*}
+	|\mathcal{A}[X] - f(X)| \leq \epsilon
+\end{align*}
+
+Prove that, if we run $\mathcal{A}$ a total of $r = O(\log(1/\delta)$ times with different random seeds and return the \emph{median}, $M$, of the $r$ outputs, then with probability $1-\delta$:
+\begin{align*}
+		|M - f(X)| \leq \epsilon.
+\end{align*}
+This approach could be used, for example, to obtain an $O(\log(1/\delta)/\epsilon^2)$ space algorithm for distinct items, whereas in class we only proved $O(1/\delta\epsilon^2)$ using Chebyshev's inequality. 
+
+\vspace{1em}
+\noindent \textbf{Hint:} Think about what event would have to happen for the median to be ``bad'', i.e., to give error $> \epsilon$. If the median is bad, what does it say about the fraction of our $r$ estimates that are bad?
+
+
+
+% \subsection{Problem 4: Exploring Concentration Bounds. (8 pts)}
+% Using combinatorics, write down and evaluate (e.g., run some code) an exact expression for the probability of flipping 60 or more heads when flipping a fair coin 100 times. Do the same for 600 or more heads in 1000 flips. Compare your results to the upper bound given by the Chernoff bound from Lecture 2:
+% \begin{align*}
+% 	\Pr[S > (1+\epsilon)\mu] \leq e^{-\frac{\epsilon^2\mu}{2+\epsilon}}.
+% \end{align*}
+% Also compare to this slightly different and less commonly used form of the bound from Wikipedia:
+% \begin{align*}
+% 	\Pr[S > (1+\epsilon)\mu] \leq \left(\frac{e^\epsilon}{(1+\epsilon)^{1+\epsilon}}\right)^{\mu}.
+% \end{align*}
+% Also compute what each Chernoff Bound would give if you wanted to bound the probability of flipping more than 70 or 700 heads. 
+% Write a 1-2 sentence comment on how what your findings suggest about how ``tight'' the Chernoff bound is. 
+
+\subsection{Problem 3: Hashing around the clock.}
 
 \textbf{(15 pts)} In modern systems, hashing is often used to distribute data items or computational tasks to a collection of servers. What happens when a server is added or removed from a system? Most hash functions, including those discussed in class, are tailored to the number of servers, $n$, and would change completely if $n$ changes. This would require rehashing and moving all of our $m$ data items, an expensive operation.
 
@@ -100,7 +145,7 @@ Here we consider an approach to avoid this problem. Assume we have access to a c
 %with $1-\delta$ probability when  $k = O\left(\frac{\log(1/\delta)}{\epsilon^2}\right)$. By the AM-GM inequality, we always have that $\|x\|_2\|y\|_2 \leq \|x\|_2^2 + \|y\|_2^2$.
 %\end{enumerate}
 
-\subsection{Problem 2(a): Analyzing Sign-JL and JL for Inner Products }
+\subsection{Problem 4(a): Analyzing Sign-JL and JL for Inner Products }
 \textbf{(15 pts)}
 Often practitioners prefer JL matrices with discrete random entries instead of Gaussians because they take less space to store and are easier to generate. We  analyze one construction below.
 
@@ -121,7 +166,7 @@ Suppose that $\bs{\Pi}$ is a ``sign Johnson-Lindenstrauss matrix'' with $n$ colu
 		\textit{This result can also be improved to have a $\log(1/\delta)$ dependence in place of $1/\delta$. .}
 \end{enumerate}
 
-\subsection{Problem 2(b): Join Size Estimation}
+\subsection{Problem 4(b): Join Size Estimation}
 \noindent\textbf{(5 pts)}
 One powerful application of sketching is in database applications. For example, a common goal is to estimate the \emph{inner join size} of two tables without performing an actual inner join (which is expensive, as it requires enumerating the keys of the tables). Formally, consider two sets of unique keys $X = \{x_1, \ldots, x_m\}$ and $Y = \{y_1, \ldots, y_n\}$ which are subsets of $1,2, \ldots, U$.  Our goal is to estimate $|X\cap Y|$ based on small space compressions of $X$ and $Y$.  
 
@@ -142,56 +187,48 @@ with probability $9/10$.
 %\end{enumerate}
 
 
-\subsection{Problem 3: Compressed classification.}
-\textbf{(10 pts)} In machine learning, the goal of many classification methods (like support vector machines) is to separate data into classes using a \emph{separating hyperplane}.
+% \subsection{Problem 3: Compressed classification.}
+% \textbf{(10 pts)} In machine learning, the goal of many classification methods (like support vector machines) is to separate data into classes using a \emph{separating hyperplane}.
 
-Recall that a hyperplane in $\R^d$ is defined by a unit vector $a \in \R^d$ ($\|a\|_2 = 1$) and scalar $c \in \R$. It contains all  $h \in \R^d$ such that $\langle a, h\rangle = c$. 
+% Recall that a hyperplane in $\R^d$ is defined by a unit vector $a \in \R^d$ ($\|a\|_2 = 1$) and scalar $c \in \R$. It contains all  $h \in \R^d$ such that $\langle a, h\rangle = c$. 
 
-Suppose our dataset consists of $n$ unit vectors in $\R^d$ (i.e., each data point is normalized to have norm $1$). These points can be separated into two sets $X, Y$,
-with the guarantee that there exists a hyperplane such that every point in $X$ is on one side and every point in 
-$Y$ is on the other. In other words, for all $x\in X, \langle a, x\rangle > c$ and for all $y\in Y, \langle a, y\rangle < c$.
+% Suppose our dataset consists of $n$ unit vectors in $\R^d$ (i.e., each data point is normalized to have norm $1$). These points can be separated into two sets $X, Y$,
+% with the guarantee that there exists a hyperplane such that every point in $X$ is on one side and every point in 
+% $Y$ is on the other. In other words, for all $x\in X, \langle a, x\rangle > c$ and for all $y\in Y, \langle a, y\rangle < c$.
 
-Furthermore, suppose that the $\ell_2$ distance of each point in $X$ and $Y$ to this separating hyperplane is at least $\epsilon$. When this is the case, the hyperplane is said to have ``margin'' $\epsilon$. 
+% Furthermore, suppose that the $\ell_2$ distance of each point in $X$ and $Y$ to this separating hyperplane is at least $\epsilon$. When this is the case, the hyperplane is said to have ``margin'' $\epsilon$. 
 
-\begin{enumerate}
-	\item Show that this margin assumption equivalently implies that for all $x\in X, \langle a, x\rangle \geq c + \epsilon$ and for all $y\in Y, \langle a, y\rangle \leq c - \epsilon$.
+% \begin{enumerate}
+% 	\item Show that this margin assumption equivalently implies that for all $x\in X, \langle a, x\rangle \geq c + \epsilon$ and for all $y\in Y, \langle a, y\rangle \leq c - \epsilon$.
 	
-	\item Show that if we use a Johnson-Lindenstrauss map $\Pi$ to reduce our data points to $O(\log n/\epsilon^2)$ dimensions, then the dimension reduced data can still be separated by a hyperplane with margin $\epsilon/4$, with high probability (say $> 9/10$).
-\end{enumerate}
+% 	\item Show that if we use a Johnson-Lindenstrauss map $\Pi$ to reduce our data points to $O(\log n/\epsilon^2)$ dimensions, then the dimension reduced data can still be separated by a hyperplane with margin $\epsilon/4$, with high probability (say $> 9/10$).
+% \end{enumerate}
 
-\subsection{Problem 4: LSH in the Wild} 
-\textit{This exercise does not involve formal proofs or analysis like more typical problem set problems. It will likely involve some coding or spreadsheet work.}
-\vspace{.25em}
+% \subsection{Problem 4: LSH in the Wild} 
+% \textit{This exercise does not involve formal proofs or analysis like more typical problem set problems. It will likely involve some coding or spreadsheet work.}
+% \vspace{.25em}
 
-\noindent\textbf{(10 pts)}
-To support its largely visual platform, Pinterest runs a massive image de-duplication operation built on Locality Sensitive Hashing for Cosine Similarity. You can read about the actual system \href{https://medium.com/pinterest-engineering/detecting-image-similarity-using-spark-lsh-and-tensorflow-618636afc939}{here}. All information and numbers below are otherwise purely hypothetical.
+% \noindent\textbf{(10 pts)}
+% To support its largely visual platform, Pinterest runs a massive image de-duplication operation built on Locality Sensitive Hashing for Cosine Similarity. You can read about the actual system \href{https://medium.com/pinterest-engineering/detecting-image-similarity-using-spark-lsh-and-tensorflow-618636afc939}{here}. All information and numbers below are otherwise purely hypothetical.
 
-Pinterest has a database of $N = $ \textbf{1 billion} images. Each image in the database is pre-processed and represented as a vector $\bv{q}\in \R^d$. When a new image is pinned, it is also processed to form a vector $\bv{y} \in \R^d$. The goal is to check for any existing duplicates or near-duplicates to $\bv{y}$ in the database.  
-Specifically, Pinterest would like to flag an image $\bv{q}$ as a near-duplicate to $\bv{y}$ if $\cos(\theta(\bv{q},\bv{y})) \geq .98$. We want to find any near-duplicate with probability $\geq 99\%$. 
+% Pinterest has a database of $N = $ \textbf{1 billion} images. Each image in the database is pre-processed and represented as a vector $\bv{q}\in \R^d$. When a new image is pinned, it is also processed to form a vector $\bv{y} \in \R^d$. The goal is to check for any existing duplicates or near-duplicates to $\bv{y}$ in the database.  
+% Specifically, Pinterest would like to flag an image $\bv{q}$ as a near-duplicate to $\bv{y}$ if $\cos(\theta(\bv{q},\bv{y})) \geq .98$. We want to find any near-duplicate with probability $\geq 99\%$. 
 
-Given this requirement, your job is to design a multi-table LSH scheme using SimHash to find candidate near-duplicates, which can then be checked directly against $\bv{y}$. To support this task, Pinterest has collected data on the empirical distribution of $\cos(\theta(\bv{q},\bv{y}))$ for a typical new image $\bv{y}$. It roughly follows a bell-curve:
+% Given this requirement, your job is to design a multi-table LSH scheme using SimHash to find candidate near-duplicates, which can then be checked directly against $\bv{y}$. To support this task, Pinterest has collected data on the empirical distribution of $\cos(\theta(\bv{q},\bv{y}))$ for a typical new image $\bv{y}$. It roughly follows a bell-curve:
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=.6\textwidth]{dist.png}
-\end{figure} 
+% \begin{figure}[H]
+% 	\centering
+% 	\includegraphics[width=.6\textwidth]{dist.png}
+% \end{figure} 
 
-Pinterest wants to consider two possible computational targets for your LSH scheme, which will determine the speed of the de-duplication algorithm:
-\begin{enumerate}
-	\item Ensure that no more than $1$ million candidate near-duplicates are checked on average when a new image is pinned. ``Checked'' means that the image's cosine similarity with the new image is computed explicitly, which is a computationally expensive operation.
-	\item Ensure that no more than $200,000$ candidates are checked on average when a new image is pinned.
-\end{enumerate}
+% Pinterest wants to consider two possible computational targets for your LSH scheme, which will determine the speed of the de-duplication algorithm:
+% \begin{enumerate}
+% 	\item Ensure that no more than $1$ million candidate near-duplicates are checked on average when a new image is pinned. ``Checked'' means that the image's cosine similarity with the new image is computed explicitly, which is a computationally expensive operation.
+% 	\item Ensure that no more than $200,000$ candidates are checked on average when a new image is pinned.
+% \end{enumerate}
 
-\noindent Based on the data above, describe how to set parameters for your LSH scheme to minimize the space (i.e., number of tables) used, while achieving each of the above goals. Justify your answers, and any assumptions you make.
-If you code anything up to help calculate your answer, please attach the code. As in lecture, you can assume that each hash table has $m = O(N)$ slots and this is large enough to ignore lower order terms depending on $1/m$. 
-
-\subsection{Extra Credit: Revisiting Wikipedia Size Estimation}\textbf{(10 pts)} 
-Many students observed that, when trying to estimate the number of articles on Wikipedia in the last homework, the mark-and-recapture method consistently returned an estimate below the claimed number of articles on Wikipedia. In this problem we will try to understand why. My guess is that the underestimate is due to the fact that 
-Wikipedia's random article generator does not return \emph{truly uniform} random articles. As discussed \href{https://en.wikipedia.org/wiki/Wikipedia:FAQ/Technical#random}{here}, Wikipedia assigns each article $i$ a random id $r_i$, which we can model as a random real number in $[0, 1]$. Then, to pick a random article, a random real number in $[0, 1]$ is sampled and article $i$ is return if that number lies in the range $[r_i, r_{i+1}].$ That is, the range $[0, 1]$ is partitioned into $n$ intervals and the probability of returning article $i$ is equal to the length of the $i^\text{th}$ interval, which we denote by $p_i$. Since these intervals themselves are random, the probability distribution won't be \emph{perfectly} uniform.
-\begin{enumerate}
-	\item Prove that, when the interval lengths are not perfectly uniform, the mark-and-recapture method should be expected to underestimate the number of articles. \textbf{Hint:} Prove that the expected number of collisions $D$ after $m$ samples equals $\binom{m}{2}\sum_{i=1}^n p_i^2$, and show that this expectation is minimized when $p_1 = \ldots = p_n = \frac{1}{n}$.  So, we get too many collisions for a non-uniform distribution, causing an underestimate of $n$.
-	\item Show that, if Wikipedia uses the scheme above, we expect that the mark-and-recapture method will systematically underestimate the number of articles by almost exactly a factor of two. \textbf{Hint:} Try to prove a bound on $\E\left[\sum_{i=1}^n p_i^2\right]$. 
-\end{enumerate}
+% \noindent Based on the data above, describe how to set parameters for your LSH scheme to minimize the space (i.e., number of tables) used, while achieving each of the above goals. Justify your answers, and any assumptions you make.
+% If you code anything up to help calculate your answer, please attach the code. As in lecture, you can assume that each hash table has $m = O(N)$ slots and this is large enough to ignore lower order terms depending on $1/m$. 
 
 
 \end{document}
