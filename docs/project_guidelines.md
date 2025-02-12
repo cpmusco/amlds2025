@@ -21,8 +21,8 @@
 
 ### Deadlines
 
-* By **Friday, 2/17**,  decide if you will complete a project, and choose your partner(2). Let the TA's know if you would like to meet to discuss possible project topics, or are having trouble choosing between a few options. 
-* By **Friday, 2/17,**  signup to present for one session of the reading group here: https://docs.google.com/spreadsheets/d/1oGnp_J586TN3UIIZmTHp0KlesBmiFPF728qy9U9CVro/edit?gid=0#gid=0.  You don't need to select your paper yet, unless you are one of the first weeks.
+* By **Friday, 2/21**,  decide if you will complete a project, and choose your partner(2). Let the TA's know if you would like to meet to discuss possible project topics, or are having trouble choosing between a few options. 
+* By **Friday, 2/21,**  signup to present for one session of the reading group here: https://docs.google.com/spreadsheets/d/1oGnp_J586TN3UIIZmTHp0KlesBmiFPF728qy9U9CVro/edit?gid=0#gid=0.  You don't need to select your paper yet, unless you are one of the first weeks.
 * By **Monday, 3/31**, select your paper and submit a 1-page proposal describing the paper's subject, and listing  3 possible ideas for research questions. The TAs and I will set up individual group meetings if needed to help you narrow down and refine your questions.
 * By **Friday, 5/9**: Turn in final project report.  
 
