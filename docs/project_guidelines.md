@@ -7,7 +7,7 @@
 3. Formulate a new **research question** about that paper. This can be a theoretical question **or** an empirical question, but empirical questions need to be more complicated than "Is Algorithm A  faster than Algorithm B in practice?". See below for example questions. 
 4. Try to solve this question, with the understanding that you may not succeed, or you might succeed in learning something different from what you originally intended! You will not be graded on if you obtain a novel, research-level result, but on how you approach the problem, what you try, and ultimately how you present your results.  That said, most years I have run this class there have been projects with novel ideas that eventually turned into research papers. 
 5. Write-up what you learned in a **report of at least 6 pages**. You should clearly explain the problem you aimed to solve, any necessary context to appreciate the problem's relevance, and what you accomplished. If you found barriers to accomplishing what you originally desired, describe those! Empirical papers should report any empirical findings with effective plots and figures. If you complete an empirical project, you should also share your code with me in some way (GitHub, Collab notebook, zip file).
-6. A list of strong example projects from last year can be found here: 
+6. A list of strong example projects from last year can be found here: https://www.chrismusco.com/amlds2025/example_projects
 
 ### Components of Reading Group
 
@@ -22,7 +22,7 @@
 ### Deadlines
 
 * By **Friday, 2/17**,  decide if you will complete a project, and choose your partner(2). Let the TA's know if you would like to meet to discuss possible project topics, or are having trouble choosing between a few options. 
-* By **Friday, 2/17,**  signup as either a presenter for one week of the reading group. You don't need to select your paper yet, unless you are one of the first weeks.
+* By **Friday, 2/17,**  signup to present for one session of the reading group here: https://docs.google.com/spreadsheets/d/1oGnp_J586TN3UIIZmTHp0KlesBmiFPF728qy9U9CVro/edit?gid=0#gid=0.  You don't need to select your paper yet, unless you are one of the first weeks.
 * By **Monday, 3/31**, select your paper and submit a 1-page proposal describing the paper's subject, and listing  3 possible ideas for research questions. The TAs and I will set up individual group meetings if needed to help you narrow down and refine your questions.
 * By **Friday, 5/9**: Turn in final project report.  
 
