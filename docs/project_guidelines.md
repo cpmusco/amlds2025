@@ -7,6 +7,7 @@
 3. Formulate a new **research question** about that paper. This can be a theoretical question **or** an empirical question, but empirical questions need to be more complicated than "Is Algorithm A  faster than Algorithm B in practice?". See below for example questions. 
 4. Try to solve this question, with the understanding that you may not succeed, or you might succeed in learning something different from what you originally intended! You will not be graded on if you obtain a novel, research-level result, but on how you approach the problem, what you try, and ultimately how you present your results.  That said, most years I have run this class there have been projects with novel ideas that eventually turned into research papers. 
 5. Write-up what you learned in a **report of at least 6 pages**. You should clearly explain the problem you aimed to solve, any necessary context to appreciate the problem's relevance, and what you accomplished. If you found barriers to accomplishing what you originally desired, describe those! Empirical papers should report any empirical findings with effective plots and figures. If you complete an empirical project, you should also share your code with me in some way (GitHub, Collab notebook, zip file).
+6. A list of strong example projects from last year can be found here: 
 
 ### Components of Reading Group
 
