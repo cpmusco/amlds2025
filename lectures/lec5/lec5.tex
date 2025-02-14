@@ -1,4 +1,5 @@
- \documentclass[compress]{beamer}
+%!LW recipe=latexmk-xelatex
+\documentclass[compress]{beamer}
 
 \usetheme[block=fill]{metropolis}
 
@@ -136,6 +137,104 @@
 	\textbf{Claim:} If I find the optimal clustering for $\bs{\Pi}\bv{a}_1, \ldots, \bs{\Pi}\bv{a}_n$ then its cost is less than $(1+\epsilon)$ times the cost of the best clustering obtained with the original data. 
 \end{frame}
 
+\begin{frame}[t]
+	\frametitle{sample application}
+	\textbf{k-means clustering}: Give data points $\bv{a}_1,\ldots, \bv{a}_n \in \R^d$, find centers $\bs{\mu}_1, \ldots, \bs{\mu}_k\in \R^d$ to minimize:
+	\begin{align*}
+		Cost(\bs{\mu}_1,\ldots, \bs{\mu}_k) = \sum_{i=1}^n \min_{j = 1,\ldots,k} \|\bs{\mu}_j - \bv{a}_i\|_2^2
+	\end{align*}
+	\begin{center}
+		\includegraphics[width=.5\textwidth]{kmeans1.png}
+	\end{center}
+\end{frame}
+\begin{frame}[t]
+	\frametitle{sample application}
+	\textbf{k-means clustering}: Give data points $\bv{a}_1,\ldots, \bv{a}_n \in \R^d$, find centers $\bs{\mu}_1, \ldots, \bs{\mu}_k\in \R^d$ to minimize:
+	\begin{align*}
+		Cost(\bs{\mu}_1,\ldots, \bs{\mu}_k) = \sum_{i=1}^n \min_{j = 1,\ldots,k} \|\bs{\mu}_j - \bv{a}_i\|_2^2
+	\end{align*}
+	\begin{center}
+		\includegraphics[width=.5\textwidth]{kmeans2.png}
+	\end{center}
+\end{frame}
+\begin{frame}[t]
+	\frametitle{sample application}
+	\textbf{k-means clustering}: Give data points $\bv{a}_1,\ldots, \bv{a}_n \in \R^d$, find centers $\bs{\mu}_1, \ldots, \bs{\mu}_k\in \R^d$ to minimize:
+	\begin{align*}
+		Cost(\bs{\mu}_1,\ldots, \bs{\mu}_k) = \sum_{i=1}^n \min_{j = 1,\ldots,k} \|\bs{\mu}_j - \bv{a}_i\|_2^2
+	\end{align*}
+	\begin{center}
+		\includegraphics[width=.5\textwidth]{kmeans3.png}
+	\end{center}
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{k-means clustering}
+	\textbf{Equivalent form}: Find clusters $C_1, \ldots, C_k \subseteq \{1, \ldots, n\}$ to minimize:
+	\vspace{-3em}
+	
+	\begin{align*}
+		Cost(C_1,\ldots, C_k) = \sum_{j=1}^k \frac{1}{2|C_j|}\sum_{u,v\in C_j} \|\bv{a}_u - \bv{a}_v\|_2^2.
+	\end{align*}
+	\vspace{-2em}
+	\begin{center}
+		\includegraphics[width=.5\textwidth]{kmeans4.png}
+	\end{center}
+	\textbf{Exercise:} Prove this to your self.
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{k-means clustering}
+	NP hard to solve exactly, but there are many good approximation algorithms. All depend at least linearly on the dimension $d$. 
+	
+	\textbf{Approximation scheme}: Find clusters $\tilde{C}_1, \ldots, \tilde{C}_k$ for the $k = O\left(\frac{\log n}{\epsilon^2}\right)$ dimension data set $\bs{\Pi}\bv{a}_1, \ldots, \bs{\Pi}\bv{a}_n.$
+	
+	\vspace{-3em}
+	\begin{center}
+		\includegraphics[width=.6\textwidth]{clustering_projected.png}
+	\end{center}
+	\vspace{-2em}
+	Argue these clusters are near optimal for $\bv{a}_1, \ldots, \bv{a}_n$.
+\end{frame}
+
+
+
+
+\begin{frame}[t]
+	\frametitle{k-means clustering}
+	\begin{align*}
+		Cost(C_1,\ldots, C_k) &= \sum_{j=1}^k \frac{1}{2|C_j|}\sum_{u,v\in C_j} \|\bv{a}_u - \bv{a}_v\|_2^2 \\
+		\widetilde{Cost}(C_1,\ldots, C_k) &= \sum_{j=1}^k \frac{1}{2|C_j|}\sum_{u,v\in C_j} \|\Pi\bv{a}_u - \Pi\bv{a}_v\|_2^2
+	\end{align*}
+		
+		
+		\textbf{Claim:} For any clusters $C_1, \ldots, C_k$:
+		\begin{align*}
+	(1-\epsilon) Cost(C_1, \ldots, C_k) \leq \widetilde{Cost}(C_1, \ldots, C_k)   \leq  (1+\epsilon) Cost(C_1, \ldots, C_k) 
+		\end{align*}
+	
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{k-means clustering}
+	Suppose we use an approximation algorithm to find clusters $B_1, \ldots, B_k$ such that:
+	\begin{align*}
+		\widetilde{Cost}(B_1,\ldots, B_k) \leq (1+\alpha)\widetilde{Cost}^*
+	\end{align*}
+	
+	Then: 
+	\begin{align*}
+		{Cost}(B_1,\ldots, B_k) &\leq \frac{1}{1-\epsilon}\widetilde{Cost}(B_1,\ldots, B_k) \\
+		&\leq(1+O(\epsilon)) (1+\alpha)\widetilde{Cost}^*\\
+		&\leq (1+O(\epsilon))(1+\alpha)(1+\epsilon){Cost}^*\\
+		&= \alert{\left(1 + O(\alpha + \epsilon)\right){Cost}^*}
+	\end{align*}
+
+	\vspace{1em}
+\begin{block}{\vspace*{-3ex}}
+	\small ${Cost}^* = \min_{C_1, \ldots, C_k} Cost(C_1, \ldots, C_k)$ and $\widetilde{Cost}^* = \min_{C_1, \ldots, C_k} \widetilde{Cost}(C_1, \ldots, C_k) $
+\end{block}
+\end{frame}
 
 \begin{frame}
 	\frametitle{randomized jl constructions}
@@ -376,6 +475,16 @@
 					\includegraphics[width=\textwidth]{binaryVector.png}
 				}
 		}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{dimensionality reduction}
+	\begin{center}
+		The Johnson-Lindenstrauss Lemma let us sketch vectors and preserve their $\ell_2$ Euclidean distance. 
+		
+		We also have dimensionality reduction techniques that preserve alternative measures of similarity.
+	\end{center}
 \end{frame}
 
 \begin{frame}
