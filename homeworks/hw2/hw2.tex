@@ -17,6 +17,7 @@
 \usepackage{enumitem}
 \usepackage{multicol}
 \usepackage{etoolbox}
+\usepackage[normalem]{ulem}
 
 \definecolor{nyuDarkPurple}{HTML}{330662}
 \definecolor{nyuOfficialPurple}{HTML}{57068c}
@@ -145,8 +146,10 @@ Here we consider an approach to avoid this problem. Assume we have access to a c
 %with $1-\delta$ probability when  $k = O\left(\frac{\log(1/\delta)}{\epsilon^2}\right)$. By the AM-GM inequality, we always have that $\|x\|_2\|y\|_2 \leq \|x\|_2^2 + \|y\|_2^2$.
 %\end{enumerate}
 
-\subsection{Problem 4(a): Analyzing Sign-JL and JL for Inner Products }
-\textbf{(15 pts)}
+
+\subsection{\sout{Problem 4(a): Analyzing Sign-JL and JL for Inner Products}} 
+\textbf{(15 pts)} \textbf{Do not need to do, will be move to next assignment.}
+
 Often practitioners prefer JL matrices with discrete random entries instead of Gaussians because they take less space to store and are easier to generate. We  analyze one construction below.
 
 Suppose that $\bs{\Pi}$ is a ``sign Johnson-Lindenstrauss matrix'' with $n$ columns, $k$ rows, and i.i.d. $\pm 1$ entries scaled by $1/\sqrt{k}$. In other words, each entry in the matrix has values $-1/\sqrt{k}$ with probability $1/2$ and $1/\sqrt{k}$ with probability $1/2$.
@@ -166,8 +169,9 @@ Suppose that $\bs{\Pi}$ is a ``sign Johnson-Lindenstrauss matrix'' with $n$ colu
 		\textit{This result can also be improved to have a $\log(1/\delta)$ dependence in place of $1/\delta$. .}
 \end{enumerate}
 
-\subsection{Problem 4(b): Join Size Estimation}
-\noindent\textbf{(5 pts)}
+\subsection{\sout{Problem 4(b): Join Size Estimation}} 
+\noindent\textbf{(5 pts)} \textbf{Do not need to do, will be move to next assignment.}
+
 One powerful application of sketching is in database applications. For example, a common goal is to estimate the \emph{inner join size} of two tables without performing an actual inner join (which is expensive, as it requires enumerating the keys of the tables). Formally, consider two sets of unique keys $X = \{x_1, \ldots, x_m\}$ and $Y = \{y_1, \ldots, y_n\}$ which are subsets of $1,2, \ldots, U$.  Our goal is to estimate $|X\cap Y|$ based on small space compressions of $X$ and $Y$.  
 
 Using your result from Problem 1, describe a method based on inner product estimation that constructs independent sketches of $X$ and $Y$ of size  $k = O\left(\frac{1}{\epsilon^2}\right)$ and from these sketches can return an estimate $Z$ for $|X\cap Y|$ satisfying
