@@ -2,7 +2,7 @@
 \usepackage{fullpage}
 \usepackage{amsmath,amsfonts,amsthm,amssymb}
 \usepackage{url}
-\usepackage{graphicx}
+\usepackage[demo]{graphicx}
 \usepackage{caption} 
 \usepackage{algpseudocode}
 \usepackage{bbm}
@@ -11,13 +11,9 @@
 \usepackage{enumerate}
 \usepackage{color}
 \usepackage[colorlinks=true, linkcolor=red, urlcolor=blue, citecolor=blue]{hyperref}
-\newcommand{\bs}[1]{\mat{#1}}
-\newcommand{\bv}[1]{\vec{#1}}
 
 \DeclareMathOperator*{\E}{\mathbb{E}}
-\let\Pr\relax
-\DeclareMathOperator*{\Pr}{\mathbb{P}}
-\DeclareMathOperator*{\R}{\mathbb{E}}
+\DeclareMathOperator*{\R}{\mathbb{R}}
 \DeclareMathOperator{\var}{Var}
 
 \topmargin 0pt
@@ -37,8 +33,8 @@
 	\begin{center}
 		\framebox{
 			\vbox{
-				\hbox to 6.50in { {\bf NYU CS-GY 9223D: Algorithmic Machine Learning 
-						and Data Science} \hfill Fall 2020 }
+				\hbox to 6.50in { {\bf NYU CS-GY 6763: Algorithmic Machine Learning 
+						and Data Science} \hfill Spring 2025 }
 				\vspace{4mm}
 				\hbox to 6.50in { {\Large \hfill Homework #2  \hfill} }
 				\vspace{2mm}
@@ -51,9 +47,34 @@
 
 \begin{document}
 	
-	\homework{1}{2 Solution key}
-	
+	\homework{1}{Solution key}
+
 	\section*{Problem 1}
+\smallskip\noindent 1.\hspace{1em} $\E[X] = 1/2$, so by Markov's $\Pr[X \geq 7/8]\leq \frac{1/2}{7/8} = .571$. 
+
+\smallskip\noindent 2.\hspace{1em} $\E[(X-\E X)^2] = \int_{0^1} (x-.5)^2 dx = .08333\ldots$ via Wolfram Alpha. So by Chebyshev's $\Pr[|X - .5| \geq (7/8-.5)]\leq \frac{.08333}{(7/8-.5)^2} = .593$. 
+
+\smallskip\noindent 3.\hspace{1em} $\E[X^2] = \int_{0}^1 x^2 dx = \frac{1}{3}$, so by Markov's $\Pr[X^2 \geq (7/8)^2]\leq \frac{1/3}{(7/8)^2} = .435$. So the uncentered moment gives a better bound.
+
+\smallskip\noindent 4.\hspace{1em} The general equation for an upper bound is:
+\begin{align*}
+	\frac{1/(q+1)}{(7/8)^q}. 
+\end{align*}
+For $q = 3, 4, \ldots, 10$ we get values:
+\begin{align*}
+	\begin{bmatrix}.373 & .341 & .325 &	.318& .318& .323&.333&.346
+	\end{bmatrix}
+\end{align*}
+So using higher moments at first improves our bound, but then eventually starts giving a weaker bound. The tighted bound is obtained at $q = 6$ and $q=6$. 
+
+\smallskip\noindent 5.\hspace{1em} Let $g$ be the step function which is $0$ for $X< 7/8$ and $1$ for $X \geq 7/8$. Then we have $\Pr[X \geq 7/8] = \Pr[g(X) \geq 1]$. We have $\E[g(X)] = \frac{1}{8}$, so $\Pr[g(X) \geq 1] \leq \frac{1}{8}$ by Markov's, which gives the tight bound. 
+
+\section*{Problem 2}
+I will write this later. This is the standard ``median trick''. The difficult observation is that, for the median to give error $> \epsilon$, it must be that more than half of the runs of the algorithm give error $> \epsilon$. Why? Suppose the median gave an answer more than $\epsilon$ above the correct value. Then all values above the median (which is $1/2$ of the runs) have to also be $>\epsilon$ above the correct value. 
+
+Once you make this observation, they just need to prove that if you flip a coin that comes up heads with probability $2/3$, you won't have $<50\%$ heads in a sample of size $O(\log(1/\delta))$ with probability $1-\delta$. This was actually done as an example in Lecture 3 (not with exactly those numbers). Best way is to use Chernoff bound.
+
+\section*{Problem 3}
 	\smallskip\noindent 1.\hspace{1em} 
 	Once there are $n+1$ servers in this setup, the expected number of items on the $(n+1)^\text{st}$ server is $\frac{m}{n+1}$, by symmetry. All of these items (and only these items) must have been relocated when the $(n+1)^{\text{st}}$ server was added. So the expected number of items that move is $\frac{m}{n+1}$. 
 	
@@ -82,7 +103,9 @@
 	
 	There's one last step -- we needed two events to hold for our proof to go through: 1) no server owns more than a $c\log n / n$ fraction of the interval and 2) no server was assigned two many items. Since each holds with probability $19/20$, by another union bound, both hold with probability $9/10$.
 	
-	\section*{Problem 2 (a)}
+
+	
+\section*{Problem 4 (a)}
 
 1. \textbf{Expectation Calculation.} As in class, we have that $\E[\|\Pi x\|_2^2] =  \E[\langle \pi, x\rangle^2]$, where $\pi$ is a single unscaled row from the matrix $\Pi$. I.e. $\pi$ has length $n$ and contains random $\pm 1$ entries. We have:
 \begin{align*}
@@ -148,72 +171,11 @@ Overall, we get a variance bound of:
 
 Once they get the mean and variance, the bound just follows from applying Chebyshev inequality again.
 	.
-	\section*{Problem 2 (b)}
+	\section*{Problem 4 (b)}
 	1. Construct 2 length $U$ binary vectors $x$ and $y$ where $x_i = 1$ if $i \in X$ and $0$ otherwise, and $y_i = 1$ if $i \in Y$ and $0$ otherwise. Note that $|X\cap Y|$ is exactly equal to $\langle x, y\rangle$, so we can estimate the quantity using sketches $\Pi x$ and $\Pi y$. If we set $k = O(1/\epsilon^2)$, then with $9/10$ probability we will have:
 	\begin{align*}
 		\left|\langle  x, y \rangle  - \langle \Pi x, \Pi y \rangle \right| \leq \epsilon \|x\|_2 \|y\|_2
 	\end{align*}
 Note that $\|x\|_2^2 = |X|$ and $\|y\|_2^2 = |Y|$, which yields the bound. 
 
-\vspace{.5em}
-
-	
-	\section*{Problem 3}
-	\smallskip\noindent 1.\hspace{1em}
-	For any vector $x$, let $z$ be the point on the hyperplane closest to $x$. Now: 
-	\begin{align*}
-	\langle x, a \rangle = \langle x - z, a \rangle  + \langle z, a \rangle  = \langle x - z, a \rangle +c = \|x - z\|_2 + c \geq c + \epsilon.
-	\end{align*}
-In the second step we used that  $\langle z, a \rangle =c$ since $z$ is on the hyperplane. And in the next step we use that $x - z$ must be perpendicular to the hyperplane (for $z$ to be the closest point). And thus $x - z$ is \emph{parallel} to $a$. Since $a$ is a unit vector, $\langle x - z, a \rangle= \|x-z\|_2$. The proof for any $y$ on the other size of the hyperplane is the same, but in that case, $y-z$ points directly opposite of $a$
-	
-	\smallskip\noindent 2.\hspace{1em}	
-	To show that there exists a good separating hyperplane for the dimension reduced data, we  exhibit one: consider the hyperplane given by parameters $\Pi a/\|\Pi a\|_2 , c/\|\Pi a\|_2$. 
-	
-	We can apply Problem 2 to claim that, if $\Pi$ reduces to $O(\log(1/\delta)/\epsilon^2)$ dimensions, then with probability $(1-\delta)$ for \emph{any} $x \in X$ or $\forall y \in Y$,
-	\begin{align*}
-	\langle \Pi a, \Pi x \rangle &\geq \langle a, x \rangle - \epsilon/2 \geq c + \epsilon/2 & &\text{and} & \langle \Pi a, \Pi y \rangle &\leq \langle a, y \rangle + \epsilon/2 \leq c - \epsilon/2.
-	\end{align*}
-	Above we use the fact that $\|x\|_2\|\bv{a}\|_2 = 1$ and $\|y\|_2\|\bv{a}\|_2 = 1$ since all $x$ and $y$ are specified to be unit vectors. Equivalently, we have:
-	\begin{align}
-	\label{eq:4}
-	\langle \Pi a/\|\Pi a\|_2, \Pi x \rangle &\geq c/\|\Pi a\|_2 + \epsilon/2\|\Pi a\|_2 & &\text{and} & \langle \Pi a/\|\Pi a\|_2, \Pi y \rangle &\geq c/\|\Pi a\|_2 + \epsilon/2\|\Pi a\|_2.
-	\end{align}
-	
-	
-	We also have from the distributional JL lemma that, with probability $1 - \delta$, $\|\Pi a\|_2 \leq 2$. And if we set $\delta = 1/99(n+1)$, by a union bound we have that \eqref{eq:4} holds for all $n$ points in our data set and $\|\Pi a\|_2 \leq 2$ simultaneously with probability $99/100$. This proves the claim with margin $\epsilon/4$. 
-	
-	\section*{Problem 4}
-	This problem can be solved in a similar way to the Shazam example from the Lecture 4 notes. You need to optimize over values of $s$ and $t$, where $s$ is the number of independent locality-sensitive hash functions used in your scheme and $t$ is the number of tables used. 
-	
-	
-	Following the analysis in Lecture 5, given a query vector $\bv{y}$ and some database vector $\bv{x}$, the probability of $\bv{x}$ showing up as a candidate near-duplicate (which will need to be scanned when $\bv{y}$ is issued as a query) is equal to:
-	\begin{align}
-		(1 - (1 - \theta(\bv{x},\bv{y})/\pi)^s)^t
-	\end{align}
-	where $\theta$ is the angle between vectors $\bv{x}$ and $\bv{y}$. 
-	
-	Our goal is to find the $s,t$ pair with the smallest value of $t$ which satisfies:
-	\begin{enumerate}
-		\item If $\cos(\theta(\bv{x},\bv{y})) \geq .98$, $(1 - (1 - \theta(\bv{x},\bv{y})/\pi)^s)^t \geq .99$
-		\item Based on the histogram data provided, the expected number of candidate near-duplicates in less than $1$ million, or $200$k, for parts (1) and (2).
-	\end{enumerate}
-	
-	Observe that $(1 - (1 - \theta(\bv{x},\bv{y})/\pi)^s)^t$ is monotonically decreasing with $s$ and the expected number of duplicates monotonically decreases with $s$. So, for a given value of $t$, it suffices to find the largest possible $s$ such that  $(1 - (1 - \cos^{-1}(.98)/\pi)^s)^t \geq .99$. I did this by solving for:
-	\begin{align*}
-		s = \frac{\log(1 - (1-.99)^{1/t})}{\log(1-\cos^{-1}(.98)/\pi)}
-	\end{align*}
-	and taking the floor. 
-	
-	Then an upper bound on the number of expected candidates can be computed for this $s$. This will be the smallest possible number of expected candidates for the given $t$. 
-	
-	My code is included below. I obtained solutions of:
-	\begin{itemize}
-		\item $\mathbf{20}$ \textbf{tables} for $\leq 1$ million candidates
-		\item  $\mathbf{44}$ \textbf{tables} for $\leq 200$k candidates
-	\end{itemize}
-	
-	\begin{figure}
-	\includegraphics[width=\textwidth]{matlabCode.png}
-	\end{figure}
-	
 \end{document}

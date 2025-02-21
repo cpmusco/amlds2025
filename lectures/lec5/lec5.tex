@@ -84,12 +84,14 @@
 
 \metroset{titleformat=smallcaps}
 
-\begin{frame}[t]
-	\frametitle{project}
-	\begin{itemize}
-		\item If you are doing a project, find a partner and sign-up to present for reading group slot \textbf{by Monday, 10/9}. We need presenters for next Friday!
-	\end{itemize}
+
+\begin{frame}
+	\frametitle{dimensionality reduction}
+	Despite all our warning from last class that low-dimensional space looks nothing like high-dimensional space, next we are going to learn about how to \textbf{compress high dimensional vectors to low dimensions.} 
+	
+	We will be very careful not to compress things \emph{too} far. An extremely simple method known as Johnson-Lindenstrauss Random Projection pushes right up to the edge of how much compression is possible. 
 \end{frame}
+
 
 \begin{frame}
 	\frametitle{euclidean dimensionality reduction}
@@ -104,41 +106,382 @@
 	\end{center}
 \end{frame}
 
-\begin{frame}[t]
-	\frametitle{sample application}
-	\textbf{k-means clustering}: For data set $\bv{a}_1, \ldots, \bv{a}_n$,  find clusters $C_1, \ldots, C_k \subseteq \{1, \ldots, n\}$ to minimize:
-	\vspace{-2em}
-	
-	\begin{align*}
-		Cost(C_1,\ldots, C_k) = \sum_{j=1}^k \frac{1}{2|C_j|}\sum_{u,v\in C_j} \|\bv{a}_u - \bv{a}_v\|_2^2.
-	\end{align*}
-	
-	\vspace{-2em}
+\begin{frame}
+	\frametitle{euclidean dimensionality reduction}
+	This is equivalent to: 
+	\begin{lemma}[Johnson-Lindenstrauss, 1984]
+		For any set of $n$ data points $\bv{q}_1,\ldots, \bv{q}_n \in \R^d$ there exists a \emph{linear map} $\Pi: \R^d \rightarrow \R^k$ where $k = O\left(\frac{\log n}{\epsilon^2}\right)$ such that \emph{for all $i,j$},
+		\begin{align*}
+			(1-\epsilon)\|\bv{q}_i - \bv{q}_j\|_2^{\mathbf{\alert{2}}} \leq \|\bs{\Pi}\bv{q}_i - \bs{\Pi}\bv{q}_j\|_2^{\mathbf{\alert{2}}} \leq (1+\epsilon)\|\bv{q}_i - \bv{q}_j\|_2^{\mathbf{\alert{2}}}.
+		\end{align*}
+	\end{lemma}
+	because for small $\epsilon$, $(1+\epsilon)^2 = 1 + O(\epsilon)$ and $(1-\epsilon)^2 = 1 - O(\epsilon)$.
+\end{frame}
+
+\begin{frame}
+	\frametitle{tons of applications}
+	\textbf{Make pretty much any computation involving vectors faster and more space efficient.}
+	\begin{itemize}
+		\item Faster vector search (used in image search, AI-based web search, Retrieval Augmented Generation (RAG), etc.).
+		\item Faster machine learning (today we will see an application to speeding up clustering).
+		\item Faster numerical linear algebra. 
+	\end{itemize}
 	\begin{center}
-		\includegraphics[width=.5\textwidth]{kmeans4.png}
+		\alert{\textbf{Only useful if we can explicity construct a JL map $\bs{\Pi}$ and apply efficiently to vectors.}}
+	\end{center}
+\end{frame}
+
+\begin{frame}
+	\frametitle{euclidean dimensionality reduction}
+	\begin{center}
+		Remarkably, $\Pi$ can be chosen \emph{completely at random}!
+	\end{center}
+	\textbf{One possible construction:} Random Gaussian.
+	\begin{align*}
+		\bs{\Pi}_{i,j} = \frac{1}{\sqrt{k}} \mathcal{N}(0,1)
+	\end{align*}
+	The map $\bs{\Pi}$ is \textbf{\alert{oblivious to the data set}}. This stands in contrast to other vector compression methods you might know like PCA.
+	
+	[Indyk, Motwani 1998] [Arriage, Vempala 1999] [Achlioptas 2001] [Dasgupta, Gupta 2003].
+	
+	Many other possible choices suffice -- you can use random $\{+1,-1\}$ variables, sparse random matrices, pseudorandom $\Pi$. Each with different advantages. 
+\end{frame}
+
+\begin{frame}
+	\frametitle{randomized jl constructions}
+	\begin{center}
+		Let $\bs{\Pi} \in \R^{k\times d}$ be chosen so that each entry equals $\frac{1}{\sqrt{k}}  \mathcal{N}(0,1)$.
+		
+		... or each entry equals $\frac{1}{\sqrt{k}}  \pm 1$ with equal probability.
+	\end{center}
+	\vspace{1em}
+	
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\includegraphics[width=\textwidth]{rand_gauss.png}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\includegraphics[width=\textwidth]{rand_sign.png}
+		\end{column}
+	\end{columns}
+	
+	\begin{center}
+		A random orthogonal matrix $\bv{Q}$ also works. I.e. with $\bv{Q}\bv{Q}^T = \bv{I}_{k\times k}$. For this reason, the JL operation is often called a ``random projection", even though it technically is not a projection when $\bs{\Pi}'s$ entries are i.i.d.
 	\end{center}
 \end{frame}
 
 \begin{frame}[t]
-	\frametitle{sample application}
-	\textbf{k-means clustering}: For data set $\bv{a}_1, \ldots, \bv{a}_n$,  find clusters $C_1, \ldots, C_k \subseteq \{1, \ldots, n\}$ to minimize:
-	\vspace{-2em}
-	
-	\begin{align*}
-		Cost(C_1,\ldots, C_k) = \sum_{j=1}^k \frac{1}{2|C_j|}\sum_{u,v\in C_j} \|\bv{a}_u - \bv{a}_v\|_2^2.
-	\end{align*}
-	
-	\vspace{-2em}
+	\frametitle{random proection}
+	Can anyone see why $\bs{\Pi}$ is similar to a projection matrix? I.e., a matrix satisfying  $\bv{Q}\bv{Q}^T = \bv{I}_{k\times k}$.
+\end{frame}
+
+\begin{frame}
+	\frametitle{random projection}
+	\begin{center}
+		\includegraphics[width=.6\textwidth]{random_projection.png}
+	\end{center}
+	\textbf{Intuition:} Multiplying by a random matrix mimics the process of projecting onto a random $k$ dimensional subspace in $d$ dimensions.
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{application: the new paradigm for search}
+	\begin{center}
+				\includegraphics[width=.9\textwidth]{multimodal_embeddings.png}
+	\end{center}
+	Use neural network (BERT, CLIP, etc.) to convert documents, images, etc. to high dimensional vectors. Results matching search should have similar vector embeddings.
+\end{frame}
+
+\begin{frame}
+	\frametitle{application: the new paradigm for search}
 	\begin{center}
 		\vspace{-.5em}
-		\includegraphics[width=.5\textwidth]{clustering_projected.png}
-		\vspace{-.5em}
+				\includegraphics[width=.8\textwidth]{vector_database.png}
+				\vspace{-.5em}
 	\end{center}
-	\textbf{Claim:} If I find the optimal clustering for $\bs{\Pi}\bv{a}_1, \ldots, \bs{\Pi}\bv{a}_n$ then its cost is less than $(1+\epsilon)$ times the cost of the best clustering obtained with the original data. 
+	Finding results for a query reduces to finding the nearest vector in a \emph{vector database}, with similarity typically measured by Euclidean distance. \textbf{This is a massive algorithmic challenge!}
+\end{frame}
+
+\begin{frame}
+	\frametitle{another example of vector search}
+	\begin{center}
+			\textbf{Shazam} can match a song clip against a library of 8 million songs (32 TB of data) in a fraction of a second. Whole system based on vector embeddings + search.
+			
+			\only<1>{\includegraphics[width=.4\textwidth]{shazam.png}}
+		\end{center}
+	\vspace{-1em}
+	\uncover<2->{
+			\begin{figure}[h]
+					\centering
+					\begin{subfigure}[t]{0.45\textwidth}
+							\centering
+							\includegraphics[width=\textwidth]{spectrogram.png}
+							\caption{Spectrogram extracted from audio clip.}
+						\end{subfigure}
+					~
+					\begin{subfigure}[t]{0.45\textwidth}
+							\centering
+							\includegraphics[width=\textwidth]{spectrogramThresh.png}
+							\caption{Processed spectrogram: used to construct audio ``fingerprint'' $\textbf{x}\in \R^d$.}
+						\end{subfigure}
+				\end{figure}
+		}
+\end{frame}
+
+\begin{frame}
+	\frametitle{vector search}
+	Tons of new startups in the space (offering managed vector databases) and all major tech companies are franticly working on speeding up vector search. 
+	\begin{center}
+		\vspace{-.5em}
+				\includegraphics[width=.6\textwidth]{startups.png}
+				\vspace{-.5em}
+	\end{center}
+	\textbf{Two main ingredients:}
+	\begin{enumerate}
+	\item Vector indexing methods (second half of lecture).
+	\item Vector compression methods (like Johnson-Lindenstrauss).
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}
+	\frametitle{application: the new paradigm for search}
+	Main computational cost is repeatedly computing $\|\bv{q}-\bv{x}_i\|_2$ for candidate result $\bv{x}_i$. 
+	\begin{center}
+		\vspace{-.5em}
+				\includegraphics[width=.8\textwidth]{database_compression.png}
+				\vspace{-.5em}
+	\end{center}
+	Vector compression leads to \emph{faster distance computations}. Not only is computational complexity reduced, but we can \emph{fit more database vectors in memory}.
+\end{frame}
+
+\begin{frame}
+	\frametitle{euclidean dimensionality reduction}
+	\begin{lemma}[Johnson-Lindenstrauss, 1984]
+		Let $\bs{\Pi} \in \R^{k\times d}$ be chosen so that each entry equals $\frac{1}{\sqrt{k}}  \mathcal{N}(0,1)$, where $\mathcal{N}(0,1)$ denotes a standard Gaussian random variable. 
+		
+		If we choose $k = O\left(\frac{\log (n)}{\epsilon^2}\right)$, then with probability $99/100$, for \emph{for all $i,j$},
+		\begin{align*}
+			(1-\epsilon)\|\bv{q}_i - \bv{q}_j\|_2^{{{2}}} \leq \|\bs{\Pi}\bv{q}_i - \bs{\Pi}\bv{q}_j\|_2^{{{2}}} \leq (1+\epsilon)\|\bv{q}_i - \bv{q}_j\|_2^{{{2}}}.
+		\end{align*}
+	\end{lemma}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{euclidean dimensionality reduction}
+	\textbf{Intermediate result:}
+	\begin{lemma}[Distributional JL Lemma]
+		Let $\bs{\Pi} \in \R^{k\times d}$ be chosen so that each entry equals $\frac{1}{\sqrt{k}}  \mathcal{N}(0,1)$, where $\mathcal{N}(0,1)$ denotes a standard Gaussian random variable. 
+		
+		If we choose $k = O\left(\frac{\log(1/\delta)}{\epsilon^2}\right)$, then for \emph{any vector $\bv{x}$}, with probability $(1-\delta)$:
+		\begin{align*}
+			(1-\epsilon)\|\bv{x}\|_2^2 \leq \|\bs{\Pi}\bv{x}\|_2^2 \leq (1+\epsilon) \|\bv{x}\|_2^2
+		\end{align*}
+	\end{lemma}
+	
+	\begin{center}\alert{
+			\textbf{Given this lemma, how do we prove the traditional Johnson-Lindenstrauss lemma?}}
+	\end{center}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{jl from distributional jl}
+	We have a set of vectors $\bv{q}_1, \ldots, \bv{q}_n$. Fix $i,j \in 1,\ldots, n$. 
+	
+	Let $\bv{x} = \bv{q}_i - \bv{q}_j$. By linearity, $\bs{\Pi}\bv{x} = \bs{\Pi}(\bv{q}_i - \bv{q}_j) = \bs{\Pi}\bv{q}_i - \bs{\Pi}\bv{q}_j$.
+	
+	By the Distributional JL Lemma, with probability $1-\delta$,
+	\begin{align*}
+		(1-\epsilon)\|\bv{q}_i - \bv{q}_j\|_2 \leq \|\bs{\Pi}\bv{q}_i - \bs{\Pi}\bv{q}_j\|_2 \leq (1+\epsilon) \|\bv{q}_i - \bv{q}_j\|_2.
+	\end{align*}
+	Finally, set $\delta = \frac{1}{100n^2}$. Since there are $< n^2$ total $i,j$ pairs, by a union bound we have that with probability $99/100$, the above will hold \emph{for all} $i,j$, as long as we compress to:
+	
+	\begin{align*}
+		k = O\left(\frac{\log(1/(1/100n^2))}{\epsilon^2}\right) = O\left(\frac{\log n}{\epsilon^2}\right) \text{ dimensions.}\qed
+	\end{align*}
+	
+\end{frame}
+
+\begin{frame}
+	\frametitle{proof of distributional jl}
+	Want to argue that, with probability $(1-\delta)$,
+	\begin{align*}
+		(1-\epsilon)\|\bv{x}\|_2^2 \leq |\bs{\Pi}\bv{x}\|_2^2 \leq (1+\epsilon)\|\bv{x}\|_2^2 
+	\end{align*}
+	
+	\begin{center}
+		\alert{\textbf{Claim}: $\E \|\bs{\Pi} \bv{x} \|_2^2 = \|\bv{x}\|_2^2.$}
+	\end{center}
+	
+	\vspace{-1em}
+	Some notation:
+	\begin{center}
+		\includegraphics[width=.6\textwidth]{jl_notation.png}
+		
+		So each $\bs{\pi}_i$ contains $\mathcal{N}(0,1)$ entries. 
+	\end{center}
+\end{frame}
+
+\begin{frame}
+	\frametitle{proof of distributional jl}
+	\textbf{Intermediate Claim:} Let $\bs{\pi}$ be a length $d$ vector with $\mathcal{N}(0,1)$ entries. 
+	\begin{align*}
+		\E\left[\|\bs{\Pi} \bv{x} \|_2^2 \right]  = \E\left[\left(\langle\bs{\pi},\bv{x}\rangle\right)^2 \right] .
+	\end{align*}
+	%	\begin{align*}
+		%		\|\bs{\Pi} \bv{x} \|_2^2 = \sum_i^k \bv{s}[i]^2 = \sum_i^k \left(\frac{1}{\sqrt{k}}\langle\bs{\pi}_i,\bv{x}\rangle\right)^2 = \frac{1}{k}\sum_i^k \left(\langle\bs{\pi}_i,\bv{x}\rangle\right)^2 
+		%	\end{align*}
+	%	\begin{align*}
+		%		\E\left[\|\bs{\Pi} \bv{x} \|_2^2 \right] &= \frac{1}{k}\sum_i^k \E\left[\left(\langle\bs{\pi}_i,\bv{x}\rangle\right)^2 \right] \\
+		%		& =\E\left[\left(\langle\bs{\pi}_i,\bv{x}\rangle\right)^2 \right] 
+		%	\end{align*}
+	\vspace{9em}
+	\begin{block}{\vspace*{-3ex}}
+		\small \textbf{Goal}: Prove $\E \|\bs{\Pi} \bv{x} \|_2^2 = \|\bv{x}\|_2^2$.
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\frametitle{proof of distributional jl}	
+	\begin{align*}
+		\langle\bs{\pi},\bv{x}\rangle = Z_1\cdot{x}[1] + Z_2\cdot{x}[2]  +  \ldots + Z_d\cdot{x}[d]
+	\end{align*}
+	where each $Z_1, \ldots, Z_d$ is a standard normal $\mathcal{N}(0,1)$. 
+	
+	We have that $Z_i \cdot{x}[i]$ is a normal $\mathcal{N}(0,{x}[i]^2)$ random variable.
+	
+	\vspace{5em}
+	\begin{block}{\vspace*{-3ex}}
+		\small \textbf{Goal}: Prove $\E \|\bs{\Pi} \bv{x} \|_2^2 = \|\bv{x}\|_2^2$. Established: $\E \|\bs{\Pi} \bv{x} \|_2^2 = \E\left[\left(\langle\bs{\pi},\bv{x}\rangle\right)^2 \right]$
+	\end{block}
 \end{frame}
 
 \begin{frame}[t]
-	\frametitle{sample application}
+	\frametitle{stable random variables}
+	\textbf{What type of random variable is $\langle\bs{\pi},\bv{x}\rangle$?}
+	\begin{fact}[Stability of Gaussian random variables]
+		\begin{align*}
+			\mathcal{N}(\mu_1, \sigma_1^2) + \mathcal{N}(\mu_2, \sigma_2^2) =  \mathcal{N}(\mu_1 + \mu_2, \sigma_1^2 + \sigma_2^2)
+		\end{align*}
+	\end{fact}
+	\begin{align*}
+		\langle\bs{\pi},\bv{x}\rangle &= \mathcal{N}(0,{x}[1]^2) + \mathcal{N}(0,{x}[2]^2) + \ldots + \mathcal{N}(0,{x}[d]^2) \\ &= \mathcal{N}(0,\|\bv{x}\|_2^2). 
+	\end{align*}
+	
+	So $\E \|\bs{\Pi} \bv{x} \|_2^2 = \E\left[\left(\langle\bs{\pi},\bv{x}\rangle\right)^2 \right] = \E\left[\mathcal{N}(0,\|\bv{x}\|_2^2)^2\right]  = \|\bv{x}\|_2^2$, as desired.
+\end{frame}
+
+\begin{frame}
+	\frametitle{proof of distributional jl}
+	Want to argue that, with probability $(1-\delta)$,
+	\begin{align*}
+		(1-\epsilon)\|\bv{x}\|_2^2 \leq \|\bs{\Pi}\bv{x}\|_2^2 \leq (1+\epsilon)\|\bv{x}\|_2^2 
+	\end{align*}
+	
+	\begin{enumerate}
+		\item $\E \|\bs{\Pi} \bv{x} \|_2^2 = \|\bv{x}\|_2^2$.
+		\item Need to use a concentration bound.
+	\end{enumerate}
+	\begin{align*}
+		\|\bs{\Pi} \bv{x} \|_2^2 = \frac{1}{k}\sum_{i=1}^k \left(\langle\bs{\pi}_i,\bv{x}\rangle\right)^2 = \frac{1}{k}\sum_{i=1}^k \mathcal{N}(0,\|\bv{x}\|_2^2)^2
+	\end{align*}
+	\alert{``Chi-squared random variable with $k$ degrees of freedom.''}
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{concentration of chi-squared random variables}
+	\begin{lemma} Let $H$ be a Chi-squared random variable with $k$ degrees of freedom. 
+		\begin{align*}
+			\Pr[|\E H - H| \geq \epsilon \E H] \leq 2 e^{-k\epsilon^2/8}
+		\end{align*}
+	\end{lemma}
+	
+	\vspace{8em}
+	\begin{block}{\vspace*{-3ex}}
+		\small \textbf{Goal}: Prove $\|\bs{\Pi} \bv{x} \|_2^2$ concentrates within $1 \pm \epsilon$ of its expectation, which equals $\|\bv{x} \|_2^2$.
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\frametitle{connection to earlier part of lecture}
+	If high dimensional geometry is so different from low-dimensional geometry, why is \emph{dimensionality reduction possible?} 
+	
+	Doesn't Johnson-Lindenstrauss tell us that high-dimensional geometry can be approximated in low dimensions?
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{connection to dimensionality reduction}
+	\textbf{Hard case:} $\bv{x}_1, \ldots, \bv{x}_n \in \R^d$ are all mutually orthogonal unit vectors: 
+	\begin{align*}
+		\|\bv{x}_i - \bv{x}_j\|_2^2 &= 2 & &\text{for all $i,j$.}  
+	\end{align*}
+	When we reduce to $k$ dimensions with JL, we still expect these vectors to be nearly orthogonal. Why?
+	
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{connection to dimensionality reduction}
+	\textbf{Hard case:} $\bv{x}_1, \ldots, \bv{x}_n \in \R^d$ are all mutually orthogonal unit vectors: 
+	\begin{align*}
+		\|\bv{x}_i - \bv{x}_j\|_2^2 &= 2 & &\text{for all $i,j$.}  
+	\end{align*}
+	
+	From our result last class, in $O(\log n /\epsilon^2)$ dimensions, there exists $2^{O(\epsilon^2\cdot \log n /\epsilon^2)} \geq n $ unit vectors that are close to mutually orthogonal.
+	\alert{$O(\log n /\epsilon^2)$ = \emph{just enough} dimensions.}
+	\vspace{2em}
+	
+	% \textbf{Alternative view:} Without additional structure, we expect that learning/inference in $d$ dimensions requires $2^{O(d)}$ data points. If we really had a data set that large, then the JL bound would be vacous, since $\log(n) = O(d)$.
+\end{frame}
+
+% \begin{frame}
+% 	\frametitle{euclidean dimensionality reduction}
+% 	\begin{lemma}[Johnson-Lindenstrauss, 1984]
+% 		For any set of $n$ data points $\bv{q}_1,\ldots, \bv{q}_n \in \R^d$ there exists a \emph{linear map} $\Pi: \R^d \rightarrow \R^k$ where $k = O\left(\frac{\log n}{\epsilon^2}\right)$ such that \emph{for all $i,j$},
+% 		\begin{align*}
+% 			(1-\epsilon)\|\bv{q}_i - \bv{q}_j\|_2 \leq \|\bs{\Pi}\bv{q}_i - \bs{\Pi}\bv{q}_j\|_2 \leq (1+\epsilon)\|\bv{q}_i - \bv{q}_j\|_2.
+% 		\end{align*}
+% 	\end{lemma}
+% 	\begin{center}
+% 		\includegraphics[height=.45\textheight]{jl_sketch.png}
+% 	\end{center}
+% \end{frame}
+
+% \begin{frame}[t]
+% 	\frametitle{second application}
+% 	\textbf{k-means clustering}: For data set $\bv{a}_1, \ldots, \bv{a}_n$,  find clusters $C_1, \ldots, C_k \subseteq \{1, \ldots, n\}$ to minimize:
+% 	\vspace{-2em}
+	
+% 	\begin{align*}
+% 		Cost(C_1,\ldots, C_k) = \sum_{j=1}^k \frac{1}{2|C_j|}\sum_{u,v\in C_j} \|\bv{a}_u - \bv{a}_v\|_2^2.
+% 	\end{align*}
+	
+% 	\vspace{-2em}
+% 	\begin{center}
+% 		\includegraphics[width=.5\textwidth]{kmeans4.png}
+% 	\end{center}
+% \end{frame}
+
+% \begin{frame}[t]
+% 	\frametitle{second application}
+% 	\textbf{k-means clustering}: For data set $\bv{a}_1, \ldots, \bv{a}_n$,  find clusters $C_1, \ldots, C_k \subseteq \{1, \ldots, n\}$ to minimize:
+% 	\vspace{-2em}
+	
+% 	\begin{align*}
+% 		Cost(C_1,\ldots, C_k) = \sum_{j=1}^k \frac{1}{2|C_j|}\sum_{u,v\in C_j} \|\bv{a}_u - \bv{a}_v\|_2^2.
+% 	\end{align*}
+	
+% 	\vspace{-2em}
+% 	\begin{center}
+% 		\vspace{-.5em}
+% 		\includegraphics[width=.5\textwidth]{clustering_projected.png}
+% 		\vspace{-.5em}
+% 	\end{center}
+% 	\textbf{Claim:} If I find the optimal clustering for $\bs{\Pi}\bv{a}_1, \ldots, \bs{\Pi}\bv{a}_n$ then its cost is less than $(1+\epsilon)$ times the cost of the best clustering obtained with the original data. 
+% \end{frame}
+
+\begin{frame}[t]
+	\frametitle{second application}
 	\textbf{k-means clustering}: Give data points $\bv{a}_1,\ldots, \bv{a}_n \in \R^d$, find centers $\bs{\mu}_1, \ldots, \bs{\mu}_k\in \R^d$ to minimize:
 	\begin{align*}
 		Cost(\bs{\mu}_1,\ldots, \bs{\mu}_k) = \sum_{i=1}^n \min_{j = 1,\ldots,k} \|\bs{\mu}_j - \bv{a}_i\|_2^2
@@ -185,7 +528,7 @@
 
 \begin{frame}[t]
 	\frametitle{k-means clustering}
-	NP hard to solve exactly, but there are many good approximation algorithms. All depend at least linearly on the dimension $d$. 
+	NP-hard to solve exactly, but there are many good approximation algorithms. All depend at least linearly on the dimension $d$. 
 	
 	\textbf{Approximation scheme}: Find clusters $\tilde{C}_1, \ldots, \tilde{C}_k$ for the $k = O\left(\frac{\log n}{\epsilon^2}\right)$ dimension data set $\bs{\Pi}\bv{a}_1, \ldots, \bs{\Pi}\bv{a}_n.$
 	
@@ -236,199 +579,6 @@
 \end{block}
 \end{frame}
 
-\begin{frame}
-	\frametitle{randomized jl constructions}
-	\begin{center}
-	 $\bs{\Pi} \in \R^{k\times d}$ can chosen so that each entry equals $\frac{1}{\sqrt{k}}  \mathcal{N}(0,1)$, or each entry equals $\frac{1}{\sqrt{k}}  \pm 1$ with equal probability. 
-	\end{center}
-	\vspace{1em}
-	
-	\begin{columns}
-		\begin{column}{0.5\textwidth}
-			\includegraphics[width=\textwidth]{rand_gauss.png}
-		\end{column}
-		\begin{column}{0.5\textwidth}
-			\includegraphics[width=\textwidth]{rand_sign.png}
-		\end{column}
-	\end{columns}
-	
-	\begin{center}
-		Lots of other constructions work.
-	\end{center}
-\end{frame}
-
-\begin{frame}
-	\frametitle{random projection}
-	\begin{center}
-		\includegraphics[width=.6\textwidth]{random_projection.png}
-	\end{center}
-	\textbf{Intuition:} Multiplying by a random matrix mimics the process of projecting onto a random $k$ dimensional subspace in $d$ dimensions.
-\end{frame}
-
-\begin{frame}
-	\frametitle{euclidean dimensionality reduction}
-	\textbf{Intermediate result:}
-	\begin{lemma}[Distributional JL Lemma]
-		Let $\bs{\Pi} \in \R^{k\times d}$ be chosen so that each entry equals $\frac{1}{\sqrt{k}}  \mathcal{N}(0,1)$, where $\mathcal{N}(0,1)$ denotes a standard Gaussian random variable. 
-		
-		If we choose $k = O\left(\frac{\log(1/\delta)}{\epsilon^2}\right)$, then for \emph{any vector $\bv{x}$}, with probability $(1-\delta)$:
-		\begin{align*}
-			(1-\epsilon)\|\bv{x}\|_2^2 \leq \|\bs{\Pi}\bv{x}\|_2^2 \leq (1+\epsilon) \|\bv{x}\|_2^2
-		\end{align*}
-	\end{lemma}
-	
-	\begin{center}\alert{
-			\textbf{Given this lemma, how do we prove the traditional Johnson-Lindenstrauss lemma?}}
-	\end{center}
-\end{frame}
-
-\begin{frame}
-	\frametitle{jl from distributional jl}
-	We have a set of vectors $\bv{q}_1, \ldots, \bv{q}_n$. Fix $i,j \in 1,\ldots, n$. 
-	
-	Let $\bv{x} = \bv{q}_i - \bv{q}_j$. By linearity, $\bs{\Pi}\bv{x} = \bs{\Pi}(\bv{q}_i - \bv{q}_j) = \bs{\Pi}\bv{q}_i - \bs{\Pi}\bv{q}_j$.
-	
-	By the Distributional JL Lemma, with probability $1-\delta$,
-	\begin{align*}
-		(1-\epsilon)\|\bv{q}_i - \bv{q}_j\|_2 \leq \|\bs{\Pi}\bv{q}_i - \bs{\Pi}\bv{q}_j\|_2 \leq (1+\epsilon) \|\bv{q}_i - \bv{q}_j\|_2.
-	\end{align*}
-	Finally, set $\delta = \frac{1}{n^2}$. Since there are $< n^2$ total $i,j$ pairs, by a union bound we have that with probability $9/10$, the above will hold \emph{for all} $i,j$, as long as we compress to:
-	
-	\begin{align*}
-		k = O\left(\frac{\log(1/(1/n^2))}{\epsilon^2}\right) = O\left(\frac{\log n}{\epsilon^2}\right) \text{ dimensions.}\qed
-	\end{align*}
-	
-\end{frame}
-
-\begin{frame}
-	\frametitle{proof of distributional jl}
-	Want to argue that, with probability $(1-\delta)$,
-	\begin{align*}
-		(1-\epsilon)\|\bv{x}\|_2^2 \leq |\bs{\Pi}\bv{x}\|_2^2 \leq (1+\epsilon)\|\bv{x}\|_2^2 
-	\end{align*}
-	
-	\begin{center}
-		\alert{\textbf{Claim}: $\E \|\bs{\Pi} \bv{x} \|_2^2 = \|\bv{x}\|_2^2.$}
-	\end{center}
-	
-	\vspace{-1em}
-	Some notation:
-	\begin{center}
-		\includegraphics[width=.6\textwidth]{jl_notation.png}
-		
-		So each $\bs{\pi}_i$ contains $\mathcal{N}(0,1)$ entries. 
-	\end{center}
-\end{frame}
-
-\begin{frame}
-	\frametitle{proof of distributional jl}
-	\textbf{Intermediate Claim:} Let $\bs{\pi}$ be a length $d$ vector with $\mathcal{N}(0,1)$ entries. 
-	\begin{align*}
-		\E\left[\|\bs{\Pi} \bv{x} \|_2^2 \right]  = \E\left[\left(\langle\bs{\pi},\bv{x}\rangle\right)^2 \right] .
-	\end{align*}
-	%	\begin{align*}
-		%		\|\bs{\Pi} \bv{x} \|_2^2 = \sum_i^k \bv{s}[i]^2 = \sum_i^k \left(\frac{1}{\sqrt{k}}\langle\bs{\pi}_i,\bv{x}\rangle\right)^2 = \frac{1}{k}\sum_i^k \left(\langle\bs{\pi}_i,\bv{x}\rangle\right)^2 
-		%	\end{align*}
-	%	\begin{align*}
-		%		\E\left[\|\bs{\Pi} \bv{x} \|_2^2 \right] &= \frac{1}{k}\sum_i^k \E\left[\left(\langle\bs{\pi}_i,\bv{x}\rangle\right)^2 \right] \\
-		%		& =\E\left[\left(\langle\bs{\pi}_i,\bv{x}\rangle\right)^2 \right] 
-		%	\end{align*}
-	\vspace{9em}
-	\begin{block}{\vspace*{-3ex}}
-		\small \textbf{Goal}: Prove $\E \|\bs{\Pi} \bv{x} \|_2^2 = \|\bv{x}\|_2^2$.
-	\end{block}
-\end{frame}
-
-\begin{frame}
-	\frametitle{proof of distributional jl}	
-	\begin{align*}
-		\langle\bs{\pi},\bv{x}\rangle = Z_1\cdot\bv{x}[1] + Z_2\cdot\bv{x}[2]  +  \ldots + Z_d\cdot\bv{x}[d]
-	\end{align*}
-	where each $Z_1, \ldots, Z_d$ is a standard normal $\mathcal{N}(0,1)$. 
-	
-	We have that $Z_i \cdot\bv{x}[i]$ is a normal $\mathcal{N}(0,\bv{x}[i]^2)$ random variable.
-	
-	\vspace{5em}
-	\begin{block}{\vspace*{-3ex}}
-		\small \textbf{Goal}: Prove $\E \|\bs{\Pi} \bv{x} \|_2^2 = \|\bv{x}\|_2^2$. Established: $\E \|\bs{\Pi} \bv{x} \|_2^2 = \E\left[\left(\langle\bs{\pi},\bv{x}\rangle\right)^2 \right]$
-	\end{block}
-\end{frame}
-
-\begin{frame}[t]
-	\frametitle{stable random variables}
-	\textbf{What type of random variable is $\langle\bs{\pi},\bv{x}\rangle$?}
-	\begin{fact}[Stability of Gaussian random variables]
-		\begin{align*}
-			\mathcal{N}(\mu_1, \sigma_1^2) + \mathcal{N}(\mu_2, \sigma_2^2) =  \mathcal{N}(\mu_1 + \mu_2, \sigma_1^2 + \sigma_2^2)
-		\end{align*}
-	\end{fact}
-	\begin{align*}
-		\langle\bs{\pi},\bv{x}\rangle &= \mathcal{N}(0,\bv{x}[1]^2) + \mathcal{N}(0,\bv{x}[2]^2) + \ldots + \mathcal{N}(0,\bv{x}[d]^2) \\ &= \mathcal{N}(0,\|\bv{x}\|_2^2). 
-	\end{align*}
-	
-	So $\E \|\bs{\Pi} \bv{x} \|_2^2 = \E\left[\left(\langle\bs{\pi},\bv{x}\rangle\right)^2 \right] = \E\left[\mathcal{N}(0,\|\bv{x}\|_2^2)\right]  = \|\bv{x}\|_2^2$, as desired.
-\end{frame}
-
-\begin{frame}
-	\frametitle{proof of distributional jl}
-	Want to argue that, with probability $(1-\delta)$,
-	\begin{align*}
-		(1-\epsilon)\|\bv{x}\|_2^2 \leq \|\bs{\Pi}\bv{x}\|_2^2 \leq (1+\epsilon)\|\bv{x}\|_2^2 
-	\end{align*}
-	
-	\begin{enumerate}
-		\item $\E \|\bs{\Pi} \bv{x} \|_2^2 = \|\bv{x}\|_2^2$.
-		\item Need to use a concentration bound.
-	\end{enumerate}
-	\begin{align*}
-		\|\bs{\Pi} \bv{x} \|_2^2 = \frac{1}{k}\sum_{i=1}^k \left(\langle\bs{\pi}_i,\bv{x}\rangle\right)^2 = \frac{1}{k}\sum_{i=1}^k \mathcal{N}(0,\|\bv{x}\|_2^2)
-	\end{align*}
-	\alert{``Chi-squared random variable with $k$ degrees of freedom.''}
-\end{frame}
-
-\begin{frame}[t]
-	\frametitle{concentration of chi-squared random variables}
-	\begin{lemma} Let $Z$ be a Chi-squared random variable with $k$ degrees of freedom. 
-		\begin{align*}
-			\Pr[|\E Z - Z| \geq \epsilon \E Z] \leq 2 e^{-k\epsilon^2/8}
-		\end{align*}
-	\end{lemma}
-	
-	\vspace{8em}
-	\begin{block}{\vspace*{-3ex}}
-		\small \textbf{Goal}: Prove $\|\bs{\Pi} \bv{x} \|_2^2$ concentrates within $1 \pm \epsilon$ of its expectation, which equals $\|\bv{x} \|_2^2$.
-	\end{block}
-\end{frame}
-
-\begin{frame}
-	\frametitle{connection last lecture}
-	If high dimensional geometry is so different from low-dimensional geometry, why is \emph{dimensionality reduction possible?} Doesn't Johnson-Lindenstrauss tell us that high-dimensional geometry can be approximated in low dimensions?
-\end{frame}
-
-\begin{frame}[t]
-	\frametitle{connection to dimensionality reduction}
-	\textbf{Hard case:} $\bv{x}_1, \ldots, \bv{x}_n \in \R^d$ are all mutually orthogonal unit vectors: 
-	\begin{align*}
-		\|\bv{x}_i - \bv{x}_j\|_2^2 &= 2 & &\text{for all $i,j$.}  
-	\end{align*}
-	When we reduce to $k$ dimensions with JL, we still expect these vectors to be nearly orthogonal. Why?
-	
-\end{frame}
-
-\begin{frame}[t]
-	\frametitle{connection to dimensionality reduction}
-	\textbf{Hard case:} $\bv{x}_1, \ldots, \bv{x}_n \in \R^d$ are all mutually orthogonal unit vectors: 
-	\begin{align*}
-		\|\bv{x}_i - \bv{x}_j\|_2^2 &= 2 & &\text{for all $i,j$.}  
-	\end{align*}
-	
-	From our result earlier, in $O(\log n /\epsilon^2)$ dimensions, there exists $2^{O(\epsilon^2\cdot \log n /\epsilon^2)} \geq n $ unit vectors that are close to mutually orthogonal.
-	\alert{$O(\log n /\epsilon^2)$ = \emph{just enough} dimensions.}
-	\vspace{2em}
-	
-	\textbf{Alternative view:} Without additional structure, we expect that learning/inference in $d$ dimenions requires $2^{O(d)}$ data points. If we really had a data set that large, then the JL bound would be vacous, since $\log(n) = O(d)$.
-\end{frame}
-
 
 %\begin{frame}[standout]
 %	\begin{center}
@@ -439,93 +589,23 @@
 \begin{frame}
 	\frametitle{dimensionality reduction}
 	\begin{center}
-		The Johnson-Lindenstrauss Lemma let us sketch vectors and preserve their $\ell_2$ Euclidean distance. 
+		The Johnson-Lindenstrauss Lemma let us sketch vectors and preserve their \textbf{$\ell_2$ Euclidean distance.} 
 		
 		We also have dimensionality reduction techniques that preserve alternative measures of similarity.
 	\end{center}
-\end{frame}
-
-
-\begin{frame}
-	\frametitle{similarity estimation}
-	\begin{center}
-			How does \textbf{Shazam} match a song clip against a library of 8 million songs (32 TB of data) in a fraction of a second?
-			
-			\only<1>{\includegraphics[width=.4\textwidth]{shazam.png}}
-		\end{center}
-	\vspace{-1em}
-	\uncover<2->{
-			\begin{figure}[h]
-					\centering
-					\begin{subfigure}[t]{0.35\textwidth}
-							\centering
-							\includegraphics[width=\textwidth]{spectrogram.png}
-							\caption{Spectrogram extracted from audio clip.}
-						\end{subfigure}
-					~
-					\begin{subfigure}[t]{0.35\textwidth}
-							\centering
-							\includegraphics[width=\textwidth]{spectrogramThresh.png}
-							\caption{Processed spectrogram: used to construct audio ``fingerprint'' $\textbf{q}\in \{0,1\}^d$.}
-						\end{subfigure}
-				\end{figure}
-			
-			\uncover<2->{\vspace{-.5em}
-					Each clip is represented by a high dimensional binary vector $\bv{q}$.
-					\includegraphics[width=\textwidth]{binaryVector.png}
-				}
-		}
-\end{frame}
-
-
-\begin{frame}
-	\frametitle{dimensionality reduction}
-	\begin{center}
-		The Johnson-Lindenstrauss Lemma let us sketch vectors and preserve their $\ell_2$ Euclidean distance. 
-		
-		We also have dimensionality reduction techniques that preserve alternative measures of similarity.
-	\end{center}
-\end{frame}
-
-\begin{frame}
-	\frametitle{similarity estimation}
-	\begin{center}
-			Given $\textbf{q}$, find any nearby ``fingerprint'' $\bv{y}$  in a database -- i.e. any $\bv{y}$ with $\text{dist}(\bv{y}, \bv{q})$ small. 
-		\end{center}
-	
-		\textbf{Challenges}:
-		\begin{itemize}
-				\item Database is possibly huge: $O(nd)$ bits.
-				\item Expensive to compute $\text{dist}(\bv{y},\bv{q})$: $O(d)$ time.
-			\end{itemize}
-\end{frame}
-
-\begin{frame}
-	\frametitle{similarity estimation}
-	\textbf{Goal:} Design a more compact sketch for comparing $\bv{q}, \bv{y}\in \{0,1\}^d$. Ideally $\ll d$ space/time complexity.
-		\begin{align*}
-				C(\textbf{q}) \in \R^k \\	
-				C(\textbf{y}) \in \R^k 
-			\end{align*}
-		\begin{center}
-				\vspace{-.5em}
-				\includegraphics[width=.8\textwidth]{compression.png}
-				\vspace{-.5em}
-			\end{center}
-			As in Johnson-Lindenstrauss compressions, we want that	$C(\bv{q})$ is similar to $C(\bv{y})$ if $\bv{q}$ is similar to $\bv{y}$.
 \end{frame}
 
 \begin{frame}
 	\frametitle{jaccard similarity}
+	Often vector embeddings used in semantic search are \emph{binary}. For such vectors, \emph{Jaccard similarity} is often used instead of Euclidean distance or inner product to compute similarity.
 	\begin{definition}[Jaccard Similarity]
 			\begin{align*}
 					J(\bv{q},\bv{y}) = \frac{|\bv{q} \cap \bv{y}|}{|\bv{q} \cup \bv{y}|} = \frac{\text{\# of non-zero entries in common}}{\text{total \# of non-zero entries}}
 				\end{align*}
 			Natural similarity measure for binary vectors. $0\leq J(\bv{q},\bv{y})\leq 1$.
 		\end{definition}
-	
-	Can be applied to any data which has a natural binary representation (more than you might think). 
 \end{frame}
+
 
 \begin{frame}
 	\frametitle{jaccard similarity for document comparison}
@@ -548,6 +628,15 @@
 \end{frame}
 
 \begin{frame}
+	\frametitle{applications: document similarity}
+	\begin{itemize}
+			\item Finding duplicate or new duplicate documents or webpages.
+			\item Change detection for high-speed web caches.
+			\item Finding near-duplicate emails or customer reviews which could indicate spam.
+		\end{itemize}
+\end{frame}
+
+\begin{frame}
 	\frametitle{jaccard similarity for seismic data}
 	\begin{center}
 			\vspace{-.5em}
@@ -560,15 +649,7 @@
 		\end{center}
 \end{frame}
 
-\begin{frame}
-	\frametitle{applications: document similarity}
-	\begin{itemize}
-			\item Finding duplicate or new duplicate documents or webpages.
-			\item Change detection for high-speed web caches.
-			\item Finding near-duplicate emails or customer reviews which could indicate spam.
-		\end{itemize}
-	
-\end{frame}
+
 
 
 \begin{frame}
@@ -674,34 +755,17 @@
 		J(\bv{q}, \bv{y}) -\epsilon \leq \tilde{J}\left(C(\bv{q}),C(\bv{y})\right)   \leq J(\bv{q}, \bv{y}) + \epsilon. 
 	\end{align*}
 	\begin{center}
-		And $\tilde{J}$ only takes $O(k)$ time to compute! \alert{\textbf{Independent}} of original fingerprint dimension $d$.
+		And $\tilde{J}$ only takes $O(k)$ time to compute! \alert{\textbf{Independent}} of original vector dimension, $d$.
 	\end{center}	
 	
-	Can be improved to $\log(1/\delta)$ dependence. Can anyone tell me how?
+	Can be improved to $\log(1/\delta)$ dependence?
 \end{frame}
 
 
 
 \begin{frame}
-	\frametitle{similarity sketching}
-	\includegraphics[width=\textwidth]{sketch_paradigm.png}
-\end{frame}
-
-\begin{frame}[standout]
-	\begin{center}
-		break
-	\end{center}
-\end{frame}
-
-\begin{frame}
-	\frametitle{near neighbor search}
-	\textbf{Common goal:} Find all vectors in database $\bv{q}_1, \ldots, \bv{q}_n \in \R^d$ that are close to some input query vector $\bv{y}\in \R^d$. I.e. find all of $\bv{y}$'s ``nearest neighbors'' in the database.
-	\begin{itemize}
-		\item The Shazam problem.
-		\item Audio + video search.
-		\item Finding duplicate or near duplicate documents.
-		\item Detecting seismic events.
-	\end{itemize}
+	\frametitle{vector search / near neighbor search}
+	\textbf{Goal:} Find all vectors in database $\bv{q}_1, \ldots, \bv{q}_n \in \R^d$ that are close to some input query vector $\bv{y}\in \R^d$. I.e. find all of $\bv{y}$'s ``nearest neighbors'' in the database.
 
 		\begin{center}
 	\textbf{\alert{How does similarity sketching help in these applications?}}
@@ -710,18 +774,22 @@
 		\item Improves runtime of ``linear scan'' from $O(nd)$ to $O(nk)$.
 		\item Improves space complexity from $O(nd)$ to $O(nk)$. This can be super important -- e.g. if it means the linear scan only accesses vectors in fast memory.
 	\end{itemize}
+
+	\begin{center}
+		\textbf{Can we also reduce the dependence on $n$?}
+	\end{center}
 \end{frame}
 
 \begin{frame}
 	\frametitle{beyond a linear scan}
 	\begin{center}
-		\textbf{New goal:} \emph{Sublinear} $o(n)$ time to find near neighbors. 
+		\textbf{Goal:} \emph{Sublinear} $o(n)$ time to find near neighbors. 
 	\end{center}
 \end{frame}
 
 \begin{frame}
 	\frametitle{beyond a linear scan}	
-	This problem can already be solved for a small number of dimensions using space partitioning approaches (e.g. kd-tree).
+	This problem can already be solved in low-dimensions using space partitioning approaches (e.g. kd-tree).
 	
 	\includegraphics[height=.4\textheight]{kdtree.png}	\includegraphics[height=.4\textheight]{3dtree.png}
 	
@@ -736,9 +804,14 @@
 		\item \textbf{\alert{Locality-sensitive hashing [Indyk, Motwani, 1998]}}
 		\item Spectral hashing [Weiss, Torralba, and Fergus, 2008]
 		\item Vector quantization [J\'{e}gou, Douze, Schmid, 2009]
+		\item Graph-based vector search [Malkov, Yashunin, 2016, Subramanya et al., 2019]
 	\end{itemize}
 
-\textbf{Key Insight of LSH:} Trade worse space-complexity for better time-complexity. I.e. typically use more than $O(n)$ space.
+\textbf{Key ideas behind all of these methods:} 
+\begin{enumerate}
+\item Trade worse space-complexity + preprocessing time for better time-complexity. I.e., preprocess database in data structure that uses $\Omega(n)$ space.
+\item Allow for approximation.
+\end{enumerate}
 \end{frame}
 
 \begin{frame}
@@ -786,7 +859,7 @@
 \begin{frame}
 	\frametitle{near neighbor search}
 	\begin{center}
-	Basic approach for near neighbor search in a database.
+	Basic approach for LSH-based near neighbor search in a database.
 	\end{center}
 		\textbf{Pre-processing:}
 	\begin{itemize}
@@ -819,13 +892,15 @@
 
 A higher false negative rate means we miss near neighbors.
 
-A higher false positive rate means increased runtime -- we need to compute $J(\bv{q},\bv{y})$ for every $\bv{q}\in T(h(\bv{y}))$ to check if it's actually close to $\bv{y}$.
+A higher false positive rate means increased runtime -- we need to compute $S(\bv{q},\bv{y})$ for every $\bv{q}\in T(h(\bv{y}))$ to check if it's actually close to $\bv{y}$.
 
 \textbf{Note:} The meaning of ``close'' and ``not close'' is application dependent. E.g. we might specify that we want to find anything with Jaccard similarity $> .4$, but not with Jaccard similarity $< .2$. 
 \end{frame}
 
-\begin{frame}
+\begin{frame}[t]
 	\frametitle{reducing false negative rate}	
+	Let's use Jaccard similarity as a running example. We will discuss LSH for inner product/Euclidean distance as well. \\
+
 	Suppose the nearest database point $\bv{q}$ has $J(\bv{y},\bv{q}) = .4$.
 	\begin{center}
 	\textbf{\alert{What's the probability we do not find $\bv{q}$?}}
@@ -891,7 +966,7 @@ A higher false positive rate means increased runtime -- we need to compute $J(\b
 	\vspace{-.5em}
 	\begin{itemize}
 		\item Choose parameter $r \in \mathbb{Z}^+$.
-		\item Let $c_1, \ldots, c_r: \{0,1\}^d \rightarrow [0,1]$ be random MinHash.
+		\item Let $c_1, \ldots, c_r: \{0,1\}^d \rightarrow [0,1]$ be independnt random MinHash's.
 		\item Let $g: [0,1]^r \rightarrow \{1, \ldots, m\}$ be a uniform random hash function.
 		\item Let $h(\bv{x}) = g(c_1(\bv{x}), \ldots, c_r(\bv{x})).$
 	\end{itemize}
@@ -1068,7 +1143,7 @@ A higher false positive rate means increased runtime -- we need to compute $J(\b
 \end{frame}
 
 \begin{frame}
-	\frametitle{fixed threshold r}
+	\frametitle{worse case guarantees}
 	\begin{center}
 	\textbf{Near Neighbor Search Problem}
 \end{center}
@@ -1093,6 +1168,7 @@ A higher false positive rate means increased runtime -- we need to compute $J(\b
 			\item Space: $\tilde{O}\left(n^{1 + 1/C}\right)$. 
 		\end{itemize}
 	\end{theorem}
+	Similar results can be proven for other metrics, including Euclidean distance. But you need a good LSH function.
 \end{frame}
 
 \begin{frame}
@@ -1149,9 +1225,9 @@ A higher false positive rate means increased runtime -- we need to compute $J(\b
 
 \begin{frame}[t]
 	\frametitle{simhash analysis in 2d}
-	\textbf{Theorem (to be prove):} If $\cos(\theta(\bv{x},\bv{y})) = v$, then 
+	\textbf{Theorem (to be proven):} If $\cos(\theta(\bv{x},\bv{y})) = v$, then 
 	\begin{align*}
-		\Pr[h(\bv{x}) == h(\bv{y})] = 1 - \frac{\theta}{\pi}  + \frac{1}{m}= 1 - \frac{\cos^{-1}(v)}{\pi} + \frac{1}{m}
+		\Pr[h(\bv{x}) == h(\bv{y})] = 1 - \frac{\theta}{\pi}  + \frac{\theta/\pi}{m}= 1 - \frac{\cos^{-1}(v)}{\pi} + \frac{\theta/\pi}{m}
 	\end{align*}
 	\begin{center}
 		\includegraphics[width=.6\textwidth]{cosine_sim.png}
@@ -1160,26 +1236,26 @@ A higher false positive rate means increased runtime -- we need to compute $J(\b
 
 \begin{frame}
 	\frametitle{simhash}
-	SimHash can be tuned, just like our MinHash based LSH function for Jaccard similarity:
+	SimHash can be banded, just like our MinHash based LSH function for Jaccard similarity:
 	\begin{itemize}
 		\item Let $\bv{g}_1,\ldots, \bv{g}_r \in \R^d$ be randomly chosen with each entry $\mathcal{N}(0,1)$. 
 		\item Let $f: \{-1,1\}^r \rightarrow \{1,\ldots, m\}$ be a uniformly random hash function. 
 		\item $h: \R^d \rightarrow \{1,\ldots, m\}$ is defined $h(\bv{x}) = f\left([\sign(\langle \bv{g}_1, \bv{x} \rangle),\ldots, \sign(\langle \bv{g}_r, \bv{x} \rangle)]\right)$.
 	\end{itemize}
 \begin{align*}
-	\Pr[h(\bv{x}) == h(\bv{y})] = \left(1-\frac{\theta}{\Pi}\right)^r
+	\Pr[h(\bv{x}) == h(\bv{y})] \approx \left(1-\frac{\theta}{\Pi}\right)^r
 \end{align*}
 \end{frame}
 
 \begin{frame}
-	\textbf{To prove:}  $\Pr[h(\bv{x}) == h(\bv{y})] = 1 - \frac{\theta}{\pi}$,  where $h(\bv{x}) = f\left(\sign(\langle \bv{g}, \bv{x} \rangle)\right)$ and $f$ is uniformly random hash function.
+	\textbf{To prove:}  $\Pr[h(\bv{x}) == h(\bv{y})] \approx 1 - \frac{\theta}{\pi}$,  where $h(\bv{x}) = f\left(\sign(\langle \bv{g}, \bv{x} \rangle)\right)$ and $f$ is uniformly random hash function.
 	\frametitle{simhash analysis in 2d}
 	\vspace{-.5em}
 	\begin{center}
 		\includegraphics[width=.5\textwidth]{simhash1.png}
 	\end{center}
 \begin{align*}
-	\Pr[h(\bv{x}) == h(\bv{y})] = z + \frac{1-v}{m} \approx z.
+	\Pr[h(\bv{x}) == h(\bv{y})] = z + \frac{1-z}{m} \approx z.
 \end{align*}
 where $z = \Pr[\sign(\langle \bv{g}, \bv{x} \rangle) == \sign(\langle \bv{g}, \bv{y} \rangle)]$
 \end{frame}
@@ -1216,402 +1292,38 @@ There is always some \emph{rotation matrix} $\bv{U}$ such that $\bv{U}\bv{x},\bv
 \begin{frame}[t]
 	\frametitle{simhash analysis higher dimensions}
 \textbf{Claim:} 
+% \begin{align*}
+% 1 - \frac{\theta}{\pi} &= \Pr[\sign(\langle \bv{g}[1,2], (\bv{U}\bv{x})[1,2] \rangle) == \sign(\langle \bv{g}[1,2], (\bv{U}\bv{y}[1,2] \rangle)] \\
+% &= \Pr[\sign(\langle \bv{g}, \bv{U}\bv{x} \rangle) == \sign(\langle \bv{g}, \bv{U}\bv{y} \rangle)] \\
+% &\alert{= \Pr[\sign(\langle \bv{g}, \bv{x} \rangle) == \sign(\langle \bv{g}, \bv{y} \rangle)]}
+% \end{align*}
 \begin{align*}
-1 - \frac{\theta}{\pi} &= \Pr[\sign(\langle \bv{g}[1,2], (\bv{U}\bv{x})[1,2] \rangle) == \sign(\langle \bv{g}[1,2], (\bv{U}\bv{y}[1,2] \rangle)] \\
-&= \Pr[\sign(\langle \bv{g}, \bv{U}\bv{x} \rangle) == \sign(\langle \bv{g}, \bv{U}\bv{y} \rangle)] \\
-&\alert{= \Pr[\sign(\langle \bv{g}, \bv{x} \rangle) == \sign(\langle \bv{g}, \bv{y} \rangle)]}
-\end{align*}
+	&\Pr[\sign(\langle \bv{g}, \bv{x} \rangle) == \sign(\langle \bv{g}, \bv{y} \rangle) = \Pr[\sign(\langle \bv{g}, \bv{U}\bv{x} \rangle) == \sign(\langle \bv{g}, \bv{U}\bv{y} \rangle)] \\
+	&\hspace{4em}= \Pr[\sign(\langle \bv{g}[1,2], (\bv{U}\bv{x})[1,2] \rangle) == \sign(\langle \bv{g}[1,2], (\bv{U}\bv{y}[1,2] \rangle)]\\
+	&\hspace{4em} = 1 - \frac{\theta}{\pi}.
+	\end{align*}
 
-	Why?
+	The first step is the trickiest here. Why does it hold?
 \end{frame}
 
-\begin{frame}[t]
-	\frametitle{modern near neigbhor search}
-	\begin{itemize}
-		\item High-dimensional vector search is exploding as a research area with the rise of machine-learned multi-modal embeddings for images, text, and more. 
-	\end{itemize}
-	\begin{center}
-		\vspace{-.5em}
-				\includegraphics[width=.8\textwidth]{multimodal_embeddings.png}
-				\vspace{-.5em}
-	\end{center}
-	Web-scale image search is now a vector search problem. 
-\end{frame}
+% \begin{frame}[t]
+% 	\frametitle{modern near neigbhor search}
+% 	\begin{itemize}
+% 		\item High-dimensional vector search is exploding as a research area with the rise of machine-learned multi-modal embeddings for images, text, and more. 
+% 	\end{itemize}
+% 	\begin{center}
+% 		\vspace{-.5em}
+% 				\includegraphics[width=.8\textwidth]{multimodal_embeddings.png}
+% 				\vspace{-.5em}
+% 	\end{center}
+% 	Web-scale image search is now a vector search problem. 
+% \end{frame}
 
-\begin{frame}[t]
-	\frametitle{graph based near neigbhor}
+% \begin{frame}[t]
+% 	\frametitle{graph based near neigbhor}
 	
-\end{frame}
+% \end{frame}
 
-%\begin{frame}[standout]
-%	\begin{center}
-%		break
-%	\end{center}
-%\end{frame}
-%
-%\begin{frame}
-%	\frametitle{next unit: continuous optimization}
-%	Have some function $f : \R^d \rightarrow \R$. Want to find ${\bv{x}}^*$ such that:
-%	\begin{align*}
-%		f({\bv{x}}^*) = \min_{\bv{x}} f(\bv{x}).
-%	\end{align*}
-%	Or at least $\hat{\bv{x}}$ which is close to a minimum. E.g. $f(\hat{\bv{x}}) \leq \min_{\bv{x}} f(\bv{x}) + \epsilon$
-%	
-%	Often we have some additional constraints:
-%	\begin{itemize}
-%		\item $\bv{x} > 0$.
-%		\item $\|\bv{x}\|_2 \leq R$, $\|\bv{x}\|_1 \leq R$.
-%		\item $\bv{a}^T\bv{x} > c$.
-%	\end{itemize}
-%\end{frame}
-%
-%\begin{frame}
-%	\frametitle{continuous optimization}
-%	\textbf{Dimension $d = 1$:}
-%	\includegraphics[width=\textwidth]{1d_functions.png}
-%	
-%	\textbf{Dimension $d = 2$:}
-%	
-%	\includegraphics[width=\textwidth]{2dfunctions.png}
-%\end{frame}
-%
-%\begin{frame}
-%	\frametitle{optimization in machine learning}
-%	\begin{center}
-%		\alert{\textbf{Continuouos optimization is the foundation of modern machine learning.}}
-%	\end{center}
-%	\textbf{Supervised learning:} Want to learn a model that maps \emph{inputs}
-%	\begin{itemize}
-%		\item numerical data vectors
-%		\item images, video
-%		\item text documents
-%	\end{itemize} 
-%	
-%	to \emph{predictions}
-%	\begin{itemize}
-%		\item numerical value (probability stock price increases)
-%		\item label (is the image a cat? does the image contain a car?)
-%		\item decision (turn car left, rotate robotic arm)
-%	\end{itemize} 
-%\end{frame}
-%
-%\begin{frame}
-%	\frametitle{machine learning model}
-%	\begin{center}
-%		Let $M_{\bv{x}}$ be a model with parameters $\bv{x} = \{x_1, \ldots, x_k\}$, which takes as input a data vector $\bv{a}$ and outputs a prediction.
-%	\end{center}
-%	
-%	\textbf{Example:}
-%	\begin{align*}
-%		M_{\bv{x}}(\bv{a}) = \sign(\bv{a}^T\bv{x})
-%	\end{align*}		
-%\end{frame}
-%
-%\begin{frame}[t]
-%	\frametitle{machine learning model}
-%	\textbf{Example:}
-%	\begin{center}
-%		\includegraphics[width=.7\textwidth]{neuralNetwork.png}
-%	\end{center}	
-%	$\bv{x}\in \R^{\text{(\# of connections)}}$ is the parameter vector containing all the network weights. 	
-%\end{frame}
-%
-%\begin{frame}
-%	\frametitle{supervised learning}
-%	Classic approach in \emph{supervised learning}: Find a model that works well on data that you already have the answer for (labels, values, classes, etc.).
-%	\begin{itemize}
-%		\item Model $M_{\bv{x}}$ parameterized by a vector of numbers $\bv{x}$.
-%		\item Dataset $\bv{a}^{(1)}, \ldots,  \bv{a}^{(n)}$ with outputs $y^{(1)}, \ldots, y^{(n)}$.
-%	\end{itemize}
-%	\begin{center}
-%		Want to find $\hat{\bv{x}}$ so that $M_{\hat{\bv{x}}}(\bv{a}^{(i)}) \approx y^{(i)}$ for $i \in 1,\ldots, n$.
-%		
-%		\alert{\textbf{How do we turn this into a function minimization problem?}}
-%	\end{center}
-%\end{frame}
-%
-%\begin{frame}
-%	\frametitle{loss function}
-%	\textbf{Loss function $L\left(M_{\bv{x}}(\bv{a}), y\right)$:} Some measure of distance between prediction $M_{\bv{x}}(\bv{a})$ and target output $y$. Increases if they are further apart.
-%	\begin{itemize}
-%		\item Squared ($\ell_2$) loss: $|M_{{\bv{x}}}(\bv{a}) - y|^2$
-%		\item Absolute deviation ($\ell_1$) loss: $|M_{{\bv{x}}}(\bv{a}) - y|$
-%		\item Hinge loss: 1 - $y \cdot M_{{\bv{x}}}(\bv{a})$ 
-%		\item Cross-entropy loss (log loss). 
-%		%		$−o  \log(M_{{\bv{x}}}(\bv{y})+(1 - o)\log(1 - M_{{\bv{x}}}(\bv{y}))$
-%		\item Etc.
-%	\end{itemize}
-%\end{frame}
-%
-%\begin{frame}
-%	\frametitle{empirical risk minimization}
-%	\textbf{Empirical risk minimization}:
-%	\begin{align*}
-%		f(\bv{x}) = \sum_{i=1}^n L\left(M_{\bv{x}}(\bv{a}^{(i)}), y^{(i)}\right)
-%	\end{align*}
-%	\begin{center}
-%		Solve the optimization problem $\min_{\bv{x}} f(\bv{x})$.
-%	\end{center}
-%\end{frame}
-%
-%\begin{frame}
-%	\frametitle{example: linear regression}
-%	\begin{itemize}
-%		\item $M_{\bv{x}}(\bv{a}) = \bv{x}^T\bv{a}$. $\bv{x}$ contains the regression coefficients. 
-%		\item $L(z,y) = |z-y|^2$. 
-%		\item $f(\bv{x}) = \sum_{i=1}^n |\bv{x}^T\bv{a}^{(i)} - y^{(i)}|^2$
-%	\end{itemize}
-%	\begin{align*}
-%		f(\bv{x}) = \|\bv{A}\bv{x} - \bv{y}\|_2^2
-%	\end{align*}
-%	where $\bv{A}$ is a matrix with $\bv{a}^{(i)}$ as its $i^\text{th}$ row and $\bv{y}$ is a vector with $y^{(i)}$ as its $i^\text{th}$ entry. 
-%\end{frame}
-%
-%\begin{frame}
-%	\frametitle{algorithms for continuous optimization}
-%	The choice of algorithm to minimize $f(\bv{x})$ will depend on:
-%	\begin{itemize}
-%		\item The form of $f(\bv{x})$ (is it linear, is it quadratic, does it have finite sum structure, etc.)
-%		\item If there are any additional constraints imposed on $\bv{x}$. E.g. $\|\bv{x}\|_2 \leq c$. 
-%	\end{itemize}
-%	\textbf{What are some example algorithms for continuous optimization?}
-%	
-%\end{frame}
-%
-%\begin{frame}
-%	\frametitle{first topic: gradient descent + variants}
-%	\textbf{Gradient descent:} A greedy algorithm for minimizing functions of multiple variables that often works amazingly well. 
-%	\begin{center}
-%		\includegraphics[width=.4\textwidth]{greedy_gradient.png}
-%		
-%		Runtime generally scales \emph{linearly} with the dimension of $\bv{x}$ (although this is a bit of an over-simplification).
-%	\end{center}
-%\end{frame}
-%
-%\begin{frame}
-%	\frametitle{second topic: methods suitable for lower dimension }
-%	\begin{itemize}
-%		\item Cutting plane methods (e.g. center-of-gravity, ellipsoid)
-%		\item Interior point methods
-%	\end{itemize}
-%	Fast and more accurate in low-dimensions, slower in very high dimensions. Generally runtime scales \emph{polynomially} with the dimension of $\bv{x}$.
-%\end{frame}
-%
-%\begin{frame}
-%	\frametitle{calculus review}
-%	For $i = 1, \ldots, d$, let $x_i$ be the $i^\text{th}$ entry of $\bv{x}$. Let $\bv{e}^{(i)}$ be the $i^\text{th}$ \emph{standard basis vector.}
-%	\vspace{2em}
-%	
-%	\textbf{Partial derivative:}
-%	\begin{align*}
-%		\frac{\partial f}{\partial x_i}(\bv{x}) = \lim_{t\rightarrow 0} \frac{f(\bv{x} + t\bv{e}^{(i)}) - f(\bv{x})}{t}
-%	\end{align*}
-%	\textbf{Directional derivative:}
-%	\begin{align*}
-%		D_\bv{v}f(\bv{x}) = \lim_{t\rightarrow 0} \frac{f(\bv{x} + t\bv{v}) - f(\bv{x})}{t}
-%	\end{align*}
-%\end{frame}
-%
-%\begin{frame}
-%	\frametitle{calculus review}
-%	\textbf{Gradient}:
-%	\begin{align*}
-%		\nabla f(\bv{x}) = 
-%		\begin{bmatrix}
-%			\frac{\partial f}{\partial x_1}(\bv{x}) \\ \frac{\partial f}{\partial x_2}(\bv{x}) \\ \vdots \\ \frac{\partial f}{\partial x_d}(\bv{x}) 
-%		\end{bmatrix}
-%	\end{align*}
-%	\textbf{Directional derivative:}
-%	\begin{align*}
-%		D_\bv{v}f(\bv{x}) = \lim_{t\rightarrow 0} \frac{f(\bv{x} + t\bv{v}) - f(\bv{x})}{t} = \alert{\nabla f(\bv{x})^T \bv{v}.}
-%	\end{align*}
-%\end{frame}
-%
-%
-%\begin{frame}
-%	\frametitle{first order optimization}
-%	Given a function $f$ to minimize, assume we have:
-%	\begin{itemize}
-%		\item \textbf{Function oracle}: Evaluate $f(\bv{x})$ for any $\bv{x}$. 
-%		\item \textbf{Gradient oracle}: Evaluate $\nabla f(\bv{x})$ for any $\bv{x}$.
-%	\end{itemize}
-%	We view the implementation of these oracles as black-boxes, but they can often require a fair bit of computation. 
-%\end{frame}
-%
-%\begin{frame}[t]
-%	\frametitle{example gradient evaluation}
-%	\textbf{Linear least-squares regression}:
-%	\begin{itemize}
-%		\item Given $\bv{a}^{(1)}, \ldots \bv{a}^{(n)} \in \R^d$, ${y}^{(1)}, \ldots {y}^{(n)} \in \R$.
-%		\item Want to minimize:
-%		\begin{align*}
-%			f(\bv{x}) = \sum_{i=1}^n \left(\bv{x}^T\bv{a}^{(i)} - {y}^{(i)}\right)^2 = \|\bv{A}\bv{x} - \bv{y}\|_2^2.
-%		\end{align*} 
-%	\end{itemize}
-%	
-%	\begin{align*}
-%		\frac{\partial f}{\partial x_j} = \sum_{i=1}^n 2\left(\bv{x}^T\bv{a}^{(i)} - {y}^{(i)}\right)\cdot a^{(i)}_j = (2\bv{A}\bv{x} -\bv{y})^T\bs{\alpha}^{(j)}
-%	\end{align*}
-%	where $\bs{\alpha}^{(j)}$ is the $j^\text{th}$ \emph{column} of $\bv{A}$. 
-%	\begin{align*}
-%		\nabla f(\bv{x}) = 2\bv{A}^T\left(\bv{A}\bv{x} - \bv{y}\right)
-%	\end{align*}
-%	\textbf{What is the time complexity of a gradient oracle for $\nabla f(\bv{x})$?}
-%\end{frame}
-%
-%\begin{frame}
-%	\frametitle{decent methods}
-%	\textbf{Greedy approach:} Given a starting point $\bv{x}$, make a small adjustment that decreases $f(\bv{x})$. In particular, $\bv{x} \leftarrow \bv{x} + \eta\bv{v}$ and $f(\bv{x}) \leftarrow f(\bv{x} + \eta\bv{v})$.
-%	
-%	\begin{center}
-%		\alert{What property do I want in $\bv{v}$?}
-%	\end{center}
-%	
-%	
-%	\textbf{Leading question:} When $\eta$ is small, what's an approximation for $f(\bv{x} + \eta\bv{v}) - f(\bv{x})$?
-%	\begin{align*}
-%		f(\bv{x} + \eta\bv{v}) - f(\bv{x}) \approx \hspace{6em}
-%	\end{align*}
-%	
-%	
-%\end{frame}
-%
-%\begin{frame}[t]
-%	\frametitle{directional derivatives}
-%	
-%	\begin{align*}
-%		D_\bv{v}f(\bv{x}) = \lim_{t\rightarrow 0} \frac{f(\bv{x} + t\bv{v}) - f(\bv{x})}{t} = \nabla f(\bv{x})^T \bv{v}.
-%	\end{align*}	
-%	So:
-%	\begin{align*}
-%		f(\bv{x} + \eta\bv{v}) - f(\bv{x}) \approx \hspace{6em}
-%	\end{align*}
-%	
-%	\textbf{How should we choose $\bv{v}$ so that $f(\bv{x} + \eta\bv{v}) < f(\bv{x})$?} 
-%	
-%\end{frame}
-%
-%\begin{frame}
-%	\frametitle{gradient descent}
-%	\textbf{Prototype algorithm:}
-%	\begin{itemize}
-%		\item Choose starting point $\bv{x}^{(0)}$.
-%		\item For $i = 0,\ldots, T$:
-%		\begin{itemize}
-%			\item $\bv{x}^{(i+1)} = \bv{x}^{(i)} - \eta \nabla f(\bv{x}^{(i)})$
-%		\end{itemize}
-%		\item Return $\bv{x}^{(T)}$.
-%	\end{itemize}
-%	
-%	$\eta$ is a step-size parameter, which is often adapted on the go. For now, assume it is fixed ahead of time.
-%\end{frame}
-%
-%\begin{frame}[t]
-%	\frametitle{gradient descent intuition}
-%	\textbf{1 dimensional example:}
-%\end{frame}
-%
-%\begin{frame}[t]
-%	\frametitle{gradient descent intuition}
-%	\textbf{2 dimensional example:}
-%	\begin{center}
-%		\includegraphics[width=.7\textwidth]{2d_example.png}
-%	\end{center}
-%\end{frame}
-%
-%\begin{frame}[t]
-%	\frametitle{key results}
-%	\textbf{For a convex function $f(\bv{x})$:}
-%	For sufficiently small $\eta$ and a sufficiently large number of iterations $T$, gradient descent will converge to a \alert{\textbf{near global minimum}}:
-%	\begin{align*}
-%		f(\bv{x}^{(T)}) \leq  f(\bv{x}^{*}) + \epsilon.  
-%	\end{align*}
-%	Examples: least squares regression, logistic regression, kernel regression, SVMs.
-%	
-%	\textbf{For a non-convex function $f(\bv{x})$:}
-%	For sufficiently small $\eta$ and  a sufficiently large number of iterations $T$, gradient descent will converge to a \alert{\textbf{near stationary point}}:
-%	\begin{align*}
-%		\|\nabla f(\bv{x}^{(T)})\|_2 \leq  \epsilon.  
-%	\end{align*}
-%	Examples: neural networks, matrix completion problems, mixture models. 	
-%\end{frame}
-%
-%\begin{frame}[t]
-%	\frametitle{convex vs. non-convex}
-%	\begin{center}
-%		\includegraphics[width=\textwidth]{nonconvex_converge.png}
-%	\end{center}
-%	One issue with non-convex functions is that they can have \alert{\textbf{local minima}}. Even when they don't, convergence analysis requires different assumptions than convex functions. 	
-%\end{frame}
-%
-%\begin{frame}[t]
-%	\frametitle{approach for this unit}
-%	We care about \emph{how fast} gradient descent and related methods converge, not just that they do converge. 
-%	\begin{itemize}
-%		\item Bounding iteration complexity requires placing some assumptions on $f(\bv{x})$. 
-%		\item Stronger assumptions lead to better bounds on the convergence. 
-%	\end{itemize}
-%	Understanding these assumptions can help us design faster variants of gradient descent (there are many!). 
-%\end{frame}
-%
-%\begin{frame}[t]
-%	\frametitle{convexity}
-%	\begin{definition}[Convex]
-%		A function $f$ is convex iff for any $\bv{x}, \bv{y},\lambda \in [0,1]$:
-%		\begin{align*}
-%			(1-\lambda)\cdot f(\bv{x}) + \lambda \cdot f(\bv{y}) \geq f\left((1-\lambda)\cdot\bv{x} + \lambda \cdot\bv{y}\right)
-%		\end{align*}
-%	\end{definition}
-%	\vspace{-.5em}
-%	\begin{center}
-%		\includegraphics[width=.6\textwidth]{convex1.png}
-%	\end{center}
-%\end{frame}
-%
-%
-%\begin{frame}[t]
-%	\frametitle{gradient descent}
-%	\small
-%	\begin{definition}[Convex]
-%		A function $f$ is convex if and only if for any $\bv{x}, \bv{y}$:
-%		\begin{align*}
-%			f(\bv{x} + \bv{z}) \geq f(\bv{x}) + \nabla f(\bv{x})^T\bv{z}
-%		\end{align*}
-%		\vspace{-1em}
-%		Equivalently:
-%		\vspace{-.5em}
-%		\begin{align*}
-%			f(\bv{x}) - f(\bv{y}) \leq \nabla f(\bv{x})^T (\bv{x} - \bv{y})
-%		\end{align*}
-%		\vspace{-1em}
-%	\end{definition}
-%	
-%	\includegraphics[width=.5\textwidth]{convex2.png}
-%	
-%\end{frame}
-%
-%\begin{frame}[t]
-%	\frametitle{gradient descent analysis}
-%	\textbf{Assume:}
-%	\begin{itemize}
-%		\item $f$ is convex.
-%		\item Lipschitz function: for all $\bv{x}$, $\|\nabla f(\bv{x})\|_2 \leq \alert{G}$.
-%		\item Starting radius: $\|\bv{x}^{*} - \bv{x}^{(0)}\|_2 \leq \alert{R}$.
-%	\end{itemize}
-%	
-%	\textbf{Gradient descent:}
-%	\begin{itemize}
-%		\item Choose number of steps $T$.
-%		\item Starting point $\bv{x}^{(0)}$. E.g.  $\bv{x}^{(0)} = \vec{0}$.
-%		\item $\eta = \frac{R}{G\sqrt{T}}$
-%		\item For $i = 0,\ldots, T$:
-%		\begin{itemize}
-%			\item $\bv{x}^{(i+1)} = \bv{x}^{(i)} - \eta \nabla f(\bv{x}^{(i)})$
-%		\end{itemize}
-%		\item Return $\hat{\bv{x}} = \argmin_{\bv{x}^{(i)}} f(\bv{x}^{(i)})$.
-%		%		\item Alternatively, return $\hat{\bv{x}} = \frac{1}{T}\sum_{i=1}^T \bv{x}^{(i)}$.
-%	\end{itemize}
-%\end{frame}
 
 \end{document} 
 

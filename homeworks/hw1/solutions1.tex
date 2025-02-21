@@ -47,135 +47,186 @@
 
 \begin{document}
 	
-	\homework{1}{Solution key}
+\section*{Problem 1 }
+	1. \hspace{1em} Assume our hash table has $cm^2$ slots for  large constant $c$. Conditioned on the event that none of the first $i-1$ items collided when inserted in the table, the probability that the $i^\text{th}$ item does not causes a collision is
+	\begin{align*}
+		1 - \frac{i-1}{cm^2}.
+	\end{align*}
+In particular, when the $i^\text{th}$ item is inserted, the table has $i-1$ filled slots out of $cm^2$ total. 
 
-	\section*{Problem 1}
-\smallskip\noindent 1.\hspace{1em} $\E[X] = 1/2$, so by Markov's $\Pr[X \geq 7/8]\leq \frac{1/2}{7/8} = .571$. 
+From the expression above, we can bound the probability there are no collisions by:
+	\begin{align*}
+	\left(1 - \frac{0}{cm^2}\right)\cdot \left(1 - \frac{1}{cm^2}\right)\cdot \left(1 - \frac{2}{cm^2}\right) \cdot \ldots \cdot \left(1 - \frac{m-1}{cm^2}\right) < \left(1 - \frac{1}{cm}\right)^m.
+	\end{align*}
+	The inequality follow from the fact the $i/m < 1$ for all $i \leq m-1$. 
 
-\smallskip\noindent 2.\hspace{1em} $\E[(X-\E X)^2] = \int_{0^1} (x-.5)^2 dx = .08333\ldots$ via Wolfram Alpha. So by Chebyshev's $\Pr[|X - .5| \geq (7/8-.5)]\leq \frac{.08333}{(7/8-.5)^2} = .593$. 
-
-\smallskip\noindent 3.\hspace{1em} $\E[X^2] = \int_{0}^1 x^2 dx = \frac{1}{3}$, so by Markov's $\Pr[X^2 \geq (7/8)^2]\leq \frac{1/3}{(7/8)^2} = .435$. So the uncentered moment gives a better bound.
-
-\smallskip\noindent 4.\hspace{1em} The general equation for an upper bound is:
+	As hinted, for $cm \geq 2$, $(1 - \frac{1}{cm})^{cm} \geq 1/2e$. So, $(1 - \frac{1}{cm})^m = \left((1 - \frac{1}{cm})^{cm}\right)^{1/c} \geq (1/2e)^{1/c}$.  Choosing $c \geq 17$ yields $(1/2e)^{1/c} \geq 9/10$. So, as long as the table has $\geq 17m^2$ slots, there is no collision with probability $> 9/10$. 
+	
+	\medskip\noindent 2. \hspace{1em}
+	By linearity of expectation, we have the $\E[\|x\|_2^2]  = \sum_{i=1}^d \E[x_i^2]$. So,  we focus on bounding $\E[x_i^2]$ for a single $i$. We have that $x_i = \sum_{j=1}^n s_j$ where:
+	\begin{align*}
+		s_j = \begin{cases}
+			0 & \text{with probability } 1 - 1/d \\
+			-1 & \text{with probability } 1/2d \\
+			+1 & \text{with probability } 1/2d 
+		\end{cases}
+	\end{align*}
+	So we calculate the expectation:
+	\begin{align*}
+		\E[x_i^2] = \E\left[\left(\sum_{j=1}^n s_j\right)^2\right] &= \E\left[s_1^2 + \ldots + s_n^2 + s_1s_2 + \ldots + s_js_k + \ldots + s_{n-1} s_n\right] \\
+		&= \E[s_1^2] + \ldots + \E[s_n^2] + \E[s_1s_2] + \ldots + \E[s_js_k] + \ldots + \E[s_{n-1}s_n]
+	\end{align*}
+We have that for each $s_j$, $\E[s_j] = 0$ and $s_j$ and $s_k$ are independent, so all of the terms of the form $\E[s_js_k]$ equal $0$. So we have that:
 \begin{align*}
-	\frac{1/(q+1)}{(7/8)^q}. 
+	\E[x_i^2] = \E[s_1^2] + \ldots + \E[s_n^2].
 \end{align*}
-For $q = 3, 4, \ldots, 10$ we get values:
+It can be directly calculated that for each $j$, $\E[s_j^2] =  1\cdot \frac{1}{2d} + 1\cdot \frac{1}{2d} = \frac{1}{d}$. So $\E[x_i^2] = \frac{n}{d}$ and finally,
 \begin{align*}
-	\begin{bmatrix}.373 & .341 & .325 &	.318& .318& .323&.333&.346
-	\end{bmatrix}
+	\E[\|x\|_2^2]  = \sum_{i=1}^d \E[x_i^2] = d\cdot \frac{n}{d} = n.
 \end{align*}
-So using higher moments at first improves our bound, but then eventually starts giving a weaker bound. The tighted bound is obtained at $q = 6$ and $q=6$. 
-
-\smallskip\noindent 5.\hspace{1em} Let $g$ be the step function which is $0$ for $X< 7/8$ and $1$ for $X \geq 7/8$. Then we have $\Pr[X \geq 7/8] = \Pr[g(X) \geq 1]$. We have $\E[g(X)] = \frac{1}{8}$, so $\Pr[g(X) \geq 1] \leq \frac{1}{8}$ by Markov's, which gives the tight bound. 
+	
 
 \section*{Problem 2}
-I will write this later. This is the standard ``median trick''. The difficult observation is that, for the median to give error $> \epsilon$, it must be that more than half of the runs of the algorithm give error $> \epsilon$. Why? Suppose the median gave an answer more than $\epsilon$ above the correct value. Then all values above the median (which is $1/2$ of the runs) have to also be $>\epsilon$ above the correct value. 
+There are many ways to solve this problem, including constructions that use multiple tables (like we did in class). I will provide a simple solution using just one table, $A$, with size $cm$, where $c$ is a large constant to be chosen later. Let $\tilde{f} = A(h(v))$ be the frequency estimate for item $v$ obtained from just that table.
 
-Once you make this observation, they just need to prove that if you flip a coin that comes up heads with probability $2/3$, you won't have $<50\%$ heads in a sample of size $O(\log(1/\delta))$ with probability $1-\delta$. This was actually done as an example in Lecture 3 (not with exactly those numbers). Best way is to use Chernoff bound.
+To get the improved bound, we split up  $A(h(v))$ in a slightly refined way than what was done in class. The intuition is that, for large enough $c$, item $v$ will not collide with \emph{any} of the top $m$ most frequent items with high probability. Call these items $v_1, \ldots, v_m$. Call the less frequent items $v_{m+1}, v_{m+2}, \ldots$. We have:
+\begin{align*}
+	A(h(v)) = f(v) + \sum_{i=1,\ldots, m, v_i \neq v}\mathbbm{1}[h(v) = h(v_i)]\cdot f(v_i) + \sum_{i> m, v_i \neq v}\mathbbm{1}[h(v) = h(v_i)] f(y).
+\end{align*}
+The second two terms are our error terms. To bound the first, note that the event $\mathbbm{1}[h(v) = h(v_i)]$ only happens with probability $1/cm$ if our table has $cm$ slots in it. Moreover, $\mathbbm{1}[h(v) = h(v_i)]$ is independent from $\mathbbm{1}[h(v) = h(v_j)]$ for $i \neq j$. So, none of the events $\mathbbm{1}[h(v) = h(v_i)]$ happen with probability:
+\begin{align*}
+	(1 - 1/cm)^m = \left((1 - 1/cm)^{cm}\right)^{1/c}  \geq (1/2e)^{1/c}. 
+\end{align*}
+Choosing $c = 50$, we have that $(1/2e)^{1/c} \geq .95$, so
+\begin{align*}
+	\Pr\left[\sum_{i=1,\ldots, m, v_i \neq v}\mathbbm{1}[h(v) = h(v_i)]\cdot f(v_i) = 0\right] \geq 19/20. 
+\end{align*}
+I.e., with very high probability, the first error term is $0$. 
+
+We now turn to the second error term. As in class, we have that: 
+\begin{align*}
+\E\left[\sum_{i> m, v_i \neq v}\mathbbm{1}[h(v) = h(v_i)] f(y)\right] = \frac{1}{cm} \sum_{i> m, v_i \neq v} f(y) \leq \frac{1}{cm}\cdot C = \frac{1}{50m}\cdot C.
+\end{align*}
+Accordingly, by Markov's inequality, 
+\begin{align*}
+\Pr\left[\sum_{i> m, v_i \neq v}\mathbbm{1}[h(v) = h(v_i)] f(y) \geq \frac{1}{m}C\right] \leq 1/50. 
+\end{align*}
+We conclude by applying a union bound: the probability that the first error term is non-zero \textit{or} the second error term is $\geq \frac{1}{m} C$ is upper bounded by $1/20 + 1/50 \leq 1/10$. Accordingly, we conclude
+\begin{align*}
+\Pr\left[\tilde{f}(v) -f(v) \geq \frac{1}{m}C\right] \leq 1/10.
+\end{align*}
 
 \section*{Problem 3}
-	\smallskip\noindent 1.\hspace{1em} 
-	Once there are $n+1$ servers in this setup, the expected number of items on the $(n+1)^\text{st}$ server is $\frac{m}{n+1}$, by symmetry. All of these items (and only these items) must have been relocated when the $(n+1)^{\text{st}}$ server was added. So the expected number of items that move is $\frac{m}{n+1}$. 
-	
-	\smallskip\noindent 2. \hspace{1em} For a server $S$ to own more than a $c\log n/n$ fraction of the interval , it would need to be that \emph{no other server} falls within distance $c\log n/n$ to the left of the server. We can choose the random location of server $S$ first. Then the probability of any one server landing within distance $c\log n /n$ from $S$'s left is $c\log n / n$. So the probability \emph{no servers} land that close is:
+	\smallskip\noindent 1.\hspace{1em}
+	Split the people being tested into $C$ equal groups with $n/C$ people each. At most $k$ of the groups will test positive since, in the worst case, each infected person will be in a different group. For each positive group, we need to rerun $n/C$ individual tests. So the number of tests run is at most $C + \frac{n}{C}\cdot k$. If we set $C = \sqrt{nk}$ then the total number of tests is:
 	\begin{align*}
-		(1 - c\log n / n)^{n-1} \leq \frac{1}{10n},
-	\end{align*}
-	as long as we choose $c$ to be a large enough constant (same analysis as homework 1). By a \emph{union bound}, we thus have that no server owns more than an $O(\log n / n)$ fraction of the interval with probability $\geq 1 - n\frac{1}{10 n} = \frac{9}{10}$ which proves the claim.
-	
-	\smallskip\noindent 3. \hspace{1em}
-	From Part 2, we could have equivalently proven that no server owns more than a $c\log n / n$ fraction of the interval with probability $19/20$ (by choosing $c$ larger). For the rest of the problem, assume that this event happening.
-	
-	For servers $S_1, \ldots, S_n$ let $Y_i^{(j)}$ be the indicator random variable that item $j$ lands within distance $c\log n / n$ to $S_i$'s left. 
-	Let $X_i$ equal $X_i = \sum_{j=1}^m Y_i^{(j)}$.
-	Since we assumed that no server owns more than a $c\log n / n$ fraction of the interval, $X_i$ is an \emph{upper bound} on the number of items assigned to server $i$. So it suffices to show that $X_i$ is not too large for all $i$. 
-	
-	To do so, note that, for a fixed $i$,  $Y_i^{(1)}, Y_i^{(2)}, \ldots, Y_i^{(m)}$ are an independent $\{0,1\}$ random variables, where each is $1$ with probability exactly $c\log n / n$. So they are just biased coin flips!
-	
-	Let $c > 2$ be a sufficiently large constant. Using the Chernoff bound from class with $\epsilon = c$, we get that:
-	\begin{align*}
-		\Pr[X_i \geq 2c \cdot \frac{m\log n}{n}] \leq e^{\frac{-c^2m\log n / n}{2+c}} \leq e^{\frac{-c\log n}{2}} \leq \frac{1}{20n}, 
-	\end{align*}
-	for large enough $c$. The last inequality uses that $m > n$ (as specified in the problem).
-	
-	We conclude via a union bound that no server is assigned more than $O(m\log n /n)$ items with probability $\frac{19}{20}$. 
-	
-	There's one last step -- we needed two events to hold for our proof to go through: 1) no server owns more than a $c\log n / n$ fraction of the interval and 2) no server was assigned two many items. Since each holds with probability $19/20$, by another union bound, both hold with probability $9/10$.
-	
+		C + \frac{n}{C}\cdot k = \sqrt{nk} + \frac{n}{\sqrt{n}\sqrt{k}}k = 2\sqrt{nk},
+	\end{align*}  as desired. 
 
-	
-\section*{Problem 4 (a)}
+\smallskip\noindent 2.\hspace{1em}
+Assume $q = c\log n$ for sufficiently large constant $c$ and assume $C = 2k$. Consider any single individual who is negative. For this individual to be falsely reported positive, they would need to test positive in all $q$ group tests they participates in. 
 
-1. \textbf{Expectation Calculation.} As in class, we have that $\E[\|\Pi x\|_2^2] =  \E[\langle \pi, x\rangle^2]$, where $\pi$ is a single unscaled row from the matrix $\Pi$. I.e. $\pi$ has length $n$ and contains random $\pm 1$ entries. We have:
-\begin{align*}
-	\E[\langle \pi, x\rangle^2] = \E\left[\left(\sum_{j=1}^n \pi_j x_j \right)^2\right] &= \E\left[\sum_{j=1}^n \pi_j^2 x_j^2\right] + \E\left[\sum_{i\neq j}^n \pi_i\pi_j x_jx_i \right]\\
-	&= \sum_{j=1}^n \E\left[\pi_j^2 \right] x_j^2 +\sum_{i\neq j}^n  \E\left[\pi_i\pi_j\right] x_jx_i .
-\end{align*}
-The last equality follows from linearity of expectation. Since $\pi_i$ is independent of $\pi_j$, we have that for $j\neq i$, $\E\left[\pi_i\pi_j\right] = \E[\pi_i]\E[\pi_j] = 0$. On the other hand $\pi_j^2 = 1$ deterministically, so we have $\E\left[\pi_j^2 \right]  = 1$. Plugging in above, we find that 
-\begin{align*}
-	\E[\langle \pi, x\rangle^2] = \sum_{j=1}^n x_j^2 +\sum_{i\neq j}^n  0\cdot x_jx_i  =  \sum_{j=1}^n x_j^2 = \|x\|_2^2,
-\end{align*}
-as desired.
+What is the probability they test positive in any one group test? For this to happen, there would need to be a positive individual in that group. Let $Z$ be the number of positive individuals in any given group. Each group has size $\frac{n}{2k}$, so by linearity of expectation, $\E[Z] = \frac{n}{2k}\cdot \frac{k}{n} = \frac{1}{2}$, since the probability that any group member is positive is $k/n$. Then by Markov's inequality, $\Pr[Z \geq 1] \leq \frac{1}{2}$. I.e., with probability $\geq \frac{1}{2}$ any given group contains \emph{no infected individuals}. 
 
- \textbf{Variance Calculation.} Since $\|\Pi x\|_2^2 = \frac{1}{k}\sum_{i=1}^k \langle \pi^i, x\rangle^2$, where $\pi^1, \ldots, \pi^k$ are the unscaled rows of $\Pi$, we first observe that $\var[\|\Pi x\|_2^2 ] = \frac{1}{k}\var[\langle \pi, x\rangle^2]$ for a single random $\pm 1$ vector $\pi$. So we just need to bound $\var[\langle \pi_i, x\rangle^2]$. This gets a bit tricky! There are many ways to do it, but I think the easiest way is to take advantage of linearity of variance by writing:
- \begin{align*}
- 	\langle \pi, x\rangle^2 = \sum_{j=1}^n \pi_j^2 x_j^2 + 2\sum_{i> j} \pi_i\pi_j x_ix_j. 
- \end{align*}
-The terms in the first part of the sum are actually deterministic, since $\pi_j = 1$. The terms in the second part of the sum are random, but they are \emph{pairwise independent} since $\pi_i\pi_j$ is random $\pm 1$ and independent from any $\pi_i\pi_k$, $\pi_k\pi_j$, or $\pi_k\pi_{\ell}$. They are not mutually independent, but we only need pairwise independence to apply linearity of variance. 
-Note that to make this claim it's important that I used the form $2\sum_{i> j}$ instead of $\sum_{i\neq j}$. If I did the later, there would be repeated random variables in the sum ($\pi_i\pi_j x_ix_j$  and $\pi_j\pi_i x_jx_i$). Writing the other way removes duplicates.
+So, the probability our negative individual has a positive person in all $q = c\log n$ of their groups is less than $\frac{1}{2}^{q} = \frac{1}{n^c}$, which is $\leq \frac{1}{10n}$ for sufficiently large $c$. Thus, the probability any given negative individual gets a false positive result is $\leq \frac{1}{10n}$. There are $n - k < n$ negative individuals and by a union bound, the probability \emph{any} of them gets a false positive test is $\leq \frac{1}{10n}\cdot n \leq \frac{1}{10}$. In other words, we get no false positives with probability $\geq 9/10$. 
+
+\smallskip\noindent 3.\hspace{1em} \textbf{Informal}: The lower bound is via a counting argument. One way of framing our goal is that we need to return a bit string of length $n$ which has a $1$ in exactly $k$ places and zeros everywhere else, with the $1$'s indicating the people we believe are infected, and the $0$'s indicating uninfected. 
+
+Before starting the testing scheme, we don't know what the correct bit string is, and there are ${n \choose k}$ different possibilities. When we run any testing scheme, we will receive a binary reponse to every test $t_1, \ldots, t_T$ and from that response will decide how to run the next test. In the end, we will decide on which bit string of the ${n \choose k}$ different possibilities is correct. The solution we return must be a function of $t_1, \ldots, t_T$: it could also depend on what subsets of people were tested, but at any time $i$, that must be a function of $t_1, \ldots, t_{i-1}$, via induction. 
+
+So, to obtain a correct answer after $T$ tests, it must be that the number of possible test results $t_1, \ldots, t_T$ exceeds the number of possible solutions ${n \choose k}$. In other words that $2^t \geq {n \choose k}$. Taking logs on both sides, and noting that $\log{n \choose k}  = O(k\log(n/k))$ gives the result.
+
+
+\section*{Problem 4}
+\smallskip\noindent 1.\hspace{1em} Recall that $\tilde{n} = \frac{m(m-1)}{2D}$, where $m$ is the number of samples collected, and $D$ is the number of duplicates observed. To prove that $(1-\epsilon) n \leq \tilde{n} \leq (1+\epsilon) n$ we first claim that it suffices to show:
+\begin{align}
+	\label{to:prove}
+	(1-\epsilon/2)\E[D] \leq D \leq (1+\epsilon/2)\E[D].
+\end{align}
+In particular, if this is the case, then:
 \begin{align*}
-	\var[\langle \pi, x\rangle^2] = \sum_{j=1}^n \var[\pi_j^2 x_j^2] + 4\sum_{i> j} \var[\pi_i\pi_j x_jx_i] = 0 + 4\sum_{i> j} x_j^2x_i^2.
+	\frac{1}{1+\epsilon/2}\frac{1}{\E[D]} \leq \frac{1}{D} \leq \frac{1}{1-\epsilon/2}\frac{1}{\E[D]}, 
 \end{align*}
-Then finally we observe that:
+Using the inequalities from the start of Lecture 2, it follows that for $0 < \epsilon \leq 1$,
 \begin{align*}
-	\|x\|_2^4 = \|x\|_2^2\cdot \|x\|_2^2 = (x_1^2 + \ldots + x_n^2)\cdot (x_1^2 + \ldots + x_n^2) \geq 2\sum_{i> j} x_j^2x_i^2.
+	(1-\epsilon/2)\frac{1}{\E[D]} \leq \frac{1}{D} \leq (1+\epsilon)\frac{1}{\E[D]}.
+\end{align*}
+Multiplying all sides of the inequalities by $m(m-1)/2$, we conclude that $(1-\epsilon) n \leq \tilde{n} \leq (1+\epsilon) n$
+
+So, we focus on proving \eqref{to:prove}. To do so, we will bound the variance of $D$ and use Chebyshev's inequality. Use $s_1, \ldots, s_m$ to denote our $m$ samples. We have that:
+\begin{align*}
+	D = \sum_{i < j} \mathbbm{1}[s_i = s_j].
+\end{align*}
+Note that the terms in the sum are pairwise independent. In particular, the event that $s_i = s_j$ does not effect the probability that $s_k = s_j$ for some other value of $k$. As discussed in class, the terms are not mutually independent, since the event that $s_i = s_j$ and $s_j = s_k$ implies that $s_i = s_k$. Regardless, pairwise independence is all we need to apply linearity of variance: 
+\begin{align*}
+	\var[D] = \sum_{i < j} \var[\mathbbm{1}[s_i = s_j]].
+\end{align*}
+$\mathbbm{1}[s_i = s_j]$ is a binary random variable equal to $1$ with probability $1/n$, so its variance is equal to $\frac{1}{n} - \frac{1}{n^2}$. We conclude that 
+\begin{align*}
+	\var[D] \leq \sum_{i < j} \frac{1}{n} = \binom{m}{2}\cdot \frac{1}{n} = \frac{m(m-1)}{2n}.
+\end{align*}
+Note that this is exactly equal to $\E[D]$. So, we have via Chebyshev's inequality that:
+\begin{align*}
+	\Pr\left[|D - \E[D] \leq \sqrt{10}\sqrt{\E[D]}\right] \leq \frac{1}{10}.
+\end{align*}
+To prove \eqref{to:prove}, we need to choose $m$ large enough so that $\sqrt{10}\sqrt{\E[D]} \leq \epsilon \E[D]$. I.e., we need
+\begin{align*}
+	\sqrt{\frac{m(m-1)}{2n}} &\geq \frac{\sqrt{10}}{\epsilon}\\
+	m(m-1) &\geq \frac{20 n}{\epsilon^2} \\
+	m \geq \sqrt{\frac{40n}{\epsilon^2}}.
+\end{align*}
+This proves the claim.
+
+\smallskip\noindent 3.\hspace{1em} For the mark-and-recapture estimator to be accurate as the number of samples goes to infinity, the key property we required was that $\E[D] = \frac{m(m-1)}{2n}$. Since we use the estimator $\tilde{n} = \frac{m(m-1)}{2D}$, we will obtain an \emph{underestimate} in the limit if: 
+\begin{align*}
+\E[D] > \frac{m(m-1)}{2n}.
+\end{align*}
+We claim that this is the case for data items drawn from \emph{any} non-uniform distribution -- Wikipedia's particular distribution doesn't matter too much. 
+
+In particular, suppose the sample procedure selects item $z$ with probability $p_z$. If we collect samples $s_1, \ldots, s_m$, the expected number of duplicates is: 
+\begin{align*}
+\E[D] = \E\left[\sum_{i<j} \mathbbm{1}[s_i = s_j]\right] = \frac{m(m-1)}{2}\cdot \E\left[\mathbbm{1}[s_1 = s_2]\right].
+\end{align*}
+Here I am using that $\mathbbm{1}[s_i = s_j]$ is the idenitically distributed for all $i,j$, so I can just fixed $i$ and $j$ to be $1,2$ arbitrarily. 
+
+What is $\E\left[\mathbbm{1}[s_1 = s_2]\right]$? We can write this as follows:
+\begin{align*}
+	\E\left[\mathbbm{1}[s_1 = s_2]\right] = \Pr[s_1 = s_2] = \sum_{z=1}^n \Pr[s_1 = z \text{ and } s_2 = z] = \sum_{z=1}^n p_z^2. 
+\end{align*}
+So, we conclude that: 
+\begin{align*}
+	\E[D] =  \frac{m(m-1)}{2}\cdot \sum_{z=1}^n p_z^2.
+\end{align*}
+We will obtain an underestimate if $\sum_{z=1}^n p_z^2 > n$. Note that it is exactly equal to $n$ in the uniform case when $p_1, \ldots, p_n = \frac{1}{n}$. There are a number of ways to see that it is larger for any other choice of $n$. 
+
+One way is via an ``exchange argument". Suppose our probabilities are not uniform, so there are at least two items $a$ and $b$ such that $p_a \neq p_b$. Now, consider modifying the distribution so that $p_a$ and $p_b$ are both replaced with their average $p_a' = p_b' = \frac{p_a+p_b}{2}$. Then, after this change, the summation $\sum_{z=1}^n p_z^2$ changes by:
+\begin{align*}
+	{p_a'}^2 + {p_b'}^2 - p_a^2 - p_b^2 = 2\cdot \frac{p_a^2 + 2p_ap_b + p_b^2}{4} - p_a^2 - p_b^2 = p_ap_b - p_a^2/2 -p_b^2/2 = -(p_a/\sqrt{2} - p_b/\sqrt{2})^2.
+\end{align*}
+This change is always \emph{negative}, meaning that the sum decreases. So, take any non-uniform distribution and make it more uniform by averaging two of the non-equal probabilities and you will \emph{strictly decrease} $\sum_{z=1}^n p_z^2$. We conclude that the sum is always strictly larger than the value of $n$ obtained by the uniform distribution. 
+
+\smallskip\noindent 4.\hspace{1em} 
+In Wikipedia's case, the probabilities $p_1, \ldots, p_n$ are themselves random. So, to understand, $\sum_{z=1}^n p_z^2$, it makes sense to consider:
+\begin{align*}
+\E\left[\sum_{z=1}^n p_z^2\right] = n \cdot \E[p_z^2]. 
 \end{align*} 
-Putting this together we have that $\var[\langle \pi, x\rangle^2]  \leq 2 	\|x\|_2^4$ and the result follows since $\var[\|\Pi x\|_2^2 ] = \frac{1}{k}\var[\langle \pi, x\rangle^2]$ as claimed above.
-
-\vspace{.5em}
-2. This just follows directly from Chebyshev's.
-
-\vspace{.5em}
-3. It's almost the same analysis as in part 1. The first thing to observe is that:
+For simplicity, imagine that we are assigning Wikipedia pages random numbers between $[0,1]$
+We can compute the expecation of $p_z$ using a similar approach as in Lecture 1 by first trying to understand $\Pr[p_z \geq t]$ for a fixed threshold $t$. In particular, for $p_z$ to be $\geq t$, it must be that no other page lands within distance $t$ of $r_z$. Imageine $r_z$ is chosen first. Then the chance this happens is $(1-t)^{n-1}$. So have have:
 \begin{align*}
-	\langle \Pi x, \Pi y\rangle  = \frac{1}{k}\sum_{i=1}^k \langle \pi^i, x\rangle \langle \pi^i, y\rangle. 
-\end{align*}
-So we have that $\E[\langle \Pi x, \Pi y\rangle] = \E[\langle \pi, x\rangle \langle \pi, y\rangle]$ and $\var[\langle \Pi x, \Pi y\rangle] = \frac{1}{k}\var[\langle \pi, x\rangle \langle \pi, y\rangle]$, where $\pi$ is a single random $\pm 1$ vector. We also have that 
+\Pr[p_z \geq t] &= (1-t)^{n-1}
+\end{align*} 
+or equivalently 
 \begin{align*}
-	\langle \pi, x\rangle \langle \pi, y\rangle = \left(\sum_{j=1}^n \pi_j x_j \right)\cdot  \left(\sum_{j=1}^n \pi_j y_j \right) = \sum_{i=1}^n\pi_i^2 x_iy_i + \sum_{j\neq i}\pi_i\pi_j x_iy_j.
-\end{align*}
-From this it's clear that 
+	\Pr[p_z^2 \geq t] &= (1-\sqrt{t})^{n-1}
+\end{align*} 
+We thus have:
 \begin{align*}
-		\E[\langle \Pi x, \Pi y\rangle]  = \E[\langle \pi, x\rangle \langle \pi, y\rangle] = \sum_{i=1}^n x_iy_i  = \langle x,y\rangle, 
-\end{align*}
-as desired. 
-
-The variance calculation is also a bit tricky since we need to make sure our sums involve pairwise independent random variables. We have that: 
+	\E[p_z^2] = \int_{0}^1 \Pr[p_z^2 \geq t] dt = \int_{0}^1 (1-\sqrt{t})^{n-1} dt = \frac{2}{n^2 + n}. 
+\end{align*} 
+It follows that:
 \begin{align*}
-	\langle \pi, x\rangle \langle \pi, y\rangle = \sum_{i=1}^n\pi_i^2 x_iy_i + \sum_{j> i}\pi_i\pi_j (x_iy_j + x_jy_i).
-\end{align*}
-Applying linearity of variance, we find that 
-\begin{align*}
-	\var[\langle \pi, x\rangle \langle \pi, y\rangle] = \sum_{j> i} (x_iy_j + x_jy_i)^2 &= \sum_{j> i} x_i^2y_j^2 + x_j^2y_i^2  + 2 x_ix_jy_iy_j \\
-	&\leq 2 \sum_{j> i} x_i^2y_j^2 + x_j^2y_i^2 \\
-	& \leq 2(x_1^2 + \ldots + x_n^2)(y_1^2 + \ldots + y_n^2) \\
-	&= 2 \|x\|_2^2 \|y\|_2^2.
-\end{align*}
-In second to last inequality we have used that for any $a,b$, $2ab \leq a^2 + b^2$, which follows from the fact that $(a-b)^2 \geq 0$ for all $a,b$ (this is technically called the AM-GM inequality).
-
-Overall, we get a variance bound of:
-\begin{align*}
-	\var[\langle \Pi x, \Pi y\rangle] \leq \frac{2}{k}\|x\|_2^2 \|y\|_2^2.
-\end{align*}
-
-Once they get the mean and variance, the bound just follows from applying Chebyshev inequality again.
-	.
-	\section*{Problem 4 (b)}
-	1. Construct 2 length $U$ binary vectors $x$ and $y$ where $x_i = 1$ if $i \in X$ and $0$ otherwise, and $y_i = 1$ if $i \in Y$ and $0$ otherwise. Note that $|X\cap Y|$ is exactly equal to $\langle x, y\rangle$, so we can estimate the quantity using sketches $\Pi x$ and $\Pi y$. If we set $k = O(1/\epsilon^2)$, then with $9/10$ probability we will have:
-	\begin{align*}
-		\left|\langle  x, y \rangle  - \langle \Pi x, \Pi y \rangle \right| \leq \epsilon \|x\|_2 \|y\|_2
-	\end{align*}
-Note that $\|x\|_2^2 = |X|$ and $\|y\|_2^2 = |Y|$, which yields the bound. 
+	\E\left[\sum_{z=1}^n p_z^2\right] = n \cdot \E[p_z^2] = \frac{2}{n+1}.
+\end{align*} 
+For large $n$, this is very close to $2/n$. So, $\E[D]$ will be almost exactly twice as large as when the probabilities are exactly uniform (in which case $\sum_{z=1}^n p_z^2 = 1/n$).
 
 \end{document}
