@@ -59,7 +59,7 @@
 	\large
 	CS-GY 6763: Homework 3. 
 	
-	Due Tuesday, November 21st, 2023, 11:59pm.
+	Due Monday, March 10th, 2025, 11:59pm.
 	\medskip
 	
 	\normalsize 
@@ -67,46 +67,152 @@
 	\medskip
 \end{center} 
 
-\subsection{Problem 1: Concentration of Random Vectors}
-\textbf{(10 pts)} In Stochastic Gradient Descent, we replace the true gradient vector with a stochastic gradient that is equal to the true gradient in expectation. Our analysis in class \emph{only used} equality in expectation, although more refined analysis of SGD often requires understanding how well the stochastic gradient \emph{concentrates} around its expectation. Previously, all concentration results we studied apply to random numbers.  For this problem, you will prove a basic concentration inequality for random vectors. 
+\subsection{Problem 1: Analyzing Sign-JL and JL for Inner Products} 
+\textbf{(15 pts)} Often practitioners prefer JL matrices with discrete random entries instead of Gaussians because they take less space to store and are easier to generate. We  analyze one construction below.
 
-In particular, let $\bv{x}_1, \ldots, \bv{x}_k \in \R^d$ be i.i.d. random vectors in $d$ dimensions (independent, drawn from the same distribution) with mean $\bs{\mu}$. I.e., $\E[\bv{x}_i] = \bs{\mu}$. Further suppose that $\E\left[\|\bv{x}_i - \bs{\mu}\|_2^2\right] = \sigma^2$. $\sigma^2$ is a natural generalization of ``variance'' to a random vector. Let $\bv{s} = \frac{1}{k}\sum_{i=1}^k\bv{x}_i$. Prove that if $k \geq O(\frac{1/\delta}{\epsilon^2})$ then
+Suppose that $\bs{\Pi}$ is a ``sign Johnson-Lindenstrauss matrix'' with $n$ columns, $k$ rows, and i.i.d. $\pm 1$ entries scaled by $1/\sqrt{k}$. In other words, each entry in the matrix has values $-1/\sqrt{k}$ with probability $1/2$ and $1/\sqrt{k}$ with probability $1/2$.
+\begin{enumerate}
+	\item Prove that for any vector $\bv{x}\in \R^n$, $\E[\|\bs{\Pi}\bv{x}\|_2^2] = \|\bv{x}\|_2^2$ and that $\Var[\|\bs{\Pi}\bv{x}\|_2^2] \leq \frac{2}{k}\|\bv{x}\|_2^4$. This is the meat of the problem and will take some effort. 
+	\vspace{.5em}
+
+%	\textit{Observe that if you work through the analysis in class, a random Gaussian JL matrix leads to variance $\frac{2}{k}\|\bv{x}\|_2^4$, so the sign-JL matrix yields strictly lower variance estimator.}
+	
+	\item Use the above to prove that $\Pr\left[\left|\|\bs{\Pi}\bv{x}\|_2^2 - \|\bv{x}\|_2^2\right| \geq \epsilon\|\bv{x}\|_2^2 \right] \leq \delta$ as long as we choose $k = O\left(\frac{1/\delta}{\epsilon^2}\right)$. Note that this bound almost matches the distributed JL lemma proven in class, but with a worse failure probability dependence of $1/\delta$ in place of $\log(1/\delta)$. 
+	\vspace{.5em}
+	
+	\textit{With more work, it's possible to improve the dependence to $\log(1/\delta)$ for the sign-JL matrix, but we won't do so here.}
+	
+	\item Generalize your analysis above to show that JL matrices are also useful in approximating inner products between two vectors. For vectors $\bv{x},\bv{y}\in \R^n$ prove that $\Pr\left[\left|\langle \bs{\Pi}\bv{x}, \bs{\Pi}\bv{y}\rangle -  \langle  \bv{x}, \bv{y}\rangle\right| \geq \epsilon\|\bv{x}\|_2\|\bv{y}\|_2\right] \leq \delta$ as long as we choose $k = O\left(\frac{1/\delta}{\epsilon^2}\right)$.
+	
+		\textit{This result can also be improved to have a $\log(1/\delta)$ dependence in place of $1/\delta$. .}
+\end{enumerate}
+
+
+\subsection{Problem 2: Join Size Estimation}
+%\textit{This problem takes some thinking about to digest what is going on!}
+%\vspace{.25em}
+\noindent\textbf{(15 pts)}
+One powerful application of sketching is in database applications. For example, a common goal is to estimate the \emph{inner join size} of two tables without performing an actual inner join (which is expensive, as it requires enumerating the keys of the tables). Formally, consider two sets of unique keys $X = \{x_1, \ldots, x_m\}$ and $Y = \{y_1, \ldots, y_n\}$ which are subsets of $1,2, \ldots, U$.  Our goal is to estimate $|X\cap Y|$ based on small space compressions of $X$ and $Y$.  
+\begin{enumerate}
+\item Using your result from Problem 1, describe a method based on inner product estimation that constructs independent sketches of $X$ and $Y$ of size  $k = O\left(\frac{1}{\epsilon^2}\right)$ and from these sketches can return an estimate $Z$ for $|X\cap Y|$ satisfying
 \begin{align*}
-	\Pr\left[\|\bv{s} - \bs{\mu}\right\|_2 \geq \epsilon \sigma] \leq \delta.
+	\left|Z - |X\cap Y|\right| \leq \epsilon \sqrt{|X||Y|}
 \end{align*}
+with probability $9/10$.
+
+\item Alternatively, consider compressing the sets as follows:
+\begin{itemize}
+	\item Choose $k$ uniform random hash functions $h_1, \ldots, h_k: \{1, \ldots, U\}\rightarrow [0,1]$. 
+	\item Let $C^X = [C^X_1,  \ldots, C^X_k]$ where $C_i^X = \min_{j = 1, \ldots, m} h_i(x_j)$.
+	\item Let $C^Y = [C^Y_1,  \ldots, C^Y_k]$ where $C_i^Y= \min_{j = 1, \ldots, n} h_i(y_j)$.
+\end{itemize}
+Given the sketches $C^X$ and $C^Y$., which each contain $k$ numbers, we estimate join size as $Z = \frac{k'}{k} \cdot (\frac{1}{S} - 1)$ where $k' \leq k$ equals $k' = \sum_{i=1}^k \mathbbm{1}[C^X_i = C^Y_i]$ and 
+\begin{align*}
+	S = \frac{1}{k}\sum_{i=1}^k \min(C^X_i,C^Y_i).
+\end{align*}
+Show that if we set $k = O(\frac{1}{\epsilon^2})$ then with probability $9/10$,
+\begin{align*}
+	\left|Z - |X\cap Y|\right| \leq \epsilon \sqrt{|X\cap Y||X\cup Y|}.
+\end{align*}
+\textbf{Hint:} Think about the two pieces of the estimator $Z$, $k'/k$ and $(\frac{1}{S} - 1)$, separately. What quantities do we expect these random variables to be close to? 
+\item Which method gives better accuracy? The JL based method or the hashing based method?
+\end{enumerate}
+
+\subsection{Problem 3: Compressed classification.}
+\textbf{(10 pts)} In machine learning, the goal of many classification methods (like support vector machines) is to separate data into classes using a \emph{separating hyperplane}.
+
+Recall that a hyperplane in $\R^d$ is defined by a unit vector $a \in \R^d$ ($\|a\|_2 = 1$) and scalar $c \in \R$. It contains all  $h \in \R^d$ such that $\langle a, h\rangle = c$. 
+
+Suppose our dataset consists of $n$ unit vectors in $\R^d$ (i.e., each data point is normalized to have norm $1$). These points can be separated into two sets $X, Y$,
+with the guarantee that there exists a hyperplane such that every point in $X$ is on one side and every point in 
+$Y$ is on the other. In other words, for all $x\in X, \langle a, x\rangle > c$ and for all $y\in Y, \langle a, y\rangle < c$.
+
+Furthermore, suppose that the $\ell_2$ distance of each point in $X$ and $Y$ to this separating hyperplane is at least $\epsilon$. When this is the case, the hyperplane is said to have ``margin'' $\epsilon$. 
+
+\begin{enumerate}
+	\item Show that this margin assumption equivalently implies that for all $x\in X, \langle a, x\rangle \geq c + \epsilon$ and for all $y\in Y, \langle a, y\rangle \leq c - \epsilon$.
+	
+	\item Show that if we use a Johnson-Lindenstrauss map $\Pi$ to reduce our data points to $O(\log n/\epsilon^2)$ dimensions, then the dimension reduced data can still be separated by a hyperplane with margin $\epsilon/4$, with high probability (say $> 9/10$).
+\end{enumerate}
+
+\subsection{Problem 4: LSH in the Wild} 
+\textit{This exercise does not involve formal proofs or analysis like more typical problem set problems. It will likely involve some coding or spreadsheet work.}
+\vspace{.25em}
+
+\noindent\textbf{(10 pts)}
+To support its largely visual platform, Pinterest runs a massive image de-duplication operation built on Locality Sensitive Hashing for Cosine Similarity. You can read about the actual system \href{https://medium.com/pinterest-engineering/detecting-image-similarity-using-spark-lsh-and-tensorflow-618636afc939}{here}. All information and numbers below are otherwise purely hypothetical.
+
+Pinterest has a database of $N = $ \textbf{1 billion} images. Each image in the database is pre-processed and represented as a vector $\bv{q}\in \R^d$. When a new image is pinned, it is also processed to form a vector $\bv{y} \in \R^d$. The goal is to check for any existing duplicates or near-duplicates to $\bv{y}$ in the database.  
+Specifically, Pinterest would like to flag an image $\bv{q}$ as a near-duplicate to $\bv{y}$ if $\cos(\theta(\bv{q},\bv{y})) \geq .98$. We want to find any near-duplicate with probability $\geq 99\%$. 
+
+Given this requirement, your job is to design a multi-table LSH scheme using SimHash to find candidate near-duplicates, which can then be checked directly against $\bv{y}$. To support this task, Pinterest has collected data on the empirical distribution of $\cos(\theta(\bv{q},\bv{y}))$ for a typical new image $\bv{y}$. It roughly follows a bell-curve:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.6\textwidth]{dist.png}
+\end{figure} 
+
+Pinterest wants to consider two possible computational targets for your LSH scheme, which will determine the speed of the de-duplication algorithm:
+\begin{enumerate}
+	\item Ensure that no more than $1$ million candidate near-duplicates are checked on average when a new image is pinned. ``Checked'' means that the image's cosine similarity with the new image is computed explicitly, which is a computationally expensive operation.
+	\item Ensure that no more than $200,000$ candidates are checked on average when a new image is pinned.
+\end{enumerate}
+
+\noindent Based on the data above, describe how to set parameters for your LSH scheme to minimize the space (i.e., number of tables) used, while achieving each of the above goals. Justify your answers, and any assumptions you make.
+If you code anything up to help calculate your answer, please attach the code. As in lecture, you can assume that each hash table has $m = O(N)$ slots and this is large enough to ignore lower order terms depending on $1/m$. 
+
+
+% \subsection{\sout{Problem 1(b): Join Size Estimation}} 
+% \noindent\textbf{(5 pts)} \textbf{Do not need to do, will be move to next assignment.}
+
+% One powerful application of sketching is in database applications. For example, a common goal is to estimate the \emph{inner join size} of two tables without performing an actual inner join (which is expensive, as it requires enumerating the keys of the tables). Formally, consider two sets of unique keys $X = \{x_1, \ldots, x_m\}$ and $Y = \{y_1, \ldots, y_n\}$ which are subsets of $1,2, \ldots, U$.  Our goal is to estimate $|X\cap Y|$ based on small space compressions of $X$ and $Y$.  
+
+% Using your result from Problem 1, describe a method based on inner product estimation that constructs independent sketches of $X$ and $Y$ of size  $k = O\left(\frac{1}{\epsilon^2}\right)$ and from these sketches can return an estimate $Z$ for $|X\cap Y|$ satisfying
+% \begin{align*}
+% 	\left|Z - |X\cap Y|\right| \leq \epsilon \sqrt{|X||Y|}
+% \end{align*}
+% with probability $9/10$.
+
+% \subsection{Problem 2: Concentration of Random Vectors}
+% \textbf{(10 pts)} In Stochastic Gradient Descent, we replace the true gradient vector with a stochastic gradient that is equal to the true gradient in expectation. Our analysis in class \emph{only used} equality in expectation, although more refined analysis of SGD often requires understanding how well the stochastic gradient \emph{concentrates} around its expectation. Previously, all concentration results we studied apply to random numbers.  For this problem, you will prove a basic concentration inequality for random vectors. 
+
+% In particular, let $\bv{x}_1, \ldots, \bv{x}_k \in \R^d$ be i.i.d. random vectors in $d$ dimensions (independent, drawn from the same distribution) with mean $\bs{\mu}$. I.e., $\E[\bv{x}_i] = \bs{\mu}$. Further suppose that $\E\left[\|\bv{x}_i - \bs{\mu}\|_2^2\right] = \sigma^2$. $\sigma^2$ is a natural generalization of ``variance'' to a random vector. Let $\bv{s} = \frac{1}{k}\sum_{i=1}^k\bv{x}_i$. Prove that if $k \geq O(\frac{1/\delta}{\epsilon^2})$ then
+% \begin{align*}
+% 	\Pr\left[\|\bv{s} - \bs{\mu}\right\|_2 \geq \epsilon \sigma] \leq \delta.
+% \end{align*}
 % \emph{Try first solving the problem first under the assumption that $\bs{\mu} = \bv{0}$.}
 
-\subsection{Problem 2: Regularization}
-\textbf{(10 pts)}
-Regularization is a popular technique in machine learning. It is often used to improve final test error, but can also help speed-up optimization methods like gradient descent by improving the condition number of the function being regularized. In particular, let $f(\bv{x})$ be a differentiable function mapping a length $d$ vector $\bv{x}$ to a scalar value. Let $g$ be the function with added Euclidean regularization:
-	\begin{align*}
-		g(\bv{x}) = f(\bv{x}) + \lambda \|\bv{x}\|_2^2
-	\end{align*}  Above $\lambda > 0$ is a non-negative constant that controls the amount of regularization. Suppose $f$ is $\alpha_1$-strongly convex and $\beta_1$-smooth, so has condition number $\beta_1/\alpha_1$. Prove that $g$ is also convex and its condition number less than or equal to that of $f$.
+% \subsection{Problem 2: Regularization}
+% \textbf{(10 pts)}
+% Regularization is a popular technique in machine learning. It is often used to improve final test error, but can also help speed-up optimization methods like gradient descent by improving the condition number of the function being regularized. In particular, let $f(\bv{x})$ be a differentiable function mapping a length $d$ vector $\bv{x}$ to a scalar value. Let $g$ be the function with added Euclidean regularization:
+% 	\begin{align*}
+% 		g(\bv{x}) = f(\bv{x}) + \lambda \|\bv{x}\|_2^2
+% 	\end{align*}  Above $\lambda > 0$ is a non-negative constant that controls the amount of regularization. Suppose $f$ is $\alpha_1$-strongly convex and $\beta_1$-smooth, so has condition number $\beta_1/\alpha_1$. Prove that $g$ is also convex and its condition number less than or equal to that of $f$.
 
-\subsection{Problem 3: Separation Oracles}
-\textbf{(12 pts)} Describe efficient separation oracles for each of the following families of convex sets.  Here, ``efficient'' means linear time plus $O(1)$ calls to any additional oracles provided to you.
+% \subsection{Problem 3: Separation Oracles}
+% \textbf{(12 pts)} Describe efficient separation oracles for each of the following families of convex sets.  Here, ``efficient'' means linear time plus $O(1)$ calls to any additional oracles provided to you.
 
-\begin{enumerate}[label=(\alph*)]
-	\item
-	The set $A \cap B$, given separation oracles for $A$ and $B$.
+% \begin{enumerate}[label=(\alph*)]
+% 	\item
+% 	The set $A \cap B$, given separation oracles for $A$ and $B$.
 	
-	\item
-	The $\ell_1$ ball: $\| \bv{x} \|_1 \leq 1$.
+% 	\item
+% 	The $\ell_1$ ball: $\| \bv{x} \|_1 \leq 1$.
 	
-	\item
-	Any convex set $A$, given a \emph{projection oracle} for $A$. Recall that a projection oracle, given a point $\bv{x}$, returns
-	\begin{equation*}
-		\text{Proj}_A(\bv{x}) =  \argmin_{y \in A} \| \bv{x} - \bv{y} \|_2.
-	\end{equation*}
+% 	\item
+% 	Any convex set $A$, given a \emph{projection oracle} for $A$. Recall that a projection oracle, given a point $\bv{x}$, returns
+% 	\begin{equation*}
+% 		\text{Proj}_A(\bv{x}) =  \argmin_{y \in A} \| \bv{x} - \bv{y} \|_2.
+% 	\end{equation*}
 	
-	% \item
-	% The $\epsilon$-neighborhood of a convex set $A$:
-	% \begin{equation*}
-	% 	\{ x \mid \exists y \in A, \| \bv{x} - \bv{y} \|_2 \leq \epsilon \}
-	% \end{equation*}
-	% given a projection oracle for $A$.
-\end{enumerate}
-Above you may wish to use the following fact that was stated but not proven in class: for any point $\bv{x}$, convex set $A$, and $\bv{z}\in A$, $\|\bv{z}-\text{Proj}_A(\bv{x})\|_2 \leq \|\bv{z} - \bv{x}\|_2$.
+% 	% \item
+% 	% The $\epsilon$-neighborhood of a convex set $A$:
+% 	% \begin{equation*}
+% 	% 	\{ x \mid \exists y \in A, \| \bv{x} - \bv{y} \|_2 \leq \epsilon \}
+% 	% \end{equation*}
+% 	% given a projection oracle for $A$.
+% \end{enumerate}
+% Above you may wish to use the following fact that was stated but not proven in class: for any point $\bv{x}$, convex set $A$, and $\bv{z}\in A$, $\|\bv{z}-\text{Proj}_A(\bv{x})\|_2 \leq \|\bv{z} - \bv{x}\|_2$.
 
 
 
@@ -132,29 +238,29 @@ Above you may wish to use the following fact that was stated but not proven in c
 %	\item \textbf{Quick answer:} Write down a convergence bound for your new algorithm based on the above result. 
 %\end{enumerate}
 
-\subsection{Problem 4: Gradient Descent with Decaying Step-size}
-\textbf{(10 pts)}
-In class we showed that gradient descent with step size $\eta = R/G\sqrt{T}$ converges to an $\epsilon$ approximate minimizer of a convex $G$-Lipschitz function in $T = R^2G^2/\epsilon^2$ steps if our starting point $\bv{x}^{(0)}$ satisfies $\|\bv{x}^{(0)} - \bv{x}^*\|_2 \leq R$. 
-Choosing this step size requires knowing $G$, $R$ and moreover $T$ in advance, which might not be reasonable in a lot of settings. For example, when training machine learning models, we might not be able to estimate how long it will take to reach a point where test accuracy levels off. Instead, we want to be able to keep running the algorithm, achieving better and better accuracy as we do. 
+% \subsection{Problem 4: Gradient Descent with Decaying Step-size}
+% \textbf{(10 pts)}
+% In class we showed that gradient descent with step size $\eta = R/G\sqrt{T}$ converges to an $\epsilon$ approximate minimizer of a convex $G$-Lipschitz function in $T = R^2G^2/\epsilon^2$ steps if our starting point $\bv{x}^{(0)}$ satisfies $\|\bv{x}^{(0)} - \bv{x}^*\|_2 \leq R$. 
+% Choosing this step size requires knowing $G$, $R$ and moreover $T$ in advance, which might not be reasonable in a lot of settings. For example, when training machine learning models, we might not be able to estimate how long it will take to reach a point where test accuracy levels off. Instead, we want to be able to keep running the algorithm, achieving better and better accuracy as we do. 
 
-Here, we analyze a variant of gradient descent with a variable step size that avoids this limitation. In particular, consider running gradient descent with the update $\bv{x}^{(i+1)} = \bv{x}^{(i)}- \eta \nabla f(\bv{x}^{(i)})$, where
-\begin{align*}
-	\eta = \frac{f(\bv{x}^{(i)}) - f(\bv{x}^{*})}{\|\nabla f(\bv{x}^{(i)})\|_2^2}.
-\end{align*}
-This step size requires knowledge of $f(\bv{x}^{*})$, but not $\bv{x}^*$, which may be reasonable in some settings. Moreover, since it's just one parameter, grid search can be more easily used to ``guess'' $f(\bv{x}^{*})$ than the three parameters $G,R,T$. More complex approaches can remove the need to know this value entirely.
+% Here, we analyze a variant of gradient descent with a variable step size that avoids this limitation. In particular, consider running gradient descent with the update $\bv{x}^{(i+1)} = \bv{x}^{(i)}- \eta \nabla f(\bv{x}^{(i)})$, where
+% \begin{align*}
+% 	\eta = \frac{f(\bv{x}^{(i)}) - f(\bv{x}^{*})}{\|\nabla f(\bv{x}^{(i)})\|_2^2}.
+% \end{align*}
+% This step size requires knowledge of $f(\bv{x}^{*})$, but not $\bv{x}^*$, which may be reasonable in some settings. Moreover, since it's just one parameter, grid search can be more easily used to ``guess'' $f(\bv{x}^{*})$ than the three parameters $G,R,T$. More complex approaches can remove the need to know this value entirely.
 
-Prove that, if we run gradient descent for $T = O(R^2G^2/\epsilon^2)$ steps using the step size above then $\hat{\bv{x}} = \min_{i \in 0, \ldots, T}f(\bv{x}^{(i)})$ satisfies $f(\hat{\bv{x}}) \leq f(\bv{x}^*) + \epsilon$. \textbf{Hint:} Prove that our distance from the optimum $\|\bv{x}^{(i)} - \bv{x}^*\|_2$ {always decreases} with this choice of step size, and the decrease is larger if our gap from the objective value $f(\bv{x}^{(i)}) - f(\bv{x}^{*})$ is larger.
+% Prove that, if we run gradient descent for $T = O(R^2G^2/\epsilon^2)$ steps using the step size above then $\hat{\bv{x}} = \min_{i \in 0, \ldots, T}f(\bv{x}^{(i)})$ satisfies $f(\hat{\bv{x}}) \leq f(\bv{x}^*) + \epsilon$. \textbf{Hint:} Prove that our distance from the optimum $\|\bv{x}^{(i)} - \bv{x}^*\|_2$ {always decreases} with this choice of step size, and the decrease is larger if our gap from the objective value $f(\bv{x}^{(i)}) - f(\bv{x}^{*})$ is larger.
 
-\subsection{Problem 5: Locating Points via the SVD}
+% \subsection{Problem 5: Locating Points via the SVD}
 	
-	\textbf{(15 pts)} Suppose you are given all pairs distances between a set of points $\bv{x}_1, \ldots, \bv{x}_n \in \R^d$. You can assume that $d \ll n$. Formally, you are given an $n\times n$ matrix $\bv{D}$ with $\bv{D}_{i,j} = \|\bv{x}_i - \bv{x}_j\|_2^2$. You would like to recover the location of the original points, at least up to possible rotation and translation (which do not change pairwise distances). Since we can only recover up to a translation, it may be easiest to assume that the points are centered around the origin. I.e. that $\sum_{i=1}^n \bv{x}_i = \bv{0}$. 
-	\begin{enumerate}[label=(\alph*)]
-		\item Under this assumption, describe an efficient algorithm for learning $\sum_{i=1}^n \|\bv{x}_i\|_2^2$ from $\bv{D}$. 
-		\item Next, describe an efficient algorithm for learning $\|\bv{x}_i\|_2^2$ for each $i \in 1, \ldots, n$. 
-		\item Finally, describe an algorithm for recovering a set of points $\bv{x}_1,\ldots, \bv{x}_n$ which realize the distances in $\bv{D}$. Hint: This is where you will use the SVD! It might help to prove that $\bv{D}$ has rank $\leq d + 2$.
-		\item
-		Implement your algorithm and run it on the U.S. cities dataset provided in \texttt{UScities.txt}. Note that the distances in the file are unsquared Euclidean distances, so you need to square them to obtain $\bv{D}$. Plot your  estimated city locations on a 2D plot and label the cities to make it clear how the plot is oriented. Submit these images and your code with the problem set.
-	\end{enumerate}
+% 	\textbf{(15 pts)} Suppose you are given all pairs distances between a set of points $\bv{x}_1, \ldots, \bv{x}_n \in \R^d$. You can assume that $d \ll n$. Formally, you are given an $n\times n$ matrix $\bv{D}$ with $\bv{D}_{i,j} = \|\bv{x}_i - \bv{x}_j\|_2^2$. You would like to recover the location of the original points, at least up to possible rotation and translation (which do not change pairwise distances). Since we can only recover up to a translation, it may be easiest to assume that the points are centered around the origin. I.e. that $\sum_{i=1}^n \bv{x}_i = \bv{0}$. 
+% 	\begin{enumerate}[label=(\alph*)]
+% 		\item Under this assumption, describe an efficient algorithm for learning $\sum_{i=1}^n \|\bv{x}_i\|_2^2$ from $\bv{D}$. 
+% 		\item Next, describe an efficient algorithm for learning $\|\bv{x}_i\|_2^2$ for each $i \in 1, \ldots, n$. 
+% 		\item Finally, describe an algorithm for recovering a set of points $\bv{x}_1,\ldots, \bv{x}_n$ which realize the distances in $\bv{D}$. Hint: This is where you will use the SVD! It might help to prove that $\bv{D}$ has rank $\leq d + 2$.
+% 		\item
+% 		Implement your algorithm and run it on the U.S. cities dataset provided in \texttt{UScities.txt}. Note that the distances in the file are unsquared Euclidean distances, so you need to square them to obtain $\bv{D}$. Plot your  estimated city locations on a 2D plot and label the cities to make it clear how the plot is oriented. Submit these images and your code with the problem set.
+% 	\end{enumerate}
 
 
 
