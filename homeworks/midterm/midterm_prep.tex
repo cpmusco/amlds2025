@@ -58,10 +58,10 @@
 
 \section{Logistics}
 \begin{itemize}
-	\item Exam will be held in class on \textbf{Friday, 10/20} starting at 2:00pm sharp. Please arrive on time!
-	\item Feyza will give a lecture for the second half of class after a short break. 
-	\item You will have \textbf{1 hour} to answer a variety of short answer and longer form questions.
+	\item Exam will be held in class on \textbf{Friday, 3/14} starting at 2:00pm sharp. Please arrive on time!
+	\item You will have \textbf{1 hour, 15 minutes} to answer a variety of short answer and longer form questions.
 	\item You can bring a one page sheet of paper (two-sided if you want) with notes, theorems, etc. written down for reference. 
+	\item Scrap paper will be provided and can be used to write solutions if extra space is needed. 
 	\item I will be in the room to answer any questions.
 \end{itemize}
 
@@ -118,9 +118,7 @@
 
 	
 	\section{Practice Problems}
-	
-	\subsection{Random variables and concentration.}
-	
+		
 	\begin{enumerate}
 		\item Show that for any  random variable ${X}$, $\E[{X}^2] \ge \E[{X}]^2$.
 		\item Show that for independent ${X}$ and ${Y}$ with $\E[{X}] = \E[{Y}] = 0$, $\Var[{X} \cdot {Y}] = \Var[X] \cdot \Var[Y]$. 
@@ -131,6 +129,12 @@
 			\item $\Pr[{X} = s \text{ or }  {Y} = t] \le \Pr[{X} = s] + \Pr[{Y} = t]$. \hspace{1em}ALWAYS \hspace{1em} SOMETIMES\hspace{1em} NEVER
 			\item $\Pr[{X} = s \text{ and } {Y} = t] = \Pr[{X} = s] \cdot \Pr[{Y} = t]$. \hspace{1em}ALWAYS\hspace{1em} SOMETIMES \hspace{1em} NEVER
 		\end{enumerate}
+		\item Let $\bs{\Pi}$ be a random Johnson-Lindenstrauss matrix (e.g. scaled random Gaussians) with $O(\log(1/\delta)/\epsilon^2)$ rows. With probability $(1-\delta)$,
+		\begin{align*}
+			\min_{\bv{x}} \|\bs{\Pi}\bv{A}\bv{x} - \bs{\Pi}\bv{b}\|_2^2 \leq (1+\epsilon) \min_{\bv{x}} \|\bv{A}\bv{x} - \bv{b}\|_2^2. 
+		\end{align*}
+		Is the statement true: \hspace{1em}ALWAYS\hspace{1em} SOMETIMES \hspace{1em} NEVER
+
 		\item Assume there are $1000$ registered users on your site $u_1, \ldots, u_{1000}$, and in a given day, each user
 		visits the site with some probability $p_i$. The event that any user visits the site is independent of what the other users do. Assume that $\sum_{i=1}^{1000} p_i = 500$. 
 		\begin{enumerate}
@@ -140,24 +144,35 @@
 			How do they compare?
 		\end{enumerate}
 		\item Give an example of a random variable and a deviation t where Markov’s inequality gives a	tighter upper bound than Chebyshev’s inequality.
-	\end{enumerate}
-	
-	\subsection{Hashing, Dimensionality Reduction, High Dimensional Vectors}
-	\begin{enumerate}
+
 %		\item SimHash can be applied to binary vectors ${y}, {q}\in \{0,1\}^d$. How does doing so compare to MinHash? How is the Jaccard similarity $J(y,q)$ related to the cosine similarity $\cos(\theta(y,q))$?
 		\item Suppose there is some unknown vector $\bs{\mu} \in \R^d$. We receive noise perturbed random samples of the form $\bv{Y}_1 = \bs{\mu} + \bv{X}_1, \ldots, \bv{Y}_k = \bs{\mu} + \bv{X}_k$ where each $\bv{X}_i$ is a random vector with each of its entries distributed as an independent random normal $\mathcal{N}(0,1)$. From our samples $\bv{Y}_1, \ldots, \bv{Y}_k$ we hope to estimate $\bs{\mu}$ by $\bs{\tilde{\mu}} = \frac{1}{k}\sum_{i=1}^k \bv{Y}_i$. 
 		\begin{enumerate}
-			\item How many samples $k$ do we require so that $\max_{i=1,\ldots, d}|\bs{\mu}_i -\bs{\tilde{\mu}_i} | \leq \epsilon$ with probability $9/10$?
-			\item How many samples $k$ do we require so that $\|\bs{\mu} -\bs{\tilde{\mu}}\|_2 \leq \epsilon$ with probability $9/10$?
+			\item Prove that with $k = O(\log n /\epsilon^2)$ samples, $\max_{i=1,\ldots, d}|\bs{\mu}_i -\bs{\tilde{\mu}_i} | \leq \epsilon$ with probability $9/10$.
+			\item Prove that with $k = O(n\log n /\epsilon)$ samples, $\|\bs{\mu} -\bs{\tilde{\mu}}\|_2 \leq \epsilon$ with probability $9/10$ \textbf{Bound}
 		\end{enumerate}
-		\item Let $\bs{\Pi}$ be a random Johnson-Lindenstrauss matrix (e.g. scaled random Gaussians) with $O(\log(1/\delta)/\epsilon^2)$ rows. Prove that with probability $(1-\delta)$,
-		\begin{align*}
-			\min_{\bv{x}} \|\bs{\Pi}\bv{A}\bv{x} - \bs{\Pi}\bv{b}\|_2^2 \leq (1+\epsilon) \min_{\bv{x}} \|\bv{A}\bv{x} - \bv{b}\|_2^2 
-		\end{align*}
 %			Is the following also true with high probability?
 %	\begin{align*}
 %		(1-\epsilon) \min_{\bv{x}} \|\bv{A}\bv{x} - \bv{b}\|_2^2\leq \min_{\bv{x}} \|\bs{\Pi}\bv{A}\bv{x} - \bs{\Pi}\bv{b}\|_2^2
 %	\end{align*}
+
+% \item In Homework 1, we considered a random walk on a $d$-dimensional grid. At each step, the walk chooses one of the $d$-dimensions uniformly at random, and takes a step in that direction - up with probability $1/2$ and down with probability $1/2$. Assume that the walk starts at the origin, takes $n$ steps, and ends at position $x$, where $x$ is a $d$ dimensional vector with integer values. We proved that $\E[\|x\|_2^2] = n$. 
+% \\\\
+% Since the result does not depend on $d$, I said this fact was surprising: if a tourist starts at Washington Square Park and wonders around Manhattan (i.e., takes a two-dimensions random walk), in expectation they don't get any more ``lost'' than if they restrict their wondering to just up and down 5th Avenue (i.e., a one dimensional random walk.)
+% \\\\
+% However, it was pointed out by a student that this is not quite correct. To return back to the park, the tourist must walk along streets and avenues, so we should really use $\ell_1$ norm $\|x\|_1 = \sum_{i=1}^n |x_i|$ to determine how lost the tourist is. 
+
+\item For two length $d$ binary vectors $\bv{q},\bv{y} \in \{0,1\}^d$, consider the hamming similarity: 
+\begin{align*}
+	s(\bv{q},\bv{y}) = 1 - \frac{\|\bv{q} - \bv{y}\|_0}{d}.
+\end{align*} 
+Construct a function $h$ as follows:
+	define the random function $c: \{0,1\}^d \rightarrow \{0,1\}$ as $c(\bv{x}) = \bv{x}[j]$, where $j$ is a uniform random integer in $\{1, \ldots, d\}$. Then, let $g$ be a uniform random hash function from $\{0,1\} \rightarrow \{1, \ldots, m\}$. Finally, let:
+	\begin{align*}
+		h(\bv{x}) = g(c(\bv{x})).
+	\end{align*}
+	
+	 Prove that $h$ is a locality sensitive hash function for {hamming similarity}. 
 	\end{enumerate}
 	
 	
