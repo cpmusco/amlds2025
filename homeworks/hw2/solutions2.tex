@@ -70,9 +70,27 @@ So using higher moments at first improves our bound, but then eventually starts 
 \smallskip\noindent 5.\hspace{1em} Let $g$ be the step function which is $0$ for $X< 7/8$ and $1$ for $X \geq 7/8$. Then we have $\Pr[X \geq 7/8] = \Pr[g(X) \geq 1]$. We have $\E[g(X)] = \frac{1}{8}$, so $\Pr[g(X) \geq 1] \leq \frac{1}{8}$ by Markov's, which gives the tight bound. 
 
 \section*{Problem 2}
-I will write this later. This is the standard ``median trick''. The difficult observation is that, for the median to give error $> \epsilon$, it must be that more than half of the runs of the algorithm give error $> \epsilon$. Why? Suppose the median gave an answer more than $\epsilon$ above the correct value. Then all values above the median (which is $1/2$ of the runs) have to also be $>\epsilon$ above the correct value. 
+Let $Y_1, \ldots, Y_r$ be indicator random variables with $Y_i = 1$ if the $i^\text{th}$ run of the algorithm \ul{failed} to output an answer $\mathcal{A}(X)_i$ with $|\mathcal{A}(X)_i - f(X)|\leq \epsilon$. Otherwise, let $Y_i = 0$ if the $i^\text{th}$ run of the algorithm succeed.
 
-Once you make this observation, they just need to prove that if you flip a coin that comes up heads with probability $2/3$, you won't have $<50\%$ heads in a sample of size $O(\log(1/\delta))$ with probability $1-\delta$. This was actually done as an example in Lecture 3 (not with exactly those numbers). Best way is to use Chernoff bound.
+The key observation is that, if $|M - f(X)| \geq \epsilon$ then it must be that at least $\frac{r}{2}$ of the random variables $Y_1, \ldots, Y_r$ equal $1$. In particular, suppose $M \geq f(X) + \epsilon$ (so the median is a bad overestimate). The algorithm return an equal or higher value to $M$ at least  half the time, so it thus returned an overestimate (and failed) half the time. On the other hand, suppose  $M \leq f(X) - \epsilon$ (so the median is a bad underestimate). The algorithm return an equal or smaller value to $M$ at least half the time, so it thus returned an underestimate (and failed) half the time. 
+
+So, this problem boils down to proving that: 
+\begin{align*}
+\Pr\left[\sum_i^r Y_i \geq r/2\right] \leq \delta.
+\end{align*}
+If $\sum_i^r Y_i \leq r/2$, then by the argument above, it cannot be the $|M - f(X)| \geq \epsilon$, so providing this shows that we obtain error $\leq \epsilon$ with probability $\geq 1-\delta$. 
+
+This is a sum of independent Bernoilli random variables, so let's apply a Chernoff bound! To do so, we will use the fact that the algorithm fails with probability $\leq 1/3$. Indeed, $\Pr\left[\sum_i^r Y_i \leq r/2\right]$ is maximized when $\Pr[Y_i] = 1/3$ exactly for all $i$. So, assume this is the case. Then we have $\E[\sum_i^r Y_i] = 1r/3$. Plugging into Chernoff bound:
+
+\begin{align*}
+\Pr\left[\sum_i^r Y_i \geq (1+\epsilon) r/3\right] \leq e^{-\frac{\epsilon^2 r/3}{(2+\epsilon)}}.
+\end{align*}
+Setting $\epsilon = 1/2$, we have
+\begin{align*}
+	\Pr\left[\sum_i^r Y_i \geq r/2\right] \leq e^{-.05333 r}. 
+\end{align*}
+Setting $r = 2\log(1/\delta)$, we have $e^{-.05333 r} \leq \delta$ as desired.
+
 
 \section*{Problem 3}
 	\smallskip\noindent 1.\hspace{1em} 
@@ -105,77 +123,77 @@ Once you make this observation, they just need to prove that if you flip a coin 
 	
 
 	
-\section*{Problem 4 (a)}
+% \section*{Problem 4 (a)}
 
-1. \textbf{Expectation Calculation.} As in class, we have that $\E[\|\Pi x\|_2^2] =  \E[\langle \pi, x\rangle^2]$, where $\pi$ is a single unscaled row from the matrix $\Pi$. I.e. $\pi$ has length $n$ and contains random $\pm 1$ entries. We have:
-\begin{align*}
-	\E[\langle \pi, x\rangle^2] = \E\left[\left(\sum_{j=1}^n \pi_j x_j \right)^2\right] &= \E\left[\sum_{j=1}^n \pi_j^2 x_j^2\right] + \E\left[\sum_{i\neq j}^n \pi_i\pi_j x_jx_i \right]\\
-	&= \sum_{j=1}^n \E\left[\pi_j^2 \right] x_j^2 +\sum_{i\neq j}^n  \E\left[\pi_i\pi_j\right] x_jx_i .
-\end{align*}
-The last equality follows from linearity of expectation. Since $\pi_i$ is independent of $\pi_j$, we have that for $j\neq i$, $\E\left[\pi_i\pi_j\right] = \E[\pi_i]\E[\pi_j] = 0$. On the other hand $\pi_j^2 = 1$ deterministically, so we have $\E\left[\pi_j^2 \right]  = 1$. Plugging in above, we find that 
-\begin{align*}
-	\E[\langle \pi, x\rangle^2] = \sum_{j=1}^n x_j^2 +\sum_{i\neq j}^n  0\cdot x_jx_i  =  \sum_{j=1}^n x_j^2 = \|x\|_2^2,
-\end{align*}
-as desired.
+% 1. \textbf{Expectation Calculation.} As in class, we have that $\E[\|\Pi x\|_2^2] =  \E[\langle \pi, x\rangle^2]$, where $\pi$ is a single unscaled row from the matrix $\Pi$. I.e. $\pi$ has length $n$ and contains random $\pm 1$ entries. We have:
+% \begin{align*}
+% 	\E[\langle \pi, x\rangle^2] = \E\left[\left(\sum_{j=1}^n \pi_j x_j \right)^2\right] &= \E\left[\sum_{j=1}^n \pi_j^2 x_j^2\right] + \E\left[\sum_{i\neq j}^n \pi_i\pi_j x_jx_i \right]\\
+% 	&= \sum_{j=1}^n \E\left[\pi_j^2 \right] x_j^2 +\sum_{i\neq j}^n  \E\left[\pi_i\pi_j\right] x_jx_i .
+% \end{align*}
+% The last equality follows from linearity of expectation. Since $\pi_i$ is independent of $\pi_j$, we have that for $j\neq i$, $\E\left[\pi_i\pi_j\right] = \E[\pi_i]\E[\pi_j] = 0$. On the other hand $\pi_j^2 = 1$ deterministically, so we have $\E\left[\pi_j^2 \right]  = 1$. Plugging in above, we find that 
+% \begin{align*}
+% 	\E[\langle \pi, x\rangle^2] = \sum_{j=1}^n x_j^2 +\sum_{i\neq j}^n  0\cdot x_jx_i  =  \sum_{j=1}^n x_j^2 = \|x\|_2^2,
+% \end{align*}
+% as desired.
 
- \textbf{Variance Calculation.} Since $\|\Pi x\|_2^2 = \frac{1}{k}\sum_{i=1}^k \langle \pi^i, x\rangle^2$, where $\pi^1, \ldots, \pi^k$ are the unscaled rows of $\Pi$, we first observe that $\var[\|\Pi x\|_2^2 ] = \frac{1}{k}\var[\langle \pi, x\rangle^2]$ for a single random $\pm 1$ vector $\pi$. So we just need to bound $\var[\langle \pi_i, x\rangle^2]$. This gets a bit tricky! There are many ways to do it, but I think the easiest way is to take advantage of linearity of variance by writing:
- \begin{align*}
- 	\langle \pi, x\rangle^2 = \sum_{j=1}^n \pi_j^2 x_j^2 + 2\sum_{i> j} \pi_i\pi_j x_ix_j. 
- \end{align*}
-The terms in the first part of the sum are actually deterministic, since $\pi_j = 1$. The terms in the second part of the sum are random, but they are \emph{pairwise independent} since $\pi_i\pi_j$ is random $\pm 1$ and independent from any $\pi_i\pi_k$, $\pi_k\pi_j$, or $\pi_k\pi_{\ell}$. They are not mutually independent, but we only need pairwise independence to apply linearity of variance. 
-Note that to make this claim it's important that I used the form $2\sum_{i> j}$ instead of $\sum_{i\neq j}$. If I did the later, there would be repeated random variables in the sum ($\pi_i\pi_j x_ix_j$  and $\pi_j\pi_i x_jx_i$). Writing the other way removes duplicates.
-\begin{align*}
-	\var[\langle \pi, x\rangle^2] = \sum_{j=1}^n \var[\pi_j^2 x_j^2] + 4\sum_{i> j} \var[\pi_i\pi_j x_jx_i] = 0 + 4\sum_{i> j} x_j^2x_i^2.
-\end{align*}
-Then finally we observe that:
-\begin{align*}
-	\|x\|_2^4 = \|x\|_2^2\cdot \|x\|_2^2 = (x_1^2 + \ldots + x_n^2)\cdot (x_1^2 + \ldots + x_n^2) \geq 2\sum_{i> j} x_j^2x_i^2.
-\end{align*} 
-Putting this together we have that $\var[\langle \pi, x\rangle^2]  \leq 2 	\|x\|_2^4$ and the result follows since $\var[\|\Pi x\|_2^2 ] = \frac{1}{k}\var[\langle \pi, x\rangle^2]$ as claimed above.
+%  \textbf{Variance Calculation.} Since $\|\Pi x\|_2^2 = \frac{1}{k}\sum_{i=1}^k \langle \pi^i, x\rangle^2$, where $\pi^1, \ldots, \pi^k$ are the unscaled rows of $\Pi$, we first observe that $\var[\|\Pi x\|_2^2 ] = \frac{1}{k}\var[\langle \pi, x\rangle^2]$ for a single random $\pm 1$ vector $\pi$. So we just need to bound $\var[\langle \pi_i, x\rangle^2]$. This gets a bit tricky! There are many ways to do it, but I think the easiest way is to take advantage of linearity of variance by writing:
+%  \begin{align*}
+%  	\langle \pi, x\rangle^2 = \sum_{j=1}^n \pi_j^2 x_j^2 + 2\sum_{i> j} \pi_i\pi_j x_ix_j. 
+%  \end{align*}
+% The terms in the first part of the sum are actually deterministic, since $\pi_j = 1$. The terms in the second part of the sum are random, but they are \emph{pairwise independent} since $\pi_i\pi_j$ is random $\pm 1$ and independent from any $\pi_i\pi_k$, $\pi_k\pi_j$, or $\pi_k\pi_{\ell}$. They are not mutually independent, but we only need pairwise independence to apply linearity of variance. 
+% Note that to make this claim it's important that I used the form $2\sum_{i> j}$ instead of $\sum_{i\neq j}$. If I did the later, there would be repeated random variables in the sum ($\pi_i\pi_j x_ix_j$  and $\pi_j\pi_i x_jx_i$). Writing the other way removes duplicates.
+% \begin{align*}
+% 	\var[\langle \pi, x\rangle^2] = \sum_{j=1}^n \var[\pi_j^2 x_j^2] + 4\sum_{i> j} \var[\pi_i\pi_j x_jx_i] = 0 + 4\sum_{i> j} x_j^2x_i^2.
+% \end{align*}
+% Then finally we observe that:
+% \begin{align*}
+% 	\|x\|_2^4 = \|x\|_2^2\cdot \|x\|_2^2 = (x_1^2 + \ldots + x_n^2)\cdot (x_1^2 + \ldots + x_n^2) \geq 2\sum_{i> j} x_j^2x_i^2.
+% \end{align*} 
+% Putting this together we have that $\var[\langle \pi, x\rangle^2]  \leq 2 	\|x\|_2^4$ and the result follows since $\var[\|\Pi x\|_2^2 ] = \frac{1}{k}\var[\langle \pi, x\rangle^2]$ as claimed above.
 
-\vspace{.5em}
-2. This just follows directly from Chebyshev's.
+% \vspace{.5em}
+% 2. This just follows directly from Chebyshev's.
 
-\vspace{.5em}
-3. It's almost the same analysis as in part 1. The first thing to observe is that:
-\begin{align*}
-	\langle \Pi x, \Pi y\rangle  = \frac{1}{k}\sum_{i=1}^k \langle \pi^i, x\rangle \langle \pi^i, y\rangle. 
-\end{align*}
-So we have that $\E[\langle \Pi x, \Pi y\rangle] = \E[\langle \pi, x\rangle \langle \pi, y\rangle]$ and $\var[\langle \Pi x, \Pi y\rangle] = \frac{1}{k}\var[\langle \pi, x\rangle \langle \pi, y\rangle]$, where $\pi$ is a single random $\pm 1$ vector. We also have that 
-\begin{align*}
-	\langle \pi, x\rangle \langle \pi, y\rangle = \left(\sum_{j=1}^n \pi_j x_j \right)\cdot  \left(\sum_{j=1}^n \pi_j y_j \right) = \sum_{i=1}^n\pi_i^2 x_iy_i + \sum_{j\neq i}\pi_i\pi_j x_iy_j.
-\end{align*}
-From this it's clear that 
-\begin{align*}
-		\E[\langle \Pi x, \Pi y\rangle]  = \E[\langle \pi, x\rangle \langle \pi, y\rangle] = \sum_{i=1}^n x_iy_i  = \langle x,y\rangle, 
-\end{align*}
-as desired. 
+% \vspace{.5em}
+% 3. It's almost the same analysis as in part 1. The first thing to observe is that:
+% \begin{align*}
+% 	\langle \Pi x, \Pi y\rangle  = \frac{1}{k}\sum_{i=1}^k \langle \pi^i, x\rangle \langle \pi^i, y\rangle. 
+% \end{align*}
+% So we have that $\E[\langle \Pi x, \Pi y\rangle] = \E[\langle \pi, x\rangle \langle \pi, y\rangle]$ and $\var[\langle \Pi x, \Pi y\rangle] = \frac{1}{k}\var[\langle \pi, x\rangle \langle \pi, y\rangle]$, where $\pi$ is a single random $\pm 1$ vector. We also have that 
+% \begin{align*}
+% 	\langle \pi, x\rangle \langle \pi, y\rangle = \left(\sum_{j=1}^n \pi_j x_j \right)\cdot  \left(\sum_{j=1}^n \pi_j y_j \right) = \sum_{i=1}^n\pi_i^2 x_iy_i + \sum_{j\neq i}\pi_i\pi_j x_iy_j.
+% \end{align*}
+% From this it's clear that 
+% \begin{align*}
+% 		\E[\langle \Pi x, \Pi y\rangle]  = \E[\langle \pi, x\rangle \langle \pi, y\rangle] = \sum_{i=1}^n x_iy_i  = \langle x,y\rangle, 
+% \end{align*}
+% as desired. 
 
-The variance calculation is also a bit tricky since we need to make sure our sums involve pairwise independent random variables. We have that: 
-\begin{align*}
-	\langle \pi, x\rangle \langle \pi, y\rangle = \sum_{i=1}^n\pi_i^2 x_iy_i + \sum_{j> i}\pi_i\pi_j (x_iy_j + x_jy_i).
-\end{align*}
-Applying linearity of variance, we find that 
-\begin{align*}
-	\var[\langle \pi, x\rangle \langle \pi, y\rangle] = \sum_{j> i} (x_iy_j + x_jy_i)^2 &= \sum_{j> i} x_i^2y_j^2 + x_j^2y_i^2  + 2 x_ix_jy_iy_j \\
-	&\leq 2 \sum_{j> i} x_i^2y_j^2 + x_j^2y_i^2 \\
-	& \leq 2(x_1^2 + \ldots + x_n^2)(y_1^2 + \ldots + y_n^2) \\
-	&= 2 \|x\|_2^2 \|y\|_2^2.
-\end{align*}
-In second to last inequality we have used that for any $a,b$, $2ab \leq a^2 + b^2$, which follows from the fact that $(a-b)^2 \geq 0$ for all $a,b$ (this is technically called the AM-GM inequality).
+% The variance calculation is also a bit tricky since we need to make sure our sums involve pairwise independent random variables. We have that: 
+% \begin{align*}
+% 	\langle \pi, x\rangle \langle \pi, y\rangle = \sum_{i=1}^n\pi_i^2 x_iy_i + \sum_{j> i}\pi_i\pi_j (x_iy_j + x_jy_i).
+% \end{align*}
+% Applying linearity of variance, we find that 
+% \begin{align*}
+% 	\var[\langle \pi, x\rangle \langle \pi, y\rangle] = \sum_{j> i} (x_iy_j + x_jy_i)^2 &= \sum_{j> i} x_i^2y_j^2 + x_j^2y_i^2  + 2 x_ix_jy_iy_j \\
+% 	&\leq 2 \sum_{j> i} x_i^2y_j^2 + x_j^2y_i^2 \\
+% 	& \leq 2(x_1^2 + \ldots + x_n^2)(y_1^2 + \ldots + y_n^2) \\
+% 	&= 2 \|x\|_2^2 \|y\|_2^2.
+% \end{align*}
+% In second to last inequality we have used that for any $a,b$, $2ab \leq a^2 + b^2$, which follows from the fact that $(a-b)^2 \geq 0$ for all $a,b$ (this is technically called the AM-GM inequality).
 
-Overall, we get a variance bound of:
-\begin{align*}
-	\var[\langle \Pi x, \Pi y\rangle] \leq \frac{2}{k}\|x\|_2^2 \|y\|_2^2.
-\end{align*}
+% Overall, we get a variance bound of:
+% \begin{align*}
+% 	\var[\langle \Pi x, \Pi y\rangle] \leq \frac{2}{k}\|x\|_2^2 \|y\|_2^2.
+% \end{align*}
 
-Once they get the mean and variance, the bound just follows from applying Chebyshev inequality again.
-	.
-	\section*{Problem 4 (b)}
-	1. Construct 2 length $U$ binary vectors $x$ and $y$ where $x_i = 1$ if $i \in X$ and $0$ otherwise, and $y_i = 1$ if $i \in Y$ and $0$ otherwise. Note that $|X\cap Y|$ is exactly equal to $\langle x, y\rangle$, so we can estimate the quantity using sketches $\Pi x$ and $\Pi y$. If we set $k = O(1/\epsilon^2)$, then with $9/10$ probability we will have:
-	\begin{align*}
-		\left|\langle  x, y \rangle  - \langle \Pi x, \Pi y \rangle \right| \leq \epsilon \|x\|_2 \|y\|_2
-	\end{align*}
-Note that $\|x\|_2^2 = |X|$ and $\|y\|_2^2 = |Y|$, which yields the bound. 
+% Once they get the mean and variance, the bound just follows from applying Chebyshev inequality again.
+% 	.
+% 	\section*{Problem 4 (b)}
+% 	1. Construct 2 length $U$ binary vectors $x$ and $y$ where $x_i = 1$ if $i \in X$ and $0$ otherwise, and $y_i = 1$ if $i \in Y$ and $0$ otherwise. Note that $|X\cap Y|$ is exactly equal to $\langle x, y\rangle$, so we can estimate the quantity using sketches $\Pi x$ and $\Pi y$. If we set $k = O(1/\epsilon^2)$, then with $9/10$ probability we will have:
+% 	\begin{align*}
+% 		\left|\langle  x, y \rangle  - \langle \Pi x, \Pi y \rangle \right| \leq \epsilon \|x\|_2 \|y\|_2
+% 	\end{align*}
+% Note that $\|x\|_2^2 = |X|$ and $\|y\|_2^2 = |Y|$, which yields the bound. 
 
 \end{document}
