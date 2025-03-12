@@ -18,6 +18,7 @@
 \usepackage{multicol}
 \usepackage{etoolbox}
 \usepackage{hyperref}
+\usepackage{bbm}
 \newcommand{\bs}[1]{\boldsymbol{#1}}
 \newcommand{\bv}[1]{\mathbf{#1}}
 \newcommand{\R}{\mathbb{R}}
@@ -148,8 +149,8 @@
 %		\item SimHash can be applied to binary vectors ${y}, {q}\in \{0,1\}^d$. How does doing so compare to MinHash? How is the Jaccard similarity $J(y,q)$ related to the cosine similarity $\cos(\theta(y,q))$?
 		\item Suppose there is some unknown vector $\bs{\mu} \in \R^d$. We receive noise perturbed random samples of the form $\bv{Y}_1 = \bs{\mu} + \bv{X}_1, \ldots, \bv{Y}_k = \bs{\mu} + \bv{X}_k$ where each $\bv{X}_i$ is a random vector with each of its entries distributed as an independent random normal $\mathcal{N}(0,1)$. From our samples $\bv{Y}_1, \ldots, \bv{Y}_k$ we hope to estimate $\bs{\mu}$ by $\bs{\tilde{\mu}} = \frac{1}{k}\sum_{i=1}^k \bv{Y}_i$. 
 		\begin{enumerate}
-			\item Prove that with $k = O(\log n /\epsilon^2)$ samples, $\max_{i=1,\ldots, d}|\bs{\mu}_i -\bs{\tilde{\mu}_i} | \leq \epsilon$ with probability $9/10$.
-			\item Prove that with $k = O(n\log n /\epsilon)$ samples, $\|\bs{\mu} -\bs{\tilde{\mu}}\|_2 \leq \epsilon$ with probability $9/10$ \textbf{Bound}
+			\item Prove that with $k = O(\log d /\epsilon^2)$ samples, $\max_{i=1,\ldots, d}|\bs{\mu}_i -\bs{\tilde{\mu}_i} | \leq \epsilon$ with probability $9/10$.
+			\item Prove that with $k = O(d\log d /\epsilon)$ samples, $\|\bs{\mu} -\bs{\tilde{\mu}}\|_2 \leq \epsilon$ with probability $9/10$.
 		\end{enumerate}
 %			Is the following also true with high probability?
 %	\begin{align*}
@@ -166,6 +167,7 @@
 \begin{align*}
 	s(\bv{q},\bv{y}) = 1 - \frac{\|\bv{q} - \bv{y}\|_0}{d}.
 \end{align*} 
+Recall that $\|\bv{q} - \bv{y}\|_0 = \sum_{i=1}^d \mathbbm{1}[\bv{q}_i \neq \bv{y}_i]$.
 Construct a function $h$ as follows:
 	define the random function $c: \{0,1\}^d \rightarrow \{0,1\}$ as $c(\bv{x}) = \bv{x}[j]$, where $j$ is a uniform random integer in $\{1, \ldots, d\}$. Then, let $g$ be a uniform random hash function from $\{0,1\} \rightarrow \{1, \ldots, m\}$. Finally, let:
 	\begin{align*}

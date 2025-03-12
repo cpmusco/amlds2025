@@ -134,11 +134,11 @@ Once they get the mean and variance, the bound just follows from applying Chebys
 Note that $\|x\|_2^2 = |X|$ and $\|y\|_2^2 = |Y|$, which yields the bound. 
 
 \vspace{.5em}
-2. The first thing to note is that $\frac{1}{S} - 1$ is exactly a distinct elements estimator for $X\cup Y$ because $\min(C_i^X, C_i^Y) = \min_{v \in X \cup Y} h_i(v)$. Accordingly, as shown in class (slide 30 of lecture 2), if we set $k = O(1/\epsilon^2)$, then with probability $19/20$, 
+2. The first thing to note is that $\frac{1}{S} - 1$ is exactly a distinct elements estimator for $X\cup Y$ because $\min(C_i^X, C_i^Y) = \min_{v \in X \cup Y} h_i(v)$. Accordingly, as shown in class, if we set $k = O(1/\epsilon^2)$, then with probability $19/20$, 
 \begin{align*}
 	\left|\left(\frac{1}{S} - 1\right) - |X\cup Y|\right| \leq \epsilon  |X\cup Y|. 
 \end{align*}
-The next thing to note is that $k'/k$ is exactly the MinHash estimator for the Jaccard similarity between $X$ and $Y$, which we denote $J = \frac{|X\cap Y|}{|X\cup Y|}$ . As shown on Ed, if we set $k = O(1/\epsilon^2)$, then with probability $19/20$, 
+The next thing to note is that $k'/k$ is exactly the MinHash estimator for the Jaccard similarity between $X$ and $Y$, which we denote $J = \frac{|X\cap Y|}{|X\cup Y|}$ . As hinted on Ed, if we set $k = O(1/\epsilon^2)$, then with probability $19/20$, we have from Chebyshev's inequality that:
 \begin{align*}
 	\left|J - k'/k \right|\leq \epsilon \cdot \sqrt{J}. 
 \end{align*}
@@ -186,7 +186,7 @@ In the second step we used that  $\langle z, a \rangle =c$ since $z$ is on the h
 	\smallskip\noindent 2.\hspace{1em}	
 	To show that there exists a good separating hyperplane for the dimension reduced data, we  exhibit one: consider the hyperplane given by parameters $\Pi a/\|\Pi a\|_2 , c/\|\Pi a\|_2$. 
 	
-	We can apply Problem 2 to claim that, if $\Pi$ reduces to $O(\log(1/\delta)/\epsilon^2)$ dimensions, then with probability $(1-\delta)$ for \emph{any} $x \in X$ or $\forall y \in Y$,
+	We can apply Problem 1 to claim that, if $\Pi$ reduces to $O(\log(1/\delta)/\epsilon^2)$ dimensions, then with probability $(1-\delta)$ for \emph{any} $x \in X$ or $\forall y \in Y$,
 	\begin{align*}
 	\langle \Pi a, \Pi x \rangle &\geq \langle a, x \rangle - \epsilon/2 \geq c + \epsilon/2 & &\text{and} & \langle \Pi a, \Pi y \rangle &\leq \langle a, y \rangle + \epsilon/2 \leq c - \epsilon/2.
 	\end{align*}
@@ -199,39 +199,39 @@ In the second step we used that  $\langle z, a \rangle =c$ since $z$ is on the h
 	
 	We also have from the distributional JL lemma that, with probability $1 - \delta$, $\|\Pi a\|_2 \leq 2$. And if we set $\delta = 1/99(n+1)$, by a union bound we have that \eqref{eq:4} holds for all $n$ points in our data set and $\|\Pi a\|_2 \leq 2$ simultaneously with probability $99/100$. This proves the claim with margin $\epsilon/4$. 
 	
-	\section*{Problem 4}
-	This problem can be solved in a similar way to the Shazam example from the Lecture 4 notes. You need to optimize over values of $s$ and $t$, where $s$ is the number of independent locality-sensitive hash functions used in your scheme and $t$ is the number of tables used. 
+	% \section*{Problem 4}
+	% This problem can be solved in a similar way to the Shazam example from the Lecture 4 notes. You need to optimize over values of $s$ and $t$, where $s$ is the number of independent locality-sensitive hash functions used in your scheme and $t$ is the number of tables used. 
 	
 	
-	Following the analysis in Lecture 5, given a query vector $\bv{y}$ and some database vector $\bv{x}$, the probability of $\bv{x}$ showing up as a candidate near-duplicate (which will need to be scanned when $\bv{y}$ is issued as a query) is equal to:
-	\begin{align}
-		1- (1 - (1 - \theta(\bv{x},\bv{y})/\pi)^s)^t
-	\end{align}
-	where $\theta$ is the angle between vectors $\bv{x}$ and $\bv{y}$. 
+	% Following the analysis in Lecture 5, given a query vector $\bv{y}$ and some database vector $\bv{x}$, the probability of $\bv{x}$ showing up as a candidate near-duplicate (which will need to be scanned when $\bv{y}$ is issued as a query) is equal to:
+	% \begin{align}
+	% 	1- (1 - (1 - \theta(\bv{x},\bv{y})/\pi)^s)^t
+	% \end{align}
+	% where $\theta$ is the angle between vectors $\bv{x}$ and $\bv{y}$. 
 	
-	Our goal is to find the $s,t$ pair with the smallest value of $t$ which satisfies:
-	\begin{enumerate}
-		\item If $\cos(\theta(\bv{x},\bv{y})) \geq .98$, $1-(1 - (1 - \theta(\bv{x},\bv{y})/\pi)^s)^t \geq .99$
-		\item Based on the histogram data provided, the expected number of candidate near-duplicates in less than $1$ million, or $200$k, for parts (1) and (2).
-	\end{enumerate}
+	% Our goal is to find the $s,t$ pair with the smallest value of $t$ which satisfies:
+	% \begin{enumerate}
+	% 	\item If $\cos(\theta(\bv{x},\bv{y})) \geq .98$, $1-(1 - (1 - \theta(\bv{x},\bv{y})/\pi)^s)^t \geq .99$
+	% 	\item Based on the histogram data provided, the expected number of candidate near-duplicates in less than $1$ million, or $200$k, for parts (1) and (2).
+	% \end{enumerate}
 	
-	Observe that $1-(1 - (1 - \theta(\bv{x},\bv{y})/\pi)^s)^t$ is monotonically decreasing with $s$ and the expected number of duplicates monotonically decreases with $s$. So, for a given value of $t$, it suffices to find the largest possible $s$ such that  $1-(1 - (1 - \cos^{-1}(.98)/\pi)^s)^t \geq .99$. I did this by solving for:
-	\begin{align*}
-		s = \frac{\log(1 - (1-.99)^{1/t})}{\log(1-\cos^{-1}(.98)/\pi)}
-	\end{align*}
-	and taking the floor. 
+	% Observe that $1-(1 - (1 - \theta(\bv{x},\bv{y})/\pi)^s)^t$ is monotonically decreasing with $s$ and the expected number of duplicates monotonically decreases with $s$. So, for a given value of $t$, it suffices to find the largest possible $s$ such that  $1-(1 - (1 - \cos^{-1}(.98)/\pi)^s)^t \geq .99$. I did this by solving for:
+	% \begin{align*}
+	% 	s = \frac{\log(1 - (1-.99)^{1/t})}{\log(1-\cos^{-1}(.98)/\pi)}
+	% \end{align*}
+	% and taking the floor. 
 	
-	Then an upper bound on the number of expected candidates can be computed for this $s$. This will be the smallest possible number of expected candidates for the given $t$. 
+	% Then an upper bound on the number of expected candidates can be computed for this $s$. This will be the smallest possible number of expected candidates for the given $t$. 
 	
-	My code is included below. I obtained solutions of:
-	\begin{itemize}
-		\item $\mathbf{20}$ \textbf{tables} for $\leq 1$ million candidates
-		\item  $\mathbf{44}$ \textbf{tables} for $\leq 200$k candidates
-	\end{itemize}
+	% My code is included below. I obtained solutions of:
+	% \begin{itemize}
+	% 	\item $\mathbf{20}$ \textbf{tables} for $\leq 1$ million candidates
+	% 	\item  $\mathbf{44}$ \textbf{tables} for $\leq 200$k candidates
+	% \end{itemize}
 	
-	\begin{figure}
-	\includegraphics[width=\textwidth]{matlabCode.png}
-	\end{figure}
+	% \begin{figure}
+	% \includegraphics[width=\textwidth]{matlabCode.png}
+	% \end{figure}
 	
 % 	\section*{Problem 1}
 	
