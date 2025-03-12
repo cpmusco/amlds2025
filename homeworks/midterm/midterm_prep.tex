@@ -150,7 +150,7 @@
 		\item Suppose there is some unknown vector $\bs{\mu} \in \R^d$. We receive noise perturbed random samples of the form $\bv{Y}_1 = \bs{\mu} + \bv{X}_1, \ldots, \bv{Y}_k = \bs{\mu} + \bv{X}_k$ where each $\bv{X}_i$ is a random vector with each of its entries distributed as an independent random normal $\mathcal{N}(0,1)$. From our samples $\bv{Y}_1, \ldots, \bv{Y}_k$ we hope to estimate $\bs{\mu}$ by $\bs{\tilde{\mu}} = \frac{1}{k}\sum_{i=1}^k \bv{Y}_i$. 
 		\begin{enumerate}
 			\item Prove that with $k = O(\log d /\epsilon^2)$ samples, $\max_{i=1,\ldots, d}|\bs{\mu}_i -\bs{\tilde{\mu}_i} | \leq \epsilon$ with probability $9/10$.
-			\item Prove that with $k = O(d\log d /\epsilon)$ samples, $\|\bs{\mu} -\bs{\tilde{\mu}}\|_2 \leq \epsilon$ with probability $9/10$.
+			\item Prove that with $k = O(d\log d /\epsilon^2)$ samples, $\|\bs{\mu} -\bs{\tilde{\mu}}\|_2 \leq \epsilon$ with probability $9/10$.
 		\end{enumerate}
 %			Is the following also true with high probability?
 %	\begin{align*}
