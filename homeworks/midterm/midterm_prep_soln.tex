@@ -17,6 +17,7 @@
 \usepackage{enumitem}
 \usepackage{multicol}
 \usepackage{etoolbox}
+\usepackage{bbm}
 \usepackage{hyperref}
 \newcommand{\bs}[1]{\boldsymbol{#1}}
 \newcommand{\bv}[1]{\mathbf{#1}}
@@ -58,8 +59,6 @@ Midterm Practice.
 
 \section{Practice Problems}
 
-\subsection{Random variables and concentration.}
-
 \begin{enumerate}
 	\item Show that for any  random variable ${X}$, $\E[{X}^2] \ge \E[{X}]^2$.
 	\textcolor{blue}{$\E[X^2] - \E[{X}]^2 = \Var[X]$, and variance must be non-negative.}
@@ -89,26 +88,48 @@ Midterm Practice.
 	\end{enumerate}
 	\item Give an example of a random variable and a deviation t where Markov’s inequality gives a	tighter bound than Chebyshev’s inequality.
 	\textcolor{blue}{Take a uniform $\{0,1\}$ random variable and bound $\Pr[X \geq 1]$. Markov's will give the tight $1/2$ bound, but Chebyshev's gives a vacuously weak bound.}
-\end{enumerate}
-
-\subsection{Hashing, Dimensionality Reduction, High Dimensional Vectors}
-\begin{enumerate}
 	\item Suppose there is some unknown vector $\bs{\mu}$. We receive noise perturbed random samples of the form $\bv{Y}_1 = \bs{\mu} + \bv{X}_1, \ldots, \bv{Y}_k = \bs{\mu} + \bv{X}_k$ where each $\bv{X}_i$ is a random vector with each of its entries distributed as an independent random normal $\mathcal{N}(0,1)$. From our samples $\bv{Y}_1, \ldots, \bv{Y}_k$ we hope to estimate $\bs{\mu}$ by $\bs{\tilde{\mu}} = \frac{1}{k}\sum_{i=1}^k \bv{Y}_i$. 
 	\begin{enumerate}
-		\item How many samples $k$ do we require so that $\max|\bs{\mu} -\bs{\tilde{\mu}} | \leq \epsilon$ with probability $9/10$?
-		\textcolor{blue}{If we can show that for all $i\in 1, \ldots, n$, $|\bs{\mu}_i -\bs{\tilde{\mu}_i} | \leq \epsilon$ with probability $1 - \frac{1}{10n}$ then by a union bound we will have that $\max|\bs{\mu} -\bs{\tilde{\mu}}| \leq \epsilon$ with probability $1 - \frac{1}{10}$. So we focus on this simpler problem. Notice that $\bs{\tilde{\mu}}_i = \bs{{\mu}}_i + \frac{1}{k}\sum_{j=1}^k[\bv{X}_j]_i$, where $[\bv{X}_j]_i$ is the $i^\text{th}$ entry of $\bv{X}_j$, which is a norm random variable. Since the sum of random normals is norm, we have that $\frac{1}{k}\sum_{j=1}^k[\bv{X}_j] \sim \frac{1}{k}\mathcal{N}(0,k) = \mathcal{N}(0,1/k)$. Applying the Gaussian tail bound from lecture, we have thus have that $\Pr[|\bs{\mu}_i - \bs{\tilde{\mu}}_i| \geq \alpha/\sqrt{k}] \leq e^{-O(\alpha^2)}$. Setting $\alpha = O(\sqrt{\log(1/(1/10n)}) =  O(\sqrt{\log n})$ and $k = O({\log n}/\epsilon^2)$ gives the bound we need. So overall we need $k = O({\log n}/\epsilon^2)$ samples. }
+		\item Prove that with $k = O(\log d /\epsilon^2)$ samples, $\max_{i=1,\ldots, d}|\bs{\mu}_i -\bs{\tilde{\mu}_i} | \leq \epsilon$ with probability $9/10$.
+		\textcolor{blue}{If we can show that for all $i\in 1, \ldots, d$, $|\bs{\mu}_i -\bs{\tilde{\mu}_i} | \leq \epsilon$ with probability $1 - \frac{1}{10d}$ then by a union bound we will have that $\max|\bs{\mu} -\bs{\tilde{\mu}}| \leq \epsilon$ with probability $1 - \frac{1}{10}$. So we focus on this simpler problem. Notice that $\bs{\tilde{\mu}}_i = \bs{{\mu}}_i + \frac{1}{k}\sum_{j=1}^k[\bv{X}_j]_i$, where $[\bv{X}_j]_i$ is the $i^\text{th}$ entry of $\bv{X}_j$, which is a norm random variable. Since the sum of random normals is norm, we have that $\frac{1}{k}\sum_{j=1}^k[\bv{X}_j] \sim \frac{1}{k}\mathcal{N}(0,k) = \mathcal{N}(0,1/k)$. Applying the Gaussian tail bound from lecture, we have thus have that $\Pr[|\bs{\mu}_i - \bs{\tilde{\mu}}_i| \geq \alpha/\sqrt{k}] \leq e^{-O(\alpha^2)}$. Setting $\alpha = O(\sqrt{\log(1/(1/10d)}) =  O(\sqrt{\log d})$ and $k = O({\log d}/\epsilon^2)$ gives the bound we need. So overall we need $k = O({\log d}/\epsilon^2)$ samples. }
 		
-		\item How many samples $k$ do we require so that $\|\bs{\mu} -\bs{\tilde{\mu}}\|_2 \leq \epsilon$ with probability $9/10$?
-		\textcolor{blue}{The proof is essentially the same. To ensure that $\|\bs{\mu} -\bs{\tilde{\mu}}\|_2 \leq \epsilon$, it suffices to have $|\bs{\mu}_i -\bs{\tilde{\mu}_i} | \leq \sqrt{\epsilon/n}$ for all $i$. This will happen with probability $9/10$ as long as  $k = O({\log n}/(\sqrt{\epsilon/n})^2) = k = O(n {\log n}/\sqrt{\epsilon}^2).$
+		\item Prove that with $k = O(d\log d /\epsilon^2)$ samples, $\|\bs{\mu} -\bs{\tilde{\mu}}\|_2 \leq \epsilon$ with probability $9/10$.
+		\textcolor{blue}{The proof is essentially the same. To ensure that $\|\bs{\mu} -\bs{\tilde{\mu}}\|_2 \leq \epsilon$, it suffices to have $|\bs{\mu}_i -\bs{\tilde{\mu}_i}| \leq \epsilon/\sqrt{d}$ for all $i$.  This will happen with probability $9/10$ as long as  $k = O({\log d}/({\epsilon/d})^2) = k = O(d {\log d}/{\epsilon}^2).$
 		}
-		
-		
 	\end{enumerate}
+
 	\item Let $\bs{\Pi}$ be a random Johnson-Lindenstrauss matrix (e.g. scaled random Gaussians) with $O(\log(1/\delta)/\epsilon^2)$ rows. Prove that with probability $(1-\delta)$,
 	\begin{align*}
 	\min_{\bv{x}} \|\bs{\Pi}\bv{A}\bv{x} - \bs{\Pi}\bv{b}\|_2^2 \leq (1+\epsilon) \min_{\bv{x}} \|\bv{A}\bv{x} - \bv{b}\|_2^2 
 	\end{align*}
 \textcolor{blue}{Let $\bv{x}^* = \argmin_{\bv{x}} \|\bv{A}\bv{x} - \bv{b}\|_2^2.$ Then by the distributional Johnson-Lindenstrauss lemma we have $\|\bs{\Pi}\bv{A}\bv{x}^* - \bs{\Pi}\bv{b}\|_2^2 = \|\bs{\Pi}(\bv{A}\bv{x}^* - \bv{b})\|_2^2 \leq (1+\epsilon)\|\bv{A}\bv{x}^* - \bv{b}\|_2^2$. And then we have that $\min_{\bv{x}} \|\bs{\Pi}\bv{A}\bv{x} - \bs{\Pi}\bv{b}\|_2^2 \leq \|\bs{\Pi}\bv{A}\bv{x}^* - \bs{\Pi}\bv{b}\|_2^2$, which gives the result.}
+
+\item For two length $d$ binary vectors $\bv{q},\bv{y} \in \{0,1\}^d$, consider the hamming similarity: 
+\begin{align*}
+	s(\bv{q},\bv{y}) = 1 - \frac{\|\bv{q} - \bv{y}\|_0}{d}.
+\end{align*} 
+Recall that $\|\bv{q} - \bv{y}\|_0 = \sum_{i=1}^d \mathbbm{1}[\bv{q}_i \neq \bv{y}_i]$.
+Construct a function $h$ as follows:
+	define the random function $c: \{0,1\}^d \rightarrow \{0,1\}$ as $c(\bv{x}) = \bv{x}[j]$, where $j$ is a uniform random integer in $\{1, \ldots, d\}$. Then, let $g$ be a uniform random hash function from $\{0,1\} \rightarrow \{1, \ldots, m\}$. Finally, let:
+	\begin{align*}
+		h(\bv{x}) = g(c(\bv{x})).
+	\end{align*}
+	
+	 Prove that $h$ is a locality sensitive hash function for {hamming similarity}. 
+
+	 \textcolor{blue}{To prove $h$ is locality sensitive, we want to argue that $\Pr[h(\bv{q}) = h(\bv{y})]$ increases as $s(\bv{q},\bv{y})$ increases. As in class, we have:
+	 \begin{align*}
+		Pr[h(\bv{q}) = h(\bv{y})] = 1\cdot \Pr[c(\bv{q}) = c(\bv{y})] + \frac{1}{m}\cdot(1-\Pr[c(\bv{q}) = c(\bv{y})])
+	 \end{align*}
+	 So we need to determine $\Pr[c(\bv{q}) = c(\bv{y})]$. Since $j$ is chosen randomly, this probability is exactly equal to the percentage of indices $i$ for which $\bv{q}_i = \bv{y}_i$. 
+	 The number of equal indices is $d - \|\bv{q}-\bv{y}\|_0$, so this percentage is $\frac{d - \|\bv{q}-\bv{y}\|_0}{d} = s(\bv{q},\bv{y})$. 
+	 We conclude that:
+	 \begin{align*}
+		Pr[h(\bv{q}) = h(\bv{y})] = s(\bv{q}, \bv{y}) + \frac{1}{m}\cdot(1-s(\bv{q}, \bv{y})), 
+	 \end{align*}
+	 which is an increasing function of $s(\bv{q}, \bv{y})$. So $s(\bv{q}, \bv{y})$ is locality sensitive.
+	 }
+	\end{enumerate}
 
 % 	Is the following also true with high probability?
 % 	\begin{align*}

@@ -1,0 +1,709 @@
+%!LW recipe=latexmk-xelatex
+\documentclass[compress]{beamer}
+
+\usetheme[block=fill]{metropolis}
+
+\usepackage{graphicx} % Allows including images
+\usepackage{amsmath,amsfonts,amsthm,amssymb}
+\usepackage{color}
+\usepackage{xcolor,cancel}
+\usepackage[shortlabels]{enumitem}
+\setitemize{label=\usebeamerfont*{itemize item}%
+	\usebeamercolor[fg]{itemize item}
+	\usebeamertemplate{itemize item}}
+\definecolor{mDarkBrown}{HTML}{604c38}
+\definecolor{mDarkTeal}{HTML}{23373b}
+\definecolor{mLightBrown}{HTML}{EB811B}
+\definecolor{mMediumBrown}{HTML}{C87A2F}
+\definecolor{mygreen}{HTML}{98C2B9}
+\definecolor{myyellow}{HTML}{DFD79C}
+\definecolor{myblue}{HTML}{8CA7CC}
+\definecolor{kern}{HTML}{8CC2B7}
+
+
+\usepackage{float}
+\usepackage{framed}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{ulem}
+\usepackage{hhline}
+\usepackage{multirow}
+\usepackage{comment}   
+\usepackage{bbm}
+\usepackage{tikz}   
+\def\Put(#1,#2)#3{\leavevmode\makebox(0,0){\put(#1,#2){#3}}}
+\newcommand*\mystrut[1]{\vrule width0pt height0pt depth#1\relax}
+\newcommand{\eqdef}{\mathbin{\stackrel{\rm def}{=}}}
+
+
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+\newcommand{\bv}[1]{\mathbf{#1}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\nnz}{nnz}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\sinc}{sinc}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\dist}{dist}
+\DeclareMathOperator{\mv}{mv}
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\step}{step}
+\DeclareMathOperator{\gap}{gap}
+\DeclareMathOperator{\poly}{poly}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\orth}{orth}
+\newcommand{\norm}[1]{\|#1\|}
+\captionsetup[subfigure]{labelformat=empty}
+\captionsetup[figure]{labelformat=empty}
+\DeclareMathOperator*{\lmin}{\lambda_{min}}
+\DeclareMathOperator*{\lmax}{\lambda_{max}}
+
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+\newcommand{\specialcellleft}[2][c]{%
+\begin{tabular}[#1]{@{}l@{}}#2\end{tabular}
+}
+
+\newtheorem{claim}[theorem]{Claim}
+
+\usepackage{tabstackengine}
+\stackMath
+
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\title{CS-GY 6763: Lecture 8 \\ Projected Gradient Descent, Second order conditions}
+\author{NYU Tandon School of Engineering, Prof. Christopher Musco}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+	\titlepage 
+\end{frame}
+
+\metroset{titleformat=smallcaps}
+
+\begin{frame}
+	\frametitle{gradient descent}
+	\textbf{Goal:} Find approximate minizer for a function $f(\bv{x})$. 
+
+	\textbf{Gradient Descent Algorithm:}
+	\begin{itemize}
+		\item Choose starting point $\bv{x}^{(0)}$.
+		\item For $i = 0,\ldots, T$:
+		\begin{itemize}
+			\item $\bv{x}^{(i+1)} = \bv{x}^{(i)} - \eta \nabla f(\bv{x}^{(i)})$
+		\end{itemize}
+		\item Return $\bv{x}^{(T)}$ (or $\argmin_{i\leq T} f(\bv{x}^{(i)}$).
+	\end{itemize}
+	
+	$\eta$ is a step-size parameter.
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{convexity: 0th order}
+	\begin{definition}[Convex]
+		A function $f$ is convex iff for any $\bv{x}, \bv{y},\lambda \in [0,1]$:
+		\begin{align*}
+		(1-\lambda)\cdot f(\bv{x}) + \lambda \cdot f(\bv{y}) \geq f\left((1-\lambda)\cdot\bv{x} + \lambda \cdot\bv{y}\right)
+		\end{align*}
+	\end{definition}
+\vspace{-.5em}
+\begin{center}
+	\includegraphics[width=.6\textwidth]{convex1.png}
+\end{center}
+\end{frame}
+
+
+\begin{frame}[t]
+	\frametitle{convexity: 1st order}	\small
+		\begin{definition}[Convex function]
+		A function $f$ is convex if and only if for any $\bv{x}, \bv{y}$:
+		\begin{align*}
+			f(\bv{x} + \bv{z}) \geq f(\bv{x}) + \nabla f(\bv{x})^T\bv{z}
+		\end{align*}
+	\vspace{-1em}
+	Equivalently:
+	\vspace{-.5em}
+		\begin{align*}
+			f(\bv{x}) - f(\bv{y}) \leq \nabla f(\bv{x})^T (\bv{x} - \bv{y})
+		\end{align*}
+	\vspace{-1em}
+	\end{definition}
+
+	\includegraphics[width=.5\textwidth]{convex2.png}
+
+\end{frame}
+
+
+\begin{frame}[t]
+	\frametitle{convexity: 2nd order}	\small
+		\begin{definition}[Convex function]
+		A twice differentiable function $f: \R\rightarrow \R$ is convex if and only if for all $x$, 
+		\begin{align*}
+			f''(x) \geq 0.
+		\end{align*}
+	\vspace{-1em}
+	\end{definition}
+
+	We will discuss the high-dimensional generalization of this fact after break.
+
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{gradient descent analysis}
+	\textbf{Assume:}
+	\begin{itemize}
+		\item $f$ is convex.
+		\item Lipschitz function: for all $\bv{x}$, $\|\nabla f(\bv{x})\|_2 \leq \alert{G}$.
+		\item Starting radius: $\|\bv{x}^{*} - \bv{x}^{(0)}\|_2 \leq \alert{R}$.
+	\end{itemize}
+	
+	\begin{claim}[GD Convergence Bound]
+		If we run GD for $T \geq \frac{R^2G^2}{\epsilon^2}$ iterations then $f(\hat{\bv{x}}) \leq f(\bv{x}^*) + \epsilon$.
+	\end{claim}
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{constrained convex optimization}
+	\textbf{Common goal}: Solve a \emph{convex minimization problem} with additional \emph{convex constraints}.  
+	\begin{align*}
+		\min_{\bv{x}\in \mathcal{S}} f(\bv{x})
+	\end{align*}
+where $\mathcal{S}$ is a \textbf{\alert{convex set}}. 
+\begin{center}
+	\includegraphics[width=.7\textwidth]{sets.png}
+	
+	Which of these is convex?
+\end{center}
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{constrained convex optimization}
+	\begin{center}
+		\includegraphics[width=.7\textwidth]{sets.png}
+	\end{center}
+
+	\begin{definition}[Convex set]
+		A set $\mathcal{S}$ is convex if for any $\bv{x}, \bv{y} \in \mathcal{S}, \lambda \in [0,1]$:
+		\begin{align*}
+			(1-\lambda)\bv{x} + \lambda\bv{y} \in \mathcal{S}.
+		\end{align*}
+	\end{definition}
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{constrained convex optimization}
+	\textbf{Examples:}
+	\begin{itemize}
+		\item \textbf{Norm constraint:} minimize $\|\bv{A}\bv{x} - \bv{b}\|_2$ subject to $\|\bv{x}\|_2 \leq \lambda$. Used e.g. for regularization, finding a sparse solution, etc.
+		\item \textbf{Positivity constraint:} minimize $f(\bv{x})$ subject to $\bv{x} \geq 0$. 
+		% Used e.g. in finding an optimal allocation for a portfolio into different assets. 
+		\item \textbf{Linear constraint:} minimize $\bv{c}^T\bv{x}$ subject to $\bv{A}\bv{x} \leq \bv{b}$. 
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{problem with gradient descent}
+	\textbf{Gradient descent:}
+	\begin{itemize}
+		\item For $i = 0,\ldots, T$:
+		\begin{itemize}
+			\item $\bv{x}^{(i+1)} = \bv{x}^{(i)} - \eta \nabla f(\bv{x}^{(i)})$
+		\end{itemize}
+		\item Return $\hat{\bv{x}} = \argmin_{i} f(\bv{x}^{(i)})$.
+	\end{itemize}
+	
+	\begin{center}
+		\alert{
+		Even if we start with $\bv{x}^{(0)} \in \mathcal{S}$, there is no guarantee that $ \bv{x}^{(0)} - \eta \nabla f(\bv{x}^{(0)})$ will remain in our set.}
+	\end{center}
+
+	\textbf{Extremely simple modification:} Force $\bv{x}^{(i)}$ to be in $\mathcal{S}$ by \textbf{\alert{projecting}} onto the set.
+\end{frame}
+
+\begin{frame}
+	\frametitle{constrained first order optimization}
+	Given a function $f$ to minimize and a convex constraint set $\mathcal{S}$, assume we have:
+	\begin{itemize}
+		\item \textbf{Function oracle}: Evaluate $f(\bv{x})$ for any $\bv{x}$. 
+		\item \textbf{Gradient oracle}: Evaluate $\nabla f(\bv{x})$ for any $\bv{x}$.
+		\item \textbf{\alert{Projection oracle}}: Evaluate $P_{\mathcal{S}}(\bv{x})$ for any $\bv{x}$.
+	\end{itemize}
+\begin{align*}
+	P_{\mathcal{S}}(\bv{x}) = \argmin_{\bv{y}\in \mathcal{S}} \|\bv{x} - \bv{y}\|_2
+\end{align*}
+\end{frame}
+
+\begin{frame}
+	\frametitle{projection oracles}
+	\begin{itemize}
+		\item How would you implement $P_\mathcal{S}$ for $\mathcal{S} = \{\bv{y}:\|\bv{y}\|_2\leq 1\}.$
+		\item How would you implement $P_\mathcal{S}$ for $\mathcal{S} = \{\bv{y}:\bv{y} = \bv{Q}\bv{z}\}.$
+	\end{itemize}
+\begin{center}
+	\includegraphics[width=.5\textwidth]{projection_image.png}
+\end{center}
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{projected gradient descent}
+	Given function $f(\bv{x})$ and set $\mathcal{S}$, such that $\|\nabla f(\bv{x})\|_2 \leq G$ for all $\bv{x}\in \mathcal{S}$ and starting point $\bv{x}^{(0)}$ with $\|\bv{x}^{(0)} - \bv{x}^*\|_2 \leq R$.  
+	
+	\textbf{Projected gradient descent:}
+	\begin{itemize}
+		\item Select starting point $\bv{x}^{(0)}$, $\eta = \frac{R}{G\sqrt{T}}$. 
+		\item For $i = 0,\ldots, T$:
+		\begin{itemize}
+			\item $\bv{z} = \bv{x}^{(i)} - \eta \nabla f(\bv{x}^{(i)})$
+			\item $\bv{x}^{(i+1)} = P_\mathcal{S}(\bv{z})$
+		\end{itemize}
+		\item Return $\hat{\bv{x}} = \argmin_{i} f(\bv{x}^{(i)})$.
+	\end{itemize}
+\begin{claim}[PGD Convergence Bound]
+	If $f, \mathcal{S}$ are convex and $T \geq \frac{R^2G^2}{\epsilon^2}$, then $f(\hat{\bv{x}}) \leq f(\bv{x}^*) + \epsilon$.
+\end{claim}
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{projected gradient descent analysis}
+	Analysis is almost identical to standard gradient descent! We just need one additional claim:
+	
+	\begin{claim}[Contraction Property of Convex Projection]
+		If $\mathcal{S}$ is convex, then for \emph{any} $\bv{y} \in \mathcal{S}$,
+		\begin{align*}
+			\|\bv{y} - P_\mathcal{S}(\bv{x})\|_2 \leq \|\bv{y} - \bv{x}\|_2.
+		\end{align*}
+	\end{claim}
+\vspace{-.75em}
+\begin{center}
+	\includegraphics[width=\textwidth]{sets.png}
+\end{center}	
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{gradient descent analysis}
+	\small
+\begin{claim}[PGD Convergence Bound]
+	If $f, \mathcal{S}$ are convex and $T \geq \frac{R^2G^2}{\epsilon^2}$, then $f(\hat{\bv{x}}) \leq f(\bv{x}^*) + \epsilon$.
+\end{claim}
+	\textbf{Claim 1:} For all $i = 0, \ldots, T$, let $\bv{z}^{(i)} = \bv{x}^{(i)} - \eta \nabla f(\bv{x}^{(i)})$. Then:
+	\begin{align*}
+		f(\bv{x}^{(i)}) - f(\bv{x}^*) &\leq \frac{\|\bv{x}^{(i)} - \bv{x}^*\|_2^2 - \|\bv{z}^{(i)} - \bv{x}^*\|_2^2}{2\eta} + \frac{\eta G^2}{2}
+		\\&\leq \frac{\|\bv{x}^{(i)} - \bv{x}^*\|_2^2 - \|\bv{x}^{(i+1)} - \bv{x}^*\|_2^2}{2\eta} + \frac{\eta G^2}{2}
+	\end{align*}
+\vspace{4em}
+
+\textbf{Same telescoping sum argument:}\vspace{-.5em}
+\begin{align*}
+	\left[\frac{1}{T}\sum_{i=0}^{T-1}f(\bv{x}^{(i)})\right] - f(\bv{x}^*) \leq \frac{R^2}{2T\eta} + \frac{\eta G^2}{2}.
+\end{align*}
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{gradient descent}
+	\textbf{Conditions:}
+	\begin{itemize}
+		\item \textbf{Convexity:} $f$ is a convex function, $\mathcal{S}$ is a convex set. 
+		\item \textbf{Bounded initial distant:} 
+		\begin{align*}
+			\|\bv{x}^{(0)} - \bv{x}^*\|_2 \leq \alert{R}
+		\end{align*}
+		\item \textbf{Bounded gradients (Lipschitz function)}: 
+		\begin{align*}
+			\|\nabla f(\bv{x})\|_2 \leq \alert{G} \text{ for all } \bv{x}\in \mathcal{S}.
+		\end{align*}
+	\end{itemize}
+	
+	\begin{theorem}[GD Convergence Bound]
+		(Projected) Gradient Descent returns $\hat{\bv{x}}$ with $f(\hat{\bv{x}}) \leq \min_{\bv{x}\in \mathcal{S}}f(\bv{x})+\epsilon$ after
+		\begin{align*}
+			T = \frac{R^2 G^2}{\epsilon^2} \text{ iterations.}
+		\end{align*}
+	\end{theorem}
+\end{frame}
+
+\begin{frame}
+	\frametitle{beyond the basic bound}
+	The previous bounds are \emph{optimal} for convex first order optimization in general. 
+	
+	But in practice, the dependence on $1/\epsilon^2$ is  pessimistic: gradient descent typically requires far fewer steps to reach $\epsilon$ error. 
+
+	Previous bounds only make a very weak \emph{first order} assumption: 
+	\begin{align*}
+		\|\nabla f(x)\|_2 \leq G.
+	\end{align*}
+	In practice, many function satisfy stronger assumptions. 
+\end{frame}
+
+\begin{frame}
+	\frametitle{second order conditions}
+	Often possible to place assumptions on the \emph{second derivative} of $f$. 
+	
+	In particular, we say that a scalar function $f$ is \alert{$\alpha$-strongly convex} and \alert{$\beta$-smooth} if for all $x$:
+	\begin{align*}
+		\alpha \leq f''(x) \leq \beta.
+	\end{align*}
+\alert{We will give an appropriate generalization of these conditions to multi-dimensional functions shortly.}
+
+	\textbf{Take away:} Having \emph{either} an upper and lower bound on the second derivative helps convergence. Having both helps a lot.
+\end{frame}
+
+\begin{frame}
+	\frametitle{improving gradient descent}
+	\textbf{Take away:} Having \emph{either} an upper and lower bound on the second derivative helps convergence. Having both helps a lot.
+
+	\textbf{Number of iterations for $\epsilon$ error:}
+	\begin{center}
+		\begin{tabular}{c|cc}
+			& $G$-Lipschitz & $\beta$-smooth   \\ \hline
+			$R$ bounded start & $O\left(\frac{G^2R^2}{\epsilon^2}\right)$ & $O\left(\frac{\beta R^2}{\epsilon}\right)$ \\
+			$\alpha$-strong convex & $O\left(\frac{G^2}{\alpha\epsilon}\right)$ & $O\left(\frac{\beta}{\alpha}\log(1/\epsilon)\right)$
+		\end{tabular}
+	\end{center}
+	As we defined them so far, smoothness and strong convexity require $f$ to be \emph{twice} differentiable. On the other hand, gradient descent only requires \emph{first order differentiability}.
+\end{frame}
+
+
+\begin{frame}[t]
+	\frametitle{second order conditions}
+	\textbf{Equivalent conditions:}
+	\begin{align*}
+		f''(x) \leq \beta \Rightarrow [f(y) - f(x)] - f'(x)(y-x) \leq \frac{\beta}{2}(y-x)^2 \\
+		f''(x) \geq \alpha \Rightarrow [f(y) - f(x)] - f'(x)(y-x) \geq \frac{\alpha}{2}(y-x)^2 \\
+	\end{align*}
+	\vspace{-4.5em}
+
+	\begin{center}
+		\includegraphics[width=.6\textwidth]{first_second_cond.png}
+
+		\textbf{Recall:} For all convex functions $[f(y) - f(x)] - f'(x)(y-x) \geq 0$. 
+	\end{center}
+ \end{frame}
+
+ \begin{frame}[t]
+	\frametitle{second order conditions}
+	Proof that $f''(x)\leq \beta \Rightarrow [f(y) - f(x)] - f'(x)(y-x) \leq \frac{\beta}{2}(y-x)^2$:
+
+	\vspace{15em} Proof for $\alpha$-strongly convex is similar, as are the other directions when $f$ is twice differentiable. 
+ \end{frame}
+
+ \begin{frame}[t]
+	\frametitle{multidimensional generalization}
+	A function is \alert{ $\alpha$-strongly convex} and \alert{$\beta$-smooth} if for all $\bv{x}$, $\bv{y}$:
+	\begin{align*}
+		\frac{\alpha}{2}\|\bv{y} - \bv{x}\|_2^2 \leq \left[f(\bv{y}) - f(\bv{x})\right] - \nabla f(\bv{x})^T(\bv{y} - \bv{x}) \leq \frac{\beta}{2}\|\bv{y}-\bv{x}\|_2^2
+	\end{align*}
+\vspace{-2em}
+\begin{center}
+	\includegraphics[width=.75\textwidth]{smoothness_image.png}
+\end{center}	
+\end{frame}
+
+
+\begin{frame}[t]
+	\frametitle{alernative definition of smoothness}
+	\begin{definition}[$\beta$-smoothness]
+		A function $f$ is $\alert{\beta}$ smooth if and only if, for all $\bv{x}$, $\bv{y}$
+		\begin{align*}
+			\|\nabla f(\bv{x}) - \nabla f(\bv{y})\|_2 \leq \alert{\beta} \|\bv{x} - \bv{y}\|_2
+		\end{align*}
+	\end{definition}
+	I.e., the gradient function is a \emph{$\beta$-Lipschitz function.} 
+	
+	We won't use this definition directly, but it's good to know. Easy to prove equivalency to previous definition (see Lem. 3.4 in \color{blue}\textbf{\href{https://arxiv.org/pdf/1405.4980.pdf}{Bubeck's book}}\color{black}).
+ \end{frame}
+
+% \begin{frame}[t]
+% 	\frametitle{smoothness}
+% 	Recall from convexity that $f(\bv{y}) - f(\bv{x}) \geq \nabla f(\bv{x})^T(\bv{y} - \bv{x})$.
+% 	\begin{center}
+% 		\alert{So now we have an upper and lower bound.}
+% 	\end{center}
+% \vspace{-1em}
+% 	\begin{align*}
+% 		0 \leq \left[f(\bv{y}) - f(\bv{x})\right] - \nabla f(\bv{x})^T(\bv{y} - \bv{x}) \leq \frac{\beta}{2}\|\bv{x} - \bv{y}\|_2^2
+% 	\end{align*}
+% \vspace{-2em}
+% \begin{center}
+% 	\includegraphics[width=.75\textwidth]{smoothness_image.png}
+% \end{center}	
+% \end{frame}
+
+\begin{frame}[t]
+	\frametitle{convergence guarantee}
+	\begin{theorem}[GD convergence for $\beta$-smooth functions.]
+		Let $f$ be a \alert{$\beta$} smooth convex function and assume we have $\|\bv{x}^{*} - \bv{x}^{(0)}\|_2 \leq \alert{R}$. If we run GD for $T$ steps, we have:
+		\begin{align*}
+			f(\bv{x}^{(T)}) - f(\bv{x}^*) \leq \frac{2\beta R^2}{T} 
+		\end{align*} 
+	\end{theorem}
+	\textbf{Corollary}: If \alert{$T = O\left(\frac{\beta R^2}{\epsilon}\right)$} we have $f(\bv{x}^{(T)}) - f(\bv{x}^*) \leq \epsilon$.
+	
+	\vspace{1em}
+		Compare this to $T = O\left(\frac{G^2 R^2}{\epsilon^2}\right)$ without  a smoothness assumption.
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{guaranteed progress}
+	\begin{center}
+	Why do you think gradient descent might be faster when a function is $\beta$-smooth?
+	\end{center}
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{guaranteed progress}
+	Previously learning rate/step size $\eta$ depended on $G$. Now choose it based on $\beta$:\vspace{-.75em}
+	\begin{align*}
+		\bv{x}^{(t+1)} \leftarrow \bv{x}^{(t)} - \frac{1}{\beta}\nabla f(\bv{x}^{(t)})
+	\end{align*}
+	
+	\textbf{Progress per step of gradient descent:}
+	\begin{enumerate}[1.]
+		\item $\left[f(\bv{x}^{(t+1)}) - f(\bv{x}^{(t)})\right] - \nabla f(\bv{x}^{(t)})^T(\bv{x}^{(t+1)} - \bv{x}^{(t)})  \leq \frac{\beta}{2}\|\bv{x}^{(t)} - \bv{x}^{(t+1)}\|_2^2.$\vspace{3em}
+		\item $\left[f(\bv{x}^{(t+1)}) - f(\bv{x}^{(t)})\right] + 
+		\frac{1}{\beta}\|\nabla f(\bv{x}^{(t)})\|_2^2 \leq \frac{\beta}{2}\|\frac{1}{\beta}\nabla f(\bv{x}^{(t)})\|_2^2.$\vspace{3em}
+		\item $f(\bv{x}^{(t)}) - f(\bv{x}^{(t+1)}) \geq \alert{\frac{1}{2\beta}\|\nabla f(\bv{x}^{(t)})\|_2^2}.$
+	\end{enumerate}
+%	\begin{align*}
+%		\left[f(\bv{x}^{(t+1)}) - f(\bv{x}^{(t)})\right] - \nabla f(\bv{x}^{(t)})^T(\bv{x}^{(t+1)} - \bv{x}^{(t)})  \leq \frac{\beta}{2}\|\bv{x}^{(t)} - \bv{x}^{(t+1)}\|_2^2\\
+%	\end{align*}
+%	\begin{align*}
+%		\left[f(\bv{x}^{(t+1)}) - f(\bv{x}^{(t)})\right] + 
+%		\frac{1}{\beta}\|\nabla f(\bv{x}^{(t)})\|_2^2 \leq \frac{\beta}{2}\|\frac{1}{\beta}\nabla f(\bv{x}^{(t)})\|_2^2 \\
+%	\end{align*}
+%	\begin{align*}
+%		f(\bv{x}^{(t)}) - f(\bv{x}^{(t+1)}) \geq \alert{\frac{1}{2\beta}\|\nabla f(\bv{x}^{(t)})\|_2^2}.
+%	\end{align*}
+\end{frame}
+
+%\begin{frame}[t]
+%	\frametitle{telescoping sum}
+%	\textbf{Claim:} For all $t$, $f(\bv{x}^{(t)}) - f(\bv{x}^{(t+1)}) \geq \alert{\frac{1}{2\beta}\|\nabla f(\bv{x}^{(t)})\|_2^2}.$
+%	
+%	\begin{align*}
+%		f(x^{(0)}) - f(x^{(T)}) \geq \frac{1}{2\beta} \sum_{t=0}^T\|\nabla f(\bv{x}^{(t)})\|_2^2
+%	\end{align*}
+%	
+%\end{frame}
+
+
+\begin{frame}[t]
+	\frametitle{convergence guarantee}
+	Once we have the bound from the previous page, proving a convergence result isn't hard, but not obvious. A concise proof can be found in Page 15 in \textcolor{blue}{\href{https://gowerrobert.github.io/pdf/M2_statistique_optimisation/grad_conv.pdf}{Garrigos and Gower's notes}.}
+	\vspace{.5em}
+
+	\begin{theorem}[GD convergence for $\beta$-smooth functions.]
+		Let $f$ be a \alert{$\beta$} smooth convex function and assume we have $\|\bv{x}^{*} - \bv{x}^{(1)}\|_2 \leq \alert{R}$. If we run GD for $T$ steps with $\eta = \frac{1}{\beta}$ we have:
+		\begin{align*}
+			f(\bv{x}^{(T)}) - f(\bv{x}^*) \leq \frac{2\beta R^2}{T} 
+		\end{align*} 
+	\end{theorem}
+	\textbf{Corollary}: If \alert{$T = O\left(\frac{\beta R^2}{\epsilon}\right)$} we have $f(\bv{x}^{(T)}) - f(\bv{x}^*) \leq \epsilon$.
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{guaranteed progress}
+	\begin{center}
+		Where did we use convexity in this proof?
+	\end{center}
+	
+	\textbf{Progress per step of gradient descent:}
+	\begin{enumerate}[1.]
+		\item $\left[f(\bv{x}^{(t+1)}) - f(\bv{x}^{(t)})\right] - \nabla f(\bv{x}^{(t)})^T(\bv{x}^{(t+1)} - \bv{x}^{(t)})  \leq \frac{\beta}{2}\|\bv{x}^{(t)} - \bv{x}^{(t+1)}\|_2^2.$\vspace{1.5em}
+		\item $\left[f(\bv{x}^{(t+1)}) - f(\bv{x}^{(t)})\right] + 
+		\frac{1}{\beta}\|\nabla f(\bv{x}^{(t)})\|_2^2 \leq \frac{\beta}{2}\|\frac{1}{\beta}\nabla f(\bv{x}^{(t)})\|_2^2.$\vspace{1.5em}
+		\item $f(\bv{x}^{(t)}) - f(\bv{x}^{(t+1)}) \geq {\frac{1}{2\beta}\|\nabla f(\bv{x}^{(t)})\|_2^2}.$
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{stationary points}
+	\begin{definition}[Stationary point]
+		For a differentiable function $f$, a \emph{stationary point} is any $\bv{x}$ with: 
+		\begin{align*}
+			\nabla f(\bv{x}) = \bv{0}
+		\end{align*}
+	\end{definition}
+	\begin{center}
+		local/global minima - local/global maxima - saddle points
+	\end{center}
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{convergence to stationary point}
+	\begin{theorem}[Convergence to Stationary Point]
+	For \emph{any} $\beta$-smooth differentiable function $f$ (convex or not), if we run GD for $T$ steps, we can find a point $\hat{\bv{x}}$ such that:
+	\begin{align*}
+		\|\nabla f(\hat{\bv{x}})\|_2^2 \leq  \frac{2\beta}{T} \left( f(\bv{x}^{(0)}) -  f(\bv{x}^{*})\right)
+	\end{align*} 
+\end{theorem}
+\textbf{Corollary:} If $T \geq \frac{2\beta}{\epsilon}$, then $\|\nabla f(\hat{\bv{x}})\|_2^2 \leq \epsilon  \left( f(\bv{x}^{(0)}) -  f(\bv{x}^{*})\right)$.
+\includegraphics[width=.4\textwidth]{simple_non_convex.png}
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{telescoping sum proof}
+	\begin{theorem}[Convergence to Stationary Point]
+		For \emph{any} $\beta$-smooth differentiable function $f$ (convex or not), if we run GD for $T$ steps, we can find a point $\hat{\bv{x}}$ such that:
+		\begin{align*}
+			\|\nabla f(\hat{\bv{x}})\|_2^2 \leq  \frac{2\beta}{T} \left( f(\bv{x}^{(0)}) -  f(\bv{x}^{*})\right) 
+		\end{align*} 
+	\end{theorem}
+We have that $\frac{1}{2\beta}\|\nabla f(\bv{x}^{(t)})\|_2^2 \leq f(\bv{x}^{(t)}) - f(\bv{x}^{(t+1)}).$ So: 
+\begin{align*}
+	\sum_{t=0}^{T-1}\frac{1}{2\beta}\|\nabla f(\bv{x}^{(t)})\|_2^2 &\leq f(\bv{x}^{(0)}) -  f(\bv{x}^{(t)})\\
+	\frac{1}{T}\sum_{t=0}^{T-1}\|\nabla f(\bv{x}^{(t)})\|_2^2 &\leq \frac{2\beta}{T} \left( f(\bv{x}^{(0)}) -  f(\bv{x}^{*})\right)\\
+	\min_t \|\nabla f(\bv{x}^{(t)})\|_2^2 &\leq \frac{2\beta}{T} \left( f(\bv{x}^{(0)}) -  f(\bv{x}^{*})\right)
+\end{align*}
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{back to convex functions}
+	I said it was a bit tricky to prove that $f(\hat{\bv{x}}) - f(\bv{x}^*) \leq \frac{2\beta R^2}{T}$ for convex functions. But we just easily proved that $\|\nabla f(\hat{\bv{x}})\|_2^2$ is small. Why doesn't this show we are close to the minimum?
+	
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{strong convexity}
+	\begin{definition}[$\alpha$-strongly convex]
+		A convex function $f$ is $\alert{\alpha}$-strongly convex if, for all $\bv{x}$, $\bv{y}$
+		\begin{align*}
+			\left[f(\bv{y}) - f(\bv{x})\right] - \nabla f(\bv{x})^T(\bv{y} - \bv{x}) \geq \frac{\alpha}{2}\|\bv{x} - \bv{y}\|_2^2 
+		\end{align*}
+	\end{definition}
+	Compare to smoothness condition.
+	$$\left[f(\bv{y}) - f(\bv{x})\right] - \nabla f(\bv{x})^T(\bv{y} - \bv{x}) \leq \alert{\frac{\beta}{2}}\|\bv{x} - \bv{y}\|_2^2.$$
+	
+	\vspace{1em}
+	For a twice-differentiable scalar function $f$, equivalent to $f''(x) \geq \alpha$.  
+	
+	\vspace{1em}
+	When $f$ is convex, we always have that $f''(x)\geq 0$, so larger values of $\alpha$ correspond to a ``stronger'' condition.
+\end{frame}
+
+
+
+\begin{frame}[t]
+	\frametitle{gd for strongly convex function}
+	\textbf{Gradient descent for strongly convex functions:}
+	\begin{itemize}
+		\item Choose number of steps $T$.
+		\item For $i = 0,\ldots, T$:
+		\begin{itemize}
+			\item $\eta = \frac{2}{\alpha\cdot(i+1)}$
+			\item $\bv{x}^{(i+1)} = \bv{x}^{(i)} - \eta \nabla f(\bv{x}^{(i)})$
+		\end{itemize}
+		\item Return $\hat{\bv{x}} = \argmin_{\bv{x}^{(i)}} f(\bv{x}^{(i)})$. 
+		%		\item Alternatively, return $\hat{\bv{x}} = \sum_{i=1}^T \frac{2i}{T(T+1)} \bv{x}^{(i)}$.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{convergence guarantee}
+	\begin{theorem}[GD convergence for $\alpha$-strongly convex functions.]
+		Let $f$ be an \alert{$\alpha$}-strongly convex function and assume we have that, for all $\bv{x}$, $\|\nabla f(\bv{x})\|_2 \leq \alert{G}$. If we run GD for $T$ steps (with adaptive step sizes) we have:
+		\begin{align*}
+			f(\hat{\bv{x}}) - f(\bv{x}^*) \leq \frac{2G^2}{\alpha T} 
+		\end{align*} 
+	\end{theorem}
+	\textbf{Corollary}: If \alert{$T = O\left(\frac{G^2}{\alpha \epsilon}\right)$} we have $f(\hat{\bv{x}}) - f(\bv{x}^*) \leq \epsilon$
+\end{frame}
+
+
+\begin{frame}[t]
+	\frametitle{convergence guarantee}
+	We could also have that $f$ is both $\beta$-smooth and $\alpha$-strongly convex.
+	
+	\begin{theorem}[GD for $\beta$-smooth, $\alpha$-strongly convex.]
+		Let $f$ be a $\beta$-smooth and $\alpha$-strongly convex function. If we run GD for $T$ steps (with step size $\eta = \frac{1}{\beta}$) we have:
+		\begin{align*}
+			\|\bv{x}^{(T)} - \bv{x}^*\|_2^2 \leq e^{-T \frac{\alpha}{\beta}} \|\bv{x}^{(0)} - \bv{x}^*\|_2^2
+		\end{align*} 
+	\end{theorem}	
+	\begin{center}
+		\alert{$\kappa = \frac{\beta}{\alpha}$} is called the ``condition number'' of $f$. 
+		
+		\textbf{Is it better if $\kappa$ is large or small?}
+	\end{center}
+\end{frame}
+
+% \begin{frame}[t]
+% 	\frametitle{smooth and strongly convex}
+% 	\textbf{Converting to more familiar form:}
+% 	Using that fact the $\nabla f(\bv{x}^*) = \bv{0}$ along with
+% 	\begin{align*}
+% 		{\frac{\alpha}{2}}\|\bv{x} - \bv{y}\|_2^2 \leq  \left[f(\bv{y}) - f(\bv{x})\right] - \nabla f(\bv{x})^T(\bv{y} - \bv{x}) \leq {\frac{\beta}{2}}\|\bv{x} - \bv{y}\|_2^2, 
+% 	\end{align*}
+% 	we have:
+% 	\begin{align*}
+% 		\|\bv{x}^{(0)} - \bv{x}^*\|_2^2 &\leq \frac{2}{\alpha} \left[f(\bv{x}^{(0)}) - f(\bv{x}^*)\right]\\
+% 		\|\bv{x}^{(T)} - \bv{x}^*\|_2^2 &\geq \frac{2}{\beta} \left[f(\bv{x}^{(T)}) - f(\bv{x}^*)\right]
+% 	\end{align*}	
+% \end{frame}
+
+\begin{frame}[t]
+	\frametitle{smooth and strongly convex}
+	\textbf{Converting to more familiar form:}
+	Using that fact the $\nabla f(\bv{x}^*) = \bv{0}$ along with
+	\begin{align*}
+		{\frac{\alpha}{2}}\|\bv{x} - \bv{y}\|_2^2 \leq  \left[f(\bv{y}) - f(\bv{x})\right] - \nabla f(\bv{x})^T(\bv{y} - \bv{x}) \leq {\frac{\beta}{2}}\|\bv{x} - \bv{y}\|_2^2, 
+	\end{align*}
+	we have:
+	\begin{align*}
+		\frac{2}{\beta} \left[f(\bv{x}^{(T)}) - f(\bv{x}^*)\right] \leq \|\bv{x}^{(T)} - \bv{x}^*\|_2^2  
+	\end{align*}	
+We also assume
+\begin{align*}
+			\|\bv{x}^{(0)} - \bv{x}^*\|_2^2 &\leq R^2.
+\end{align*}
+\end{frame}
+
+\begin{frame}[t]
+	\frametitle{convergence guarantee}
+	\begin{corollary}[GD for $\beta$-smooth, $\alpha$-strongly convex.]
+		Let $f$ be a $\beta$-smooth and $\alpha$-strongly convex function. If we run GD for $T$ steps (with step size $\eta = \frac{1}{\beta}$) we have:
+		\begin{align*}
+			f(\bv{x}^{(T)}) - f(\bv{x}^*)  \leq \frac{\beta}{2} e^{-T\frac{\alpha}{\beta}} \cdot  R^2
+		\end{align*} 
+	\end{corollary}	
+	\textbf{Corollary}: 
+	If \alert{$T = O\left(\frac{\beta}{\alpha}\log(R\beta/\epsilon)\right)$} we have:
+	\begin{align*}
+		f({\bv{x}}^{(T)}) - f(\bv{x}^*) \leq \epsilon
+	\end{align*}
+	Only depend on $\log(1/\epsilon)$ instead of on $1/\epsilon$ or $1/\epsilon^2$!
+\end{frame}
+
+\begin{frame}{title}
+	\frametitle{smooth, strongly convex optimization}
+	After break or on homework we will prove the guarantee for the special case of:
+	\begin{align*}
+		f(\bv{x}) = \frac{1}{2}\|\bv{A}\bv{x} - \bv{b}\|_2^2
+	\end{align*}
+	\textbf{Goal:} Get some of the key ideas across, introduces important concepts like the Hessian, and show the connection between conditioning and linear algebra.
+	
+	\begin{center}
+	\alert{But first we will talk about \emph{online gradient descent} and \emph{stochastic gradient descent} next week.}
+	\end{center}
+\end{frame}
+
+
+
+\end{document} 
+
+
+
+
+
+
+
+
